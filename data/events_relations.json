@@ -1,0 +1,347 @@
+[
+  {
+    "id": "rel_001",
+    "name": "Conflito Interno",
+    "description": "Dois jogadores do time tiveram uma briga durante o jantar. A situação está tensa no bootcamp.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Reunir os dois para uma conversa mediada",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Deixar a situação esfriar naturalmente",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "communication", "value": -1, "is_temporary": true, "duration": 2}
+        ]
+      },
+      {
+        "text": "Chamar atenção de ambos publicamente",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "rel_002",
+    "name": "Pedido de Saída",
+    "description": "Um jogador veio falar em privado que está pensando em sair da equipe após o Major.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Tentar convencer a ficar com argumentos reais",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Respeitar a decisão e focar no torneio",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Pedir que ele anuncie logo para planejar",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -2.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "rel_003",
+    "name": "Papo com um Veterano Rival",
+    "description": "Durante o almoço, um veterano de um time rival oferece conselho ao IGL. Pode ser sincero ou uma armadilha psicológica.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Ouvir com atenção e absorver o conselho",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Ouvir, mas não mudar nada",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Recusar educadamente",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "rel_004",
+    "name": "Rivalidade Histórica",
+    "description": "O próximo adversário tem um histórico ruim com o time. Palavras duras foram ditas no passado.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Usar a raiva como motivação",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      },
+      {
+        "text": "Tratar como qualquer outro adversário",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Fazer trash talk nas redes sociais",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rel_005",
+    "name": "Fã Especial",
+    "description": "Um fã manda uma carta emocionante para o time. O moral aumenta, mas isso atrai mais expectativas.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Ler a carta para o time inteiro",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 2.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      },
+      {
+        "text": "Guardar para motivação pessoal",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Compartilhar nas redes e criar momentum",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "rel_006",
+    "name": "Pressão da Org",
+    "description": "A organização mandou uma mensagem deixando claro que espera resultados. A pressão está alta.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Passar a mensagem para o time com suavidade",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Proteger o time e absorver a pressão",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "morale", "value": -1.5, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Ignorar e não mencionar",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rel_007",
+    "name": "Bromance em Alta",
+    "description": "Dois jogadores do time estão com uma química incrível tanto dentro quanto fora do jogo.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Criar jogadas que exploram essa dupla",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Manter equilibrio no time todo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Deixar a energia fluir naturalmente",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "rel_008",
+    "name": "Rumor de Transferência",
+    "description": "Surgiu um rumor de que um time grande quer contratar um dos jogadores. A equipe está ansiosa.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Confrontar o jogador diretamente",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Reunir todos e falar abertamente",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Ignorar e focar no jogo",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 2}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rel_009",
+    "name": "Novo Integrante na Comissão",
+    "description": "A org contratou um novo analista. Ele tem ideias diferentes das do IGL.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Dar abertura para as ideias novas",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0},
+          {"target": "player_igl", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Manter o sistema atual por ora",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Misturar ambas as abordagens",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rel_010",
+    "name": "Apoio da Torcida",
+    "description": "A torcida local está do lado do time rival. O ambiente é hostil.",
+    "context": "relations",
+    "choices": [
+      {
+        "text": "Usar a hostilidade como combustível",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      },
+      {
+        "text": "Manter o foco e ignorar a torcida",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Tentar conquistar a torcida com jogo bonito",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      }
+    ]
+  }
+]

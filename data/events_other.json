@@ -1,0 +1,688 @@
+[
+  {
+    "id": "psych_001",
+    "name": "Pressão do Eliminatório",
+    "description": "O time está a uma derrota de ser eliminado. O nervosismo é palpável no ar.",
+    "context": "psychological",
+    "choices": [
+      {
+        "text": "Discurso motivacional antes da série",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 2.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      },
+      {
+        "text": "Manter rotina normal sem drama",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Fazer meditação e exercício de respiração",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "energy", "value": 10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "psych_002",
+    "name": "Síndrome do Impostor",
+    "description": "Um dos jogadores começa a questionar se merece estar no Major. O medo de falhar é crescente.",
+    "context": "psychological",
+    "choices": [
+      {
+        "text": "Reforçar o valor dele com dados e exemplos",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 2.0, "is_temporary": false, "duration": 0},
+          {"target": "player_random", "attribute": "consistency", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Deixar o jogador resolver internamente",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -2.0, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Reduzir responsabilidades temporariamente",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "psych_003",
+    "name": "Tilt Coletivo",
+    "description": "O time inteiro entrou em tilt após perder três rounds seguidos de forma humilhante.",
+    "context": "psychological",
+    "choices": [
+      {
+        "text": "Pedir timeout imediato",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Mudar completamente a estratégia",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "form", "value": 1.0, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Manter o plano e confiar na reação",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "psych_004",
+    "name": "Notícia de Família",
+    "description": "Um dos jogadores recebe uma notícia preocupante de um familiar próximo.",
+    "context": "psychological",
+    "choices": [
+      {
+        "text": "Liberar o jogador para cuidar da família",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 2.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "form", "value": -1.5, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Apoiar mas manter no jogo",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "consistency", "value": -2, "is_temporary": true, "duration": 2}
+        ]
+      },
+      {
+        "text": "Ignorar e focar no torneio",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -3.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": -1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "psych_005",
+    "name": "Medo do Palco",
+    "description": "Um jogador mais jovem confessa que está com stage fright nos jogos ao vivo.",
+    "context": "psychological",
+    "choices": [
+      {
+        "text": "Trabalhar a confiança com um psicólogo",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 3}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Deixar veteranos compartilharem experiências",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Dizer que é normal e vai passar",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "health_001",
+    "name": "Lesão no Pulso",
+    "description": "O AWPer do time está sentindo dores no pulso. Pode ser tendinite.",
+    "context": "health",
+    "choices": [
+      {
+        "text": "Afastar para tratamento imediato",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "aim", "value": -2, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "aim", "value": 3, "is_temporary": true, "duration": 3}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Continuar com analgésicos e cuidado",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "aim", "value": -1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Jogar na dor por enquanto",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "aim", "value": -3, "is_temporary": true, "duration": 4}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "health_002",
+    "name": "Gripe no Bootcamp",
+    "description": "Metade do time pegou gripe. Todos estão com energia baixíssima.",
+    "context": "health",
+    "choices": [
+      {
+        "text": "Cancelar treinos e tratar todos",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 20, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Treino leve com protocolo de saúde",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Continuar normalmente, são homens fortes",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -25, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "health_003",
+    "name": "Insônia Coletiva",
+    "description": "O estresse do campeonato fez vários jogadores dormirem mal por dias.",
+    "context": "health",
+    "choices": [
+      {
+        "text": "Ajustar horários e reduzir telas à noite",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 15, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Usar suplementos de melatonina",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Continuar assim, é adrenalina",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -20, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "train_001",
+    "name": "Scrimmage de Luxo",
+    "description": "Um dos melhores times do mundo propõe um scrimmage privado. Raramente recusam.",
+    "context": "training",
+    "choices": [
+      {
+        "text": "Aceitar e aprender ao máximo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Aceitar mas preservar estratégias chave",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Recusar para preservar energia",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "train_002",
+    "name": "Sessão de Clutch Training",
+    "description": "O coach quer dedicar horas a situações de clutch e pistol round.",
+    "context": "training",
+    "choices": [
+      {
+        "text": "Sessão completa de clutch scenarios",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -15, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "clutch", "value": 2, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Apenas os clutchers treinam",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "clutch", "value": 2, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Focar em pistol rounds",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "train_003",
+    "name": "Feedback do Coach",
+    "description": "O coach deu um feedback duro sobre a comunicação do time. Alguns ficaram ofendidos.",
+    "context": "training",
+    "choices": [
+      {
+        "text": "Abraçar o feedback e trabalhar nele",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "communication", "value": 2, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Questionar o método do coach",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Filtrar o que é útil e ignorar o resto",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "train_004",
+    "name": "Workshop de IGL",
+    "description": "Uma palestra exclusiva de um IGL lendário está disponível. O problema é que conflita com o treino.",
+    "context": "training",
+    "choices": [
+      {
+        "text": "Ir à palestra e cancelar treino",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "tactics", "value": 2, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Mandar o IGL e manter os outros treinando",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Priorizar o treino",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "form", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_001",
+    "name": "Cobertura da Mídia",
+    "description": "Uma grande cobertura de imprensa quer entrevistar o time antes da série decisiva.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Aceitar todas as entrevistas",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Só o capitão fala com a imprensa",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Recusar e focar no jogo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_002",
+    "name": "Problema no Bootcamp",
+    "description": "O hotel do bootcamp tem problemas de internet. Os servidores estão inconsistentes.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Mudar para outro hotel imediatamente",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Adaptar os treinos para o offline",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Treinar mesmo com lag e adaptar",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_003",
+    "name": "Premiação Especial",
+    "description": "O organizador anuncia um prêmio extra para o melhor desempenho individual. Isso gera uma competição interna.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Estimular a competição saudável",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "form", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Dividir o prêmio se ganhar",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.5, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Ignorar e focar no time",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_004",
+    "name": "Final Inesperada",
+    "description": "O adversário esperado foi eliminado por um underdog. O plano de jogo precisa mudar.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Maratonar análise do novo adversário",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -15, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 2, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Análise básica e confiar no improviso",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Descansar e manter foco mental",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 15, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_005",
+    "name": "Transmissão Viral",
+    "description": "Um clip do time viralizou nas redes. A atenção súbita é ao mesmo tempo motivante e assustadora.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Aproveitar o hype e jogar com confiança",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 2.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 2}
+        ]
+      },
+      {
+        "text": "Manter o foco e ignorar as redes",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Criar mais conteúdo para manter o momentum",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_006",
+    "name": "Formato Alterado",
+    "description": "Os organizadores anunciaram uma mudança no formato das partidas de última hora.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Adaptar estratégia imediatamente",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Reclamar formalmente do formato",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      },
+      {
+        "text": "Usar o caos como vantagem",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_007",
+    "name": "Incidente com o Equipamento",
+    "description": "O computador principal do IGL deu problema na véspera. Tecnicamente tudo está resolvido, mas o nervosismo ficou.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Testar exaustivamente antes de dormir",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "energy", "value": -15, "is_temporary": false, "duration": 0},
+          {"target": "player_igl", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Confiar no técnico e descansar",
+        "immediate_effects": [
+          {"target": "player_igl", "attribute": "energy", "value": 10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Usar o backup sem drama",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "ctx_008",
+    "name": "Patrocínio de Última Hora",
+    "description": "Uma empresa quer fechar patrocínio agora, mas exige um post antes da série.",
+    "context": "contextual",
+    "choices": [
+      {
+        "text": "Aceitar e fazer o post rápido",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "energy", "value": -5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Negociar para fazer depois",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Recusar para manter o foco",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  }
+]

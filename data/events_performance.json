@@ -1,0 +1,352 @@
+[
+  {
+    "id": "perf_001",
+    "name": "Treino Intensivo",
+    "description": "O técnico propõe uma sessão extra de treino antes da próxima série. A equipe está cansada, mas pode se beneficiar da prática adicional.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Aceitar o treino completo (todos participam)",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -15, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Treino leve focado em táticas",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -5, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Cancelar o treino e descansar",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": 20, "is_temporary": false, "duration": 0},
+          {"target": "player_all", "attribute": "form", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_002",
+    "name": "Desempenho Abaixo do Esperado",
+    "description": "Na última série, o time inteiro ficou bem abaixo do esperado. O analista apresenta os dados e sugere um plano de ação.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Rever os demos individualmente",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "aim", "value": 1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Reunião de equipe para motivação",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 1.0, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Ignorar e focar no próximo jogo",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "perf_003",
+    "name": "Sequência Incrível",
+    "description": "Um dos jogadores está em uma forma impressionante. O resto do time quer aproveitar isso ao máximo.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Centralizar o jogo nele",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "aim", "value": 2, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": [
+          {"target": "team", "attribute": "synergy", "value": -0.5, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Manter o jogo coletivo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Pedir que ele mostre o time como faz",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "form", "value": 0.5, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_004",
+    "name": "Análise do Adversário",
+    "description": "O analista preparou um dossiê completo sobre o próximo adversário. Estudar leva tempo e energia.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Estudo completo de todos os mapas",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -10, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 2, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Estudo rápido dos pontos principais",
+        "immediate_effects": [],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 1, "is_temporary": true, "duration": 1}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Confiar no próprio jogo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "perf_005",
+    "name": "Crise de Aim",
+    "description": "O principal fragger do time está errando tiros que normalmente acerta de olhos fechados. Algo está errado.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Sessão especial de aim training",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "energy", "value": -20, "is_temporary": false, "duration": 0},
+          {"target": "player_random", "attribute": "form", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Conversar sobre o estado mental",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Dar um dia de folga",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "energy", "value": 30, "is_temporary": false, "duration": 0},
+          {"target": "player_random", "attribute": "form", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_006",
+    "name": "Setup Novo",
+    "description": "O patrocinador quer que o time use novos periféricos imediatamente. Adaptar leva tempo.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Aceitar e adaptar antes da série",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "aim", "value": -1, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "aim", "value": 2, "is_temporary": true, "duration": 3}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Usar apenas depois do torneio",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Negociar com o patrocinador",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_007",
+    "name": "Mapa Surpresa no Pool",
+    "description": "A organização anunciou um novo mapa no pool. O time tem pouca prática nele.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Treinar o mapa intensivamente",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "energy", "value": -15, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_all", "attribute": "tactics", "value": 2, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Banir o mapa sempre que possível",
+        "immediate_effects": [],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_all", "attribute": "consistency", "value": -1, "is_temporary": true, "duration": 2}
+        ]
+      },
+      {
+        "text": "Improvisar no mapa novo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "form", "value": -1.0, "is_temporary": false, "duration": 0}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "perf_008",
+    "name": "Lag no Servidor",
+    "description": "Durante o aquecimento, o servidor apresenta lag. A equipe fica nervosa.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Reclamar formalmente aos organizadores",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Adaptar o estilo de jogo",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "form", "value": -0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Manter a calma e não ligar",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_009",
+    "name": "Eco Force Buy",
+    "description": "O IGL quer arriscar um force buy em situação econômica ruim. O time está dividido.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Apoiar a decisão do IGL",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": 1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0}
+        ]
+      },
+      {
+        "text": "Discutir e chegar a um consenso",
+        "immediate_effects": [
+          {"target": "player_all", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Ignorar e fazer o full save",
+        "immediate_effects": [
+          {"target": "team", "attribute": "synergy", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      }
+    ]
+  },
+  {
+    "id": "perf_010",
+    "name": "Clutch Perdido",
+    "description": "O clutcher do time perdeu um 1v3 que parecia ganho. O time reagiu mal.",
+    "context": "performance",
+    "choices": [
+      {
+        "text": "Dar suporte emocional imediato",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 1.5, "is_temporary": false, "duration": 0},
+          {"target": "team", "attribute": "synergy", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": []
+      },
+      {
+        "text": "Analisar o que deu errado friamente",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": -1.0, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [
+          {"target": "player_random", "attribute": "clutch", "value": 1, "is_temporary": true, "duration": 2}
+        ],
+        "hidden_effects": []
+      },
+      {
+        "text": "Dizer que não tem problema",
+        "immediate_effects": [
+          {"target": "player_random", "attribute": "morale", "value": 0.5, "is_temporary": false, "duration": 0}
+        ],
+        "temporary_effects": [],
+        "hidden_effects": [
+          {"target": "player_random", "attribute": "clutch", "value": -1, "is_temporary": true, "duration": 1}
+        ]
+      }
+    ]
+  }
+]
