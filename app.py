@@ -10,20 +10,41 @@ from systems.team_factory import (
     generate_share_code, decode_share_code, ROLE_ORDER,
 )
 from systems.save_system import save_game, load_game, list_saves
+from uuid import uuid4
+from flask import session
 
 app = Flask(__name__)
 app.secret_key = "cs_roguelike_v4_2025"
-_state: dict = {}
+_states: dict = {}
+
+
+def get_session_state():
+    sid = session.get("sid")
+
+    if sid is None:
+        sid = str(uuid4())
+        session["sid"] = sid
+
+    if sid not in _states:
+        _states[sid] = {
+            "team": None,
+            "campaign": None,
+            "pending_events": []
+        }
+
+    return _states[sid]
 
 
 def get_game():
-    return _state.get("team"), _state.get("campaign")
+    state = get_session_state()
+    return state["team"], state["campaign"]
 
 
 def set_game(team, campaign):
-    _state["team"] = team
-    _state["campaign"] = campaign
-    _state["pending_events"] = []
+    state = get_session_state()
+    state["team"] = team
+    state["campaign"] = campaign
+    state["pending_events"] = []
 
 
 @app.route("/")
@@ -93,7 +114,7 @@ def get_events():
     if campaign.state.is_finished() or not campaign.events_enabled:
         return jsonify({"ok": True, "events": []})
     events = campaign.get_pending_events()
-    _state["pending_events"] = events
+    get_session_state()["pending_events"] = events
     return jsonify({"ok": True, "events": [e.to_dict() for e in events]})
 
 
@@ -104,7 +125,7 @@ def apply_choice():
     data         = request.get_json(silent=True) or {}
     event_index  = data.get("event_index", 0)
     choice_index = data.get("choice_index", 0)
-    pending      = _state.get("pending_events", [])
+    pending = get_session_state()["pending_events"]
     if event_index >= len(pending):
         return jsonify({"ok": False, "error": "Evento inválido"}), 400
     event = pending[event_index]
