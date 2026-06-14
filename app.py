@@ -133,9 +133,11 @@ def play_series():
             "win_probability":   round(result["win_probability"], 3),
             "series_detail":     result["series_detail"],
             "stage_label":       campaign.state.current_stage_label(),
+            "stage_mvp":         result.get("stage_mvp"),
         },
         "campaign": campaign.state.to_dict(),
         "team":     team.to_dict(),
+        "team_score": round(team.team_score(), 2),
         "share_code": generate_share_code(team),
     })
 

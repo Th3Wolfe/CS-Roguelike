@@ -410,13 +410,94 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .result-card {
   background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
   padding:12px 16px; margin-bottom:16px; display:none;
+  transition: border-color .4s, box-shadow .4s;
 }
 .result-card.show { display:block; }
+.result-card.neon-win {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(40,200,80,.35), 0 0 24px rgba(40,200,80,.18), inset 0 0 8px rgba(40,200,80,.06);
+  animation: neon-pulse-win 2.4s ease-in-out infinite;
+}
+.result-card.neon-loss {
+  border-color: var(--red);
+  box-shadow: 0 0 10px rgba(224,48,48,.35), 0 0 24px rgba(224,48,48,.18), inset 0 0 8px rgba(224,48,48,.06);
+  animation: neon-pulse-loss 2.4s ease-in-out infinite;
+}
+@keyframes neon-pulse-win {
+  0%,100% { box-shadow: 0 0 8px rgba(40,200,80,.3),  0 0 20px rgba(40,200,80,.12); }
+  50%      { box-shadow: 0 0 14px rgba(40,200,80,.55), 0 0 32px rgba(40,200,80,.28); }
+}
+@keyframes neon-pulse-loss {
+  0%,100% { box-shadow: 0 0 8px rgba(224,48,48,.3),  0 0 20px rgba(224,48,48,.12); }
+  50%      { box-shadow: 0 0 14px rgba(224,48,48,.55), 0 0 32px rgba(224,48,48,.28); }
+}
 .rc-label {
   font-family:var(--font-display); font-size:.65rem; font-weight:700;
   text-transform:uppercase; letter-spacing:.15em; color:var(--text3); margin-bottom:6px;
 }
 .rc-text { font-size:.84rem; color:var(--text2); }
+
+/* ═══════════════════════════════════════════════
+   STAGE RESULT MODAL
+═══════════════════════════════════════════════ */
+#stage-overlay {
+  position:fixed; inset:0; background:rgba(6,10,15,.93); z-index:1100;
+  display:none; align-items:center; justify-content:center; padding:20px;
+  overflow-y:auto;
+}
+#stage-overlay.show { display:flex; }
+.stage-modal {
+  background:var(--bg2); border-radius:var(--r);
+  width:640px; max-width:98vw; padding:28px 28px 24px;
+  display:flex; flex-direction:column; gap:0;
+}
+.stm-verdict {
+  text-align:center; margin-bottom:20px;
+}
+.stm-title {
+  font-family:var(--font-display); font-size:2.2rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.18em; margin-bottom:6px;
+}
+.stm-title.advance { color:var(--green); text-shadow:0 0 40px rgba(40,200,80,.3); }
+.stm-title.elim    { color:var(--red);   text-shadow:0 0 40px rgba(224,48,48,.3); }
+.stm-title.champ   { color:var(--orange);text-shadow:0 0 60px rgba(232,160,32,.4); }
+.stm-subtitle {
+  font-size:.88rem; color:var(--text2); line-height:1.6;
+}
+.stm-section-label {
+  font-family:var(--font-display); font-size:.65rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.18em; color:var(--text3);
+  margin:16px 0 8px; display:flex; align-items:center; gap:8px;
+}
+.stm-section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+/* feats */
+.stm-feats { display:flex; flex-direction:column; gap:6px; margin-bottom:4px; }
+.stm-feat {
+  background:var(--bg3); border-left:3px solid var(--orange);
+  border-radius:0 var(--r) var(--r) 0; padding:7px 12px;
+  font-size:.82rem; color:var(--text2); line-height:1.5;
+}
+.stm-feat b { color:var(--text); }
+/* roster */
+.stm-roster { display:grid; grid-template-columns:repeat(auto-fill,minmax(168px,1fr)); gap:8px; }
+.stm-player {
+  background:var(--bg3); border:1px solid var(--border); border-radius:var(--r);
+  padding:9px 11px;
+}
+.stm-p-nick {
+  font-family:var(--font-display); font-size:.88rem; font-weight:800;
+  color:var(--orange); text-transform:uppercase;
+}
+.stm-p-role { font-size:.68rem; color:var(--text2); margin-bottom:5px; }
+.stm-p-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px; }
+.stm-ps { background:var(--bg4); border-radius:2px; padding:3px 2px; text-align:center; }
+.stm-ps-v { font-family:var(--font-display); font-size:.75rem; font-weight:700; }
+.stm-ps-k { font-size:.5rem; color:var(--text2); text-transform:uppercase; }
+.stm-footer { margin-top:20px; text-align:center; }
+/* border accents per type */
+.stage-modal.border-advance { border:2px solid var(--green); }
+.stage-modal.border-elim    { border:2px solid var(--red); }
+.stage-modal.border-champ   { border:2px solid var(--orange); }
 
 /* ═══════════════════════════════════════════════
    MATCH OVERLAY — CS2 HUD style
@@ -504,6 +585,31 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .rv-dot { width:11px; height:11px; border-radius:2px; background:var(--bg5); transition:background .1s; }
 .rv-dot.t  { background:var(--orange); }
 .rv-dot.ct { background:var(--blue); }
+
+/* player stats table inside match overlay */
+.pst-section { margin-top:10px; }
+.pst-label {
+  font-family:var(--font-display); font-size:.6rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.16em; color:var(--text3);
+  margin-bottom:5px; display:flex; align-items:center; gap:8px;
+}
+.pst-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.pst-table { width:100%; border-collapse:collapse; }
+.pst-table th {
+  font-family:var(--font-display); font-size:.58rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--text3);
+  padding:3px 6px; text-align:right; border-bottom:1px solid var(--border);
+}
+.pst-table th:first-child { text-align:left; }
+.pst-table td {
+  font-size:.75rem; color:var(--text2); padding:4px 6px; text-align:right;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.pst-table td:first-child { text-align:left; color:var(--text); }
+.pst-nick { font-family:var(--font-display); font-size:.76rem; font-weight:700; color:var(--orange); }
+.pst-role { font-size:.62rem; color:var(--text3); }
+.pst-kd-pos { color:var(--green); }
+.pst-kd-neg { color:var(--red); }
 
 /* match summary */
 .match-summary {
@@ -750,6 +856,23 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   </div>
 </div>
 
+<!-- ═══════════════════════════  STAGE RESULT MODAL  ═══════════════════════════ -->
+<div id="stage-overlay">
+  <div class="stage-modal" id="stage-modal">
+    <div class="stm-verdict">
+      <div class="stm-title" id="stm-title">–</div>
+      <div class="stm-subtitle" id="stm-subtitle">–</div>
+    </div>
+    <div class="stm-section-label">Feitos da Campanha</div>
+    <div class="stm-feats" id="stm-feats"></div>
+    <div class="stm-section-label">Escalação</div>
+    <div class="stm-roster" id="stm-roster"></div>
+    <div class="stm-footer">
+      <button class="btn btn-orange btn-lg" id="stm-btn" onclick="closeStageModal()">Continuar →</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════  MATCH OVERLAY  ═══════════════════════════ -->
 <div id="match-overlay">
   <div class="match-modal">
@@ -767,6 +890,18 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
       <div class="sm-dot" id="dot-2">3</div>
     </div>
     <div id="maps-area"></div>
+    <div class="pst-section" id="pst-section" style="display:none;">
+      <div class="pst-label">Desempenho do Time</div>
+      <table class="pst-table" id="pst-table">
+        <thead>
+          <tr>
+            <th>Jogador</th>
+            <th>K</th><th>D</th><th>K/D</th><th>ADR</th>
+          </tr>
+        </thead>
+        <tbody id="pst-body"></tbody>
+      </table>
+    </div>
     <div class="match-summary" id="match-summary">
       <div class="ms-result" id="ms-result">–</div>
       <div class="ms-desc"   id="ms-desc">–</div>
@@ -918,7 +1053,19 @@ async function loadSave(fn){
   const r=await api("/load","POST",{filename:fn});
   if(!r.ok){toast("Erro: "+r.error,"err");return;}
   G.team=r.team; G.campaign=r.campaign;
-  showScreen("game"); updateGameUI();
+  G._prevStage=r.campaign.stage;
+  document.getElementById("game-main").innerHTML=`
+    <div class="campaign-card">
+      <div class="cc-stage-name" id="cc-stage">–</div>
+      <div class="cc-desc" id="cc-desc">–</div>
+    </div>
+    <div class="result-card" id="result-card">
+      <div class="rc-label">Último Resultado</div>
+      <div class="rc-text" id="rc-text"></div>
+    </div>
+    <div class="section-head">Jogadores</div>
+    <div class="players-grid" id="players-grid"></div>`;
+  showScreen("game"); updateGameUI(null);
   toast("Jogo carregado!","ok");
 }
 
@@ -1052,7 +1199,21 @@ async function confirmDraft(){
   const r=await api("/new_game","POST",{team_name:teamName, player_picks:G.draft.picks, events_enabled:false});
   if(!r.ok){toast("Erro: "+r.error,"err");return;}
   G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code;
-  showScreen("game"); updateGameUI();
+  G._prevStage=r.campaign.stage;
+  G._lastTeamScore=r.team_score??null;
+  // Reset game-main to its original structure (fixes gameover screen persisting)
+  document.getElementById("game-main").innerHTML=`
+    <div class="campaign-card">
+      <div class="cc-stage-name" id="cc-stage">–</div>
+      <div class="cc-desc" id="cc-desc">–</div>
+    </div>
+    <div class="result-card" id="result-card">
+      <div class="rc-label">Último Resultado</div>
+      <div class="rc-text" id="rc-text"></div>
+    </div>
+    <div class="section-head">Jogadores</div>
+    <div class="players-grid" id="players-grid"></div>`;
+  showScreen("game"); updateGameUI(null);
   toast("Major iniciado! Boa sorte 🏆","ok");
 }
 
@@ -1095,9 +1256,9 @@ function updateGameUI(){
 
   const syn=team.synergy;
   document.getElementById("sb-syn").textContent=(syn>=0?"+":"")+syn.toFixed(1);
-  // estimate score display
-  const avgRtg=team.players.reduce((s,p)=>s+p.attributes.rating,0)/team.players.length;
-  document.getElementById("sb-score").textContent=(avgRtg*0.6+syn*0.1).toFixed(1);
+  // Use the real post-series score returned by the backend; fallback to G._lastTeamScore or "–"
+  const score = G._lastTeamScore ?? null;
+  document.getElementById("sb-score").textContent = score !== null ? score.toFixed(1) : "–";
 
   renderHistoryFeed(campaign.history||[]);
   renderPlayersGrid(team.players);
@@ -1128,6 +1289,9 @@ function stageAbbr(s){
 
 function renderPlayersGrid(players){
   const STATS=[["rating","RTG","c-rtg"],["kast","KAST","c-kast"],["impact","IMP","c-imp"],["adr","ADR","c-adr"],["kpr","KPR","c-kpr"]];
+  const lastStats={};
+  if(G._lastPlayerStats) G._lastPlayerStats.forEach(s=>lastStats[s.nickname]=s);
+
   document.getElementById("players-grid").innerHTML=players.map(p=>{
     const a=p.attributes,s=p.status;
     const phys=s.physical??s.energy??100, ment=s.mental??s.energy??100;
@@ -1136,6 +1300,18 @@ function renderPlayersGrid(players){
         <div class="ps-v ${c} ${vColor(a[k])}">${a[k].toFixed(2)}</div>
         <div class="ps-k">${l}</div>
       </div>`).join("");
+
+    const ls=lastStats[p.nickname];
+    const kdHtml=ls?`
+      <div class="pcs-item">
+        <div class="pcs-lbl">⚔️ K/D</div>
+        <div class="pcs-val" style="color:${ls.kd>=1?"var(--green)":"var(--red)"};">${ls.kills}/${ls.deaths} <span style="font-size:.65rem;opacity:.7;">(${ls.kd.toFixed(2)})</span></div>
+      </div>
+      <div class="pcs-item">
+        <div class="pcs-lbl">💥 ADR</div>
+        <div class="pcs-val">${ls.adr.toFixed(1)}</div>
+      </div>`:"";
+
     return `
       <div class="player-card">
         <div class="pc-top">
@@ -1164,12 +1340,13 @@ function renderPlayersGrid(players){
           </div>
           <div class="pcs-item">
             <div class="pcs-lbl">😤 Moral</div>
-            <div class="pcs-val" style="color:${s.morale>=0?"var(--green)":"var(--red)"}">${s.morale>=0?"+":""}${s.morale.toFixed(1)}</div>
+            <div class="pcs-val" style="color:${s.morale>=0?"var(--green)":"var(--red)"};">${s.morale>=0?"+":""}${s.morale.toFixed(1)}</div>
           </div>
           <div class="pcs-item">
             <div class="pcs-lbl">📈 Forma</div>
-            <div class="pcs-val" style="color:${s.form>=0?"var(--green)":"var(--red)"}">${s.form>=0?"+":""}${s.form.toFixed(1)}</div>
+            <div class="pcs-val" style="color:${s.form>=0?"var(--green)":"var(--red)"};">${s.form>=0?"+":""}${s.form.toFixed(1)}</div>
           </div>
+          ${kdHtml}
         </div>
         ${(p.buffs||[]).length?`<div style="margin-top:6px;font-size:.68rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px;">${p.buffs.map(b=>`<span style="background:var(--bg4);padding:1px 6px;border-radius:2px;color:${b.effect>=0?"var(--green)":"var(--red)"};">${b.name}(${b.duration})</span>`).join("")}</div>`:""}
       </div>`;
@@ -1215,15 +1392,19 @@ async function applyEv(ei,ci){
 }
 
 async function playSeries(){
+  G._prevStage=G.campaign?.stage;  // snapshot before series resolves
   const r=await api("/play_series","POST");
   if(!r.ok){toast(r.error||"Erro","err");return;}
   G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code;
+  G._lastTeamScore=r.team_score;  // real post-series score from backend
   await animSeries(r.result, r.team.name);
   updateGameUI();
   const res=r.result;
   const rc=document.getElementById("result-card");
   document.getElementById("rc-text").textContent=res.description;
+  rc.classList.remove("neon-win","neon-loss");
   rc.classList.add("show");
+  setTimeout(()=>rc.classList.add(res.won?"neon-win":"neon-loss"),50);
 }
 
 // ═══════════════════════════════════════════
@@ -1236,6 +1417,7 @@ async function animSeries(result, teamName){
   for(let i=0;i<3;i++){const d=document.getElementById(`dot-${i}`);d.className="sm-dot";d.textContent=i+1;}
   document.getElementById("maps-area").innerHTML="";
   document.getElementById("match-summary").classList.remove("show");
+  document.getElementById("pst-section").style.display="none";
   document.getElementById("match-overlay").classList.add("show");
 
   const detail=result.series_detail;
@@ -1276,6 +1458,27 @@ async function animSeries(result, teamName){
     badge.textContent=won?"VITÓRIA":"DERROTA";
     badge.className=`msc-result-badge ${won?"w":"l"}`;
     await sleep(800);
+  }
+
+  // player stats table
+  if(detail.player_stats && detail.player_stats.length){
+    const tbody=document.getElementById("pst-body");
+    tbody.innerHTML=detail.player_stats
+      .sort((a,b)=>b.kd-a.kd)
+      .map(p=>{
+        const kdClass=p.kd>=1?"pst-kd-pos":"pst-kd-neg";
+        return `<tr>
+          <td><div class="pst-nick">${p.nickname}</div><div class="pst-role">${p.role}</div></td>
+          <td>${p.kills}</td>
+          <td>${p.deaths}</td>
+          <td class="${kdClass}">${p.kd.toFixed(2)}</td>
+          <td>${p.adr.toFixed(1)}</td>
+        </tr>`;
+      }).join("");
+    document.getElementById("pst-section").style.display="block";
+    // Store stats in G for HUD update
+    G._lastPlayerStats = detail.player_stats;
+    if(result.stage_mvp) G._lastStageMvp = result.stage_mvp;
   }
 
   // summary
@@ -1319,8 +1522,124 @@ async function animMap(mi, fT, fO){
 
 function closeMatch(){
   document.getElementById("match-overlay").classList.remove("show");
-  if(G.campaign?.stage==="finished_win"||G.campaign?.stage==="finished_loss"){
-    showEndScreen(G.campaign.stage==="finished_win");
+  const stg=G.campaign?.stage;
+  if(stg==="finished_win"||stg==="finished_loss"){
+    showStageModal(false, stg==="finished_win");
+  } else {
+    // check if a stage just changed (stage transition)
+    const prevStage=G._prevStage;
+    if(prevStage && prevStage!==stg){
+      showStageModal(true, false);
+    }
+  }
+  G._prevStage=stg;
+}
+
+// ═══════════════════════════════════════════
+// STAGE RESULT MODAL
+// ═══════════════════════════════════════════
+function showStageModal(isAdvance, isChamp){
+  const modal=document.getElementById("stage-modal");
+  const titleEl=document.getElementById("stm-title");
+  const subEl=document.getElementById("stm-subtitle");
+  const btnEl=document.getElementById("stm-btn");
+  const featsEl=document.getElementById("stm-feats");
+  const rosterEl=document.getElementById("stm-roster");
+
+  // Determine type
+  const isElim=!isAdvance&&!isChamp;
+
+  modal.className="stage-modal "+(isChamp?"border-champ":isElim?"border-elim":"border-advance");
+
+  if(isChamp){
+    titleEl.textContent="🏆 CAMPEÃO!";
+    titleEl.className="stm-title champ";
+    subEl.textContent="Você conquistou o Major. Lenda absoluta.";
+    btnEl.textContent="🎉 Finalizar";
+  } else if(isElim){
+    titleEl.textContent="💔 ELIMINADO";
+    titleEl.className="stm-title elim";
+    subEl.textContent="A campanha chegou ao fim. Faz parte do jogo.";
+    btnEl.textContent="Encerrar Campanha";
+  } else {
+    const stgLabel=STAGE_LABELS[G.campaign?.stage]||"Próxima Fase";
+    titleEl.textContent="✅ AVANÇOU!";
+    titleEl.className="stm-title advance";
+    subEl.textContent=`Seu time garantiu a classificação! Próxima fase: ${stgLabel}`;
+    btnEl.textContent="Próxima Fase →";
+  }
+
+  // Feats
+  featsEl.innerHTML=buildFeats(isChamp, isElim);
+
+  // Roster
+  const ROLE_EMOJI2={"IGL":"🧠","AWPer":"🔭","Entry Fragger":"💥","Support":"🛡️","Lurker":"🐍"};
+  rosterEl.innerHTML=(G.team?.players||[]).map(p=>{
+    const a=p.attributes;
+    return `<div class="stm-player">
+      <div class="stm-p-nick">${flag(p.country)} ${p.nickname}</div>
+      <div class="stm-p-role">${ROLE_EMOJI2[p.role]||""} ${p.role}</div>
+      <div class="stm-p-stats">
+        <div class="stm-ps"><div class="stm-ps-v c-rtg">${a.rating.toFixed(2)}</div><div class="stm-ps-k">RTG</div></div>
+        <div class="stm-ps"><div class="stm-ps-v c-kast">${a.kast.toFixed(1)}</div><div class="stm-ps-k">KAST</div></div>
+        <div class="stm-ps"><div class="stm-ps-v c-imp">${a.impact.toFixed(1)}</div><div class="stm-ps-k">IMP</div></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("stage-overlay").classList.add("show");
+}
+
+function buildFeats(isChamp, isElim){
+  const h=G.campaign?.history||[];
+  const team=G.team;
+  if(!h.length) return `<div class="stm-feat">Nenhuma série jogada ainda.</div>`;
+
+  const feats=[];
+  const wins=h.filter(x=>x.result==="win").length;
+  const losses=h.filter(x=>x.result==="loss").length;
+  feats.push(`<div class="stm-feat">📊 Resultado no stage: <b>${wins} vitórias</b> e <b>${losses} derrotas</b> em ${h.length} séries.</div>`);
+
+  // Streak
+  let streak=0,streakType=h[h.length-1]?.result;
+  for(let i=h.length-1;i>=0&&h[i].result===streakType;i--) streak++;
+  if(streak>=2) feats.push(`<div class="stm-feat">${streakType==="win"?"🔥 Sequência de":"❄️ Sequência negativa de"} <b>${streak} ${streakType==="win"?"vitórias":"derrotas"} consecutivas</b>.</div>`);
+
+  // Best player of the team by K/D from last match stats (or fallback to rating)
+  if(team?.players?.length){
+    const ls=G._lastPlayerStats||[];
+    const lsMap={}; ls.forEach(s=>lsMap[s.nickname]=s);
+    const withKd=team.players.filter(p=>lsMap[p.nickname]);
+    if(withKd.length){
+      const best=withKd.sort((a,b)=>lsMap[b.nickname].kd - lsMap[a.nickname].kd)[0];
+      const bs=lsMap[best.nickname];
+      feats.push(`<div class="stm-feat">⭐ Destaque do time: <b>${best.nickname}</b> — ${bs.kills}/${bs.deaths} K/D (${bs.kd.toFixed(2)}), ADR ${bs.adr.toFixed(1)}.</div>`);
+    } else {
+      const best=[...team.players].sort((a,b)=>b.attributes.rating-a.attributes.rating)[0];
+      feats.push(`<div class="stm-feat">⭐ Destaque do time: <b>${best.nickname}</b> (RTG ${best.attributes.rating.toFixed(2)}, ${best.role}).</div>`);
+    }
+  }
+
+  // Stage MVP (best player across all teams in the stage)
+  const mvp=G._lastStageMvp;
+  if(mvp){
+    const isMine=team?.players?.some(p=>p.nickname===mvp.nickname);
+    const label=isMine?"🏅 MVP do Stage (seu time!)":"🏅 MVP do Stage";
+    feats.push(`<div class="stm-feat">${label}: <b>${mvp.nickname}</b> (${mvp.team}) — ${mvp.kills}/${mvp.deaths} K/D (${mvp.kd.toFixed(2)}), ADR ${mvp.adr.toFixed(1)}, Rating ${mvp.rating.toFixed(3)}.</div>`);
+    G._lastStageMvp=null; // consume it
+  }
+
+  if(isChamp) feats.push(`<div class="stm-feat">🏆 <b>${team.name}</b> conquistou o Major! Uma corrida histórica e inesquecível.</div>`);
+  if(isElim)  feats.push(`<div class="stm-feat">💬 A jornada de <b>${team.name}</b> terminou aqui. Mas a lenda começa a ser construída.</div>`);
+
+  return feats.join("");
+}
+
+function closeStageModal(){
+  document.getElementById("stage-overlay").classList.remove("show");
+  const stg=G.campaign?.stage;
+  if(stg==="finished_win"||stg==="finished_loss"){
+    showEndScreen(stg==="finished_win");
   }
 }
 
@@ -1389,7 +1708,8 @@ async function decodeShare(){
   const r=await api("/state");
   if(r.ok){
     G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code||null;
-    showScreen("game"); updateGameUI();
+    G._prevStage=r.campaign.stage;
+    showScreen("game"); updateGameUI(r.team_score);
   } else {
     showScreen("menu");
   }
