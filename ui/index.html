@@ -725,21 +725,23 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 
 @media (max-width:768px){
 
-  #stage-overlay{
-    padding:0;
+  html,
+  body{
     overflow-y:auto;
-    align-items:flex-start;
   }
 
-  .stage-modal{
-    width:100vw;
+  .screen.active{
+    height:auto;
     min-height:100vh;
-    max-height:none;
+  }
 
+  .game-layout{
+    display:block;
     overflow:visible;
+  }
 
-    border-radius:0;
-    padding:16px;
+  .game-main{
+    overflow:visible;
   }
 
   /* =========================
