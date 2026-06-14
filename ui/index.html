@@ -718,6 +718,438 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .ti.err { border-color:var(--red);    color:var(--red); }
 .ti.inf { border-color:var(--blue);   color:var(--blue); }
 @keyframes tfade { from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;} }
+
+/* ═══════════════════════════════════════════════
+   MOBILE APP MODE
+═══════════════════════════════════════════════ */
+
+@media (max-width:768px){
+
+  #stage-overlay{
+    padding:0;
+    overflow-y:auto;
+    align-items:flex-start;
+  }
+
+  .stage-modal{
+    width:100vw;
+    min-height:100vh;
+    max-height:none;
+
+    overflow:visible;
+
+    border-radius:0;
+    padding:16px;
+  }
+
+  /* =========================
+     GERAL
+  ========================= */
+
+  .btn{
+    min-height:44px;
+  }
+
+  .btn-sm{
+    min-height:38px;
+  }
+
+  .menu-logo h1{
+    font-size:2.4rem;
+  }
+
+  .menu-logo{
+    margin-bottom:32px;
+  }
+
+  .menu-btns{
+    width:92vw;
+    max-width:380px;
+  }
+
+  #load-saves-panel{
+    width:92vw;
+  }
+
+  /* =========================
+     ERA SELECT
+  ========================= */
+
+  .era-grid{
+    width:95vw;
+  }
+
+  .era-card{
+    padding:14px;
+  }
+
+  .era-year{
+    font-size:1.5rem;
+    min-width:50px;
+  }
+
+  /* =========================
+     DRAFT
+  ========================= */
+
+  .draft-layout{
+    display:flex;
+    flex-direction:column;
+    overflow:auto;
+  }
+
+  .draft-left{
+    border-right:none;
+    border-bottom:1px solid var(--border);
+    flex:none;
+    max-height:none;
+    overflow:visible;
+  }
+
+  .draft-right{
+    overflow:visible;
+    padding:14px;
+  }
+
+  .role-name{
+    font-size:1.2rem;
+  }
+
+  .cand-grid{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .cand-card{
+    padding:14px;
+  }
+
+  .cc-stats{
+    gap:4px;
+  }
+
+  .slot{
+    min-height:auto;
+  }
+
+  /* =========================
+     TOP BAR
+  ========================= */
+
+  .game-topbar{
+    position:sticky;
+    top:0;
+    z-index:500;
+    height:58px;
+    padding:0 10px;
+  }
+
+  .team-title{
+    font-size:.95rem;
+    max-width:140px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .gtb-left{
+    gap:8px;
+  }
+
+  .gtb-right{
+    gap:4px;
+  }
+
+  .stage-chip{
+    font-size:.65rem;
+  }
+
+  /* =========================
+     GAME LAYOUT
+  ========================= */
+
+  .game-layout{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+
+  .game-main{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+
+    padding:12px 12px 95px;
+  }
+
+  /* =========================
+     SIDEBAR -> APP CARD
+  ========================= */
+
+  .game-sidebar{
+    order:-1;
+    border-right:none;
+    border-bottom:1px solid var(--border);
+    overflow:visible;
+  }
+
+  .hist-feed{
+    max-height:180px;
+  }
+
+  /* =========================
+     PLAYER CARDS
+  ========================= */
+
+  .players-grid{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .player-card{
+    padding:12px;
+  }
+
+  .pc-stats{
+    gap:4px;
+  }
+
+  .pc-status{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  /* =========================
+     CAMPAIGN CARD
+  ========================= */
+
+  .campaign-card{
+    padding:12px;
+  }
+
+  .cc-stage-name{
+    font-size:1rem;
+  }
+
+  /* =========================
+     RESULT CARD
+  ========================= */
+
+  .result-card{
+    padding:12px;
+  }
+
+  /* =========================
+     MATCH OVERLAY
+  ========================= */
+
+  #match-overlay{
+    padding:0;
+  }
+
+  .match-modal{
+    width:100vw;
+    height:100vh;
+    max-width:none;
+    border-radius:0;
+    padding:14px;
+    overflow-y:auto;
+  }
+
+  .mm-matchup{
+    gap:10px;
+  }
+
+  .mm-team-name{
+    min-width:auto;
+    font-size:1rem;
+  }
+
+  .series-maps{
+    gap:6px;
+  }
+
+  .sm-dot{
+    width:30px;
+    height:30px;
+    font-size:.75rem;
+  }
+
+  .score-dig{
+    font-size:2rem;
+    min-width:40px;
+  }
+
+  .msc-team-lbl{
+    width:auto;
+    font-size:.65rem;
+  }
+
+  .pst-table{
+    font-size:.65rem;
+  }
+
+  .pst-table th,
+  .pst-table td{
+    padding:3px;
+  }
+
+  /* =========================
+     STAGE OVERLAY
+  ========================= */
+
+  #stage-overlay{
+    padding:0;
+  }
+
+  .stage-modal{
+    width:100vw;
+    min-height:100vh;
+    max-width:none;
+    border-radius:0;
+    padding:16px;
+  }
+
+  .stm-title{
+    font-size:1.6rem;
+  }
+
+  .stm-roster{
+    grid-template-columns:1fr;
+  }
+
+  /* =========================
+     EVENTS
+  ========================= */
+
+  #event-overlay{
+    padding:0;
+  }
+
+  .ev-modal{
+    width:100vw;
+    min-height:100vh;
+    max-width:none;
+    border-radius:0;
+    padding:18px;
+  }
+
+  /* =========================
+     SHARE PANEL
+  ========================= */
+
+  .panel-overlay{
+    padding:0;
+  }
+
+  .panel-box{
+    width:100vw;
+    height:100vh;
+    max-width:none;
+    max-height:none;
+    border-radius:0;
+  }
+
+  /* =========================
+     END SCREEN
+  ========================= */
+
+  .end-wrap{
+    padding:24px;
+  }
+
+  .end-title{
+    font-size:2.2rem;
+  }
+
+  .end-acts{
+    flex-direction:column;
+    width:100%;
+  }
+
+  .end-acts .btn{
+    width:100%;
+  }
+
+  /* =========================
+     TOAST
+  ========================= */
+
+  #toast{
+    width:100%;
+    padding:0 12px;
+  }
+
+  .ti{
+    width:100%;
+    max-width:none;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════
+   SMALL PHONES
+═══════════════════════════════════════════════ */
+
+@media (max-width: 480px){
+
+  .menu-logo h1{
+    font-size:2rem;
+  }
+
+  .role-name{
+    font-size:1rem;
+  }
+
+  .cc-stage-name{
+    font-size:.9rem;
+  }
+
+  .pc-nick{
+    font-size:.9rem;
+  }
+
+  .team-title{
+    max-width:90px;
+  }
+
+  .gtb-right .btn{
+    padding:5px 8px;
+  }
+
+  .score-dig{
+    font-size:1.6rem;
+  }
+
+  .stm-title{
+    font-size:1.3rem;
+  }
+
+  .mm-team-name{
+    font-size:.85rem;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════
+   SAFE AREA (iPhone)
+═══════════════════════════════════════════════ */
+
+@supports (padding: max(0px)) {
+
+  .game-main{
+    padding-bottom:max(95px, env(safe-area-inset-bottom));
+  }
+
+  .match-modal,
+  .stage-modal,
+  .panel-box,
+  .ev-modal{
+    padding-bottom:max(16px, env(safe-area-inset-bottom));
+  }
+
+}
+
 </style>
 </head>
 <body>
