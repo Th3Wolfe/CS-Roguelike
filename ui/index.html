@@ -157,12 +157,12 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   font-family:var(--font-display); font-size:1.3rem; font-weight:900;
   text-transform:uppercase; letter-spacing:.12em; color:var(--orange);
 }
-.draft-layout { flex:1; overflow:hidden; display:grid; grid-template-columns:240px 1fr; }
+.draft-layout { flex:1; overflow:hidden; display:grid; grid-template-columns:280px 1fr; }
 
 /* left sidebar */
 .draft-left {
   background:var(--bg2); border-right:1px solid var(--border);
-  padding:14px 12px; display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  padding:18px 16px; display:flex; flex-direction:column; gap:12px; overflow-y:auto;
 }
 .draft-left h3 {
   font-family:var(--font-display); font-size:.8rem; font-weight:700;
@@ -170,8 +170,8 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 }
 .team-name-inp {
   width:100%; background:var(--bg3); border:1px solid var(--border2);
-  border-radius:var(--r); color:var(--text); font-family:var(--font-body); font-size:.88rem;
-  padding:7px 10px;
+  border-radius:var(--r); color:var(--text); font-family:var(--font-body); font-size:.95rem;
+  padding:9px 12px;
 }
 .team-name-inp:focus { outline:none; border-color:var(--orange); }
 
@@ -182,76 +182,93 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .dp-pip.current { background:var(--orange); }
 
 /* role slots */
-.slot-list { display:flex; flex-direction:column; gap:6px; flex:1; }
+.slot-list { display:flex; flex-direction:column; gap:8px; flex:1; overflow-y:auto; }
 .slot {
-  background:var(--bg3); border:1px solid var(--border);
-  border-radius:var(--r); padding:8px 10px; min-height:52px;
+  background:var(--bg3); border:2px solid var(--border);
+  border-radius:var(--r); padding:10px 13px; min-height:62px;
+  cursor:pointer; transition:border-color .12s, opacity .12s;
 }
 .slot.active { border-color:var(--orange); background:rgba(232,160,32,.05); }
-.slot.filled { border-color:var(--green);  background:rgba(40,200,80,.04); }
+.slot.filled { border-color:var(--green); background:rgba(40,200,80,.04); cursor:default; }
+.slot.empty-slot { opacity:.6; cursor:default; }
 .slot-role-lbl {
-  font-family:var(--font-display); font-size:.65rem; font-weight:700;
-  text-transform:uppercase; letter-spacing:.12em; color:var(--text3); margin-bottom:3px;
+  font-family:var(--font-display); font-size:.68rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.12em; color:var(--text3); margin-bottom:4px;
 }
-.slot-role-lbl.active { color:var(--orange); }
-.slot-empty { font-size:.76rem; color:var(--text3); font-style:italic; }
+.slot-empty { font-size:.8rem; color:var(--text3); font-style:italic; }
 .slot-filled-row { display:flex; justify-content:space-between; align-items:center; }
-.slot-nick { font-family:var(--font-display); font-weight:700; color:var(--orange); font-size:.9rem; }
-.slot-sub  { font-size:.67rem; color:var(--text2); }
+.slot-nick { font-family:var(--font-display); font-weight:700; color:var(--orange); font-size:.95rem; }
+.slot-sub  { font-size:.72rem; color:var(--text2); }
 
-/* blind toggle */
-.blind-toggle {
-  display:flex; align-items:center; gap:8px; cursor:pointer;
-  background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); padding:8px 10px;
-}
-.blind-toggle input { accent-color:var(--orange); }
-.blind-toggle span  { font-size:.78rem; color:var(--text2); }
-
-/* right panel */
-.draft-right { overflow-y:auto; padding:20px 22px; }
-.role-header { margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border); }
-.role-name {
-  font-family:var(--font-display); font-size:1.5rem; font-weight:900;
-  text-transform:uppercase; letter-spacing:.1em;
-}
-.role-desc { color:var(--text2); font-size:.82rem; margin-top:4px; }
-.role-keys { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
-.role-key {
-  font-family:var(--font-display); font-size:.7rem; font-weight:700; text-transform:uppercase;
-  padding:2px 8px; border-radius:2px; border:1px solid var(--border2); color:var(--text2);
+/* reshuffle bar */
+.reshuffle-bar {
+  background:var(--bg3); border:1px solid var(--border); border-radius:var(--r);
+  padding:12px 14px; margin:4px 0;
 }
 
-.cand-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
-.cand-card {
+/* right panel — pool */
+.draft-right { overflow-y:auto; padding:24px 28px; }
+.draft-pool-header {
+  font-family:var(--font-display); font-size:.9rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.12em; color:var(--text);
+  margin-bottom:12px; display:flex; align-items:center; gap:8px;
+}
+.draft-pool-header::after { content:''; flex:1; height:1px; background:var(--border); }
+.draft-hint {
+  font-size:.82rem; color:var(--text2); margin-bottom:16px; line-height:1.6;
+  background:var(--bg3); padding:10px 14px; border-radius:var(--r);
+  border-left:3px solid var(--orange);
+}
+.pool-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:12px; }
+.pool-card {
   background:var(--bg2); border:2px solid var(--border); border-radius:var(--r);
-  padding:12px; cursor:pointer; transition:border-color .12s, background .12s;
+  padding:14px 14px; cursor:pointer;
+  transition:border-color .12s, transform .08s, opacity .15s;
 }
-.cand-card:hover { border-color:var(--orange); background:var(--bg3); }
-.cand-card.picked { border-color:var(--green); background:rgba(40,200,80,.06); pointer-events:none; }
-.cc-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.cc-flag { font-size:1.2rem; }
-.cc-names .cc-nick {
-  font-family:var(--font-display); font-weight:800; color:var(--orange); font-size:.95rem;
+.pool-card:hover:not(.pool-used) { border-color:var(--orange); transform:translateY(-2px); }
+.pool-card.pool-used { opacity:.32; pointer-events:none; }
+.pool-card.pool-selected { border-color:var(--green); background:rgba(40,200,80,.06); }
+.pool-nick { font-family:var(--font-display); font-size:1rem; font-weight:900; color:var(--orange); }
+.pool-real { font-size:.7rem; color:var(--text2); margin-bottom:2px; }
+.pool-role { font-size:.7rem; color:var(--text3); margin:4px 0 6px; }
+.pool-trait {
+  display:inline-block; font-size:.64rem; background:var(--bg4); border-radius:2px;
+  padding:2px 6px; color:var(--text2); margin-bottom:8px;
+  font-family:var(--font-display); text-transform:uppercase; letter-spacing:.05em;
 }
-.cc-names .cc-real { font-size:.68rem; color:var(--text2); }
-.cc-era  { font-size:.65rem; color:var(--text3); margin-bottom:6px; }
-.cc-trait {
-  display:inline-block; font-size:.66rem; background:var(--bg4); border-radius:2px;
-  padding:2px 6px; color:var(--text2); margin-bottom:7px;
-  font-family:var(--font-display); text-transform:uppercase; letter-spacing:.06em;
-}
-/* stat row */
-.cc-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:3px; }
-.cs-box { background:var(--bg4); border-radius:2px; padding:4px 2px; text-align:center; }
-.cs-box.hl { background:rgba(232,160,32,.12); border:1px solid rgba(232,160,32,.25); }
-.cs-v { font-family:var(--font-display); font-size:.82rem; font-weight:700; }
-.cs-k { font-size:.55rem; color:var(--text2); text-transform:uppercase; margin-top:1px; }
-/* blind mode */
-.cand-card.blind .cc-names .cc-nick { color:var(--text2); letter-spacing:.3em; }
-.cand-card.blind .cc-era,
-.cand-card.blind .cc-trait,
-.cand-card.blind .cc-stats { filter:blur(4px); pointer-events:none; user-select:none; }
+.pool-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:3px; margin-top:8px; }
+.ps-mini { background:var(--bg4); border-radius:3px; padding:5px 0; text-align:center; }
+.ps-mini-v { font-family:var(--font-display); font-size:.76rem; font-weight:700; color:var(--text2); }
+.ps-mini-v.key-stat { color:var(--green); }
+.ps-mini-k { font-size:.5rem; color:var(--text3); text-transform:uppercase; }
+.slot.selecting { border-color:var(--blue); background:rgba(80,140,255,.07); animation:slot-pulse .8s ease-in-out infinite; }
+@keyframes slot-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(80,140,255,.3);} 50%{box-shadow:0 0 8px rgba(80,140,255,.15);} }
+
 .draft-loading { text-align:center; padding:60px; color:var(--text2); font-family:var(--font-display); font-size:.9rem; letter-spacing:.1em; text-transform:uppercase; }
+
+/* slot-spin: team name roulette during draw */
+.draft-spin-wrap {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:50px 20px; gap:14px;
+}
+.draft-spin-label {
+  font-size:.65rem; font-family:var(--font-display); font-weight:700;
+  text-transform:uppercase; letter-spacing:.18em; color:var(--text3);
+}
+.draft-spin-name {
+  font-family:var(--font-display); font-size:1.6rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.1em;
+  color:var(--orange); min-height:2.2rem; text-align:center;
+  transition:opacity .06s;
+}
+.draft-spin-name.landing {
+  animation: spin-land .5s cubic-bezier(.22,.68,0,1.2) forwards;
+}
+@keyframes spin-land {
+  0%   { transform:scale(1.18); opacity:.6; }
+  60%  { transform:scale(.96);  opacity:1; }
+  100% { transform:scale(1);    opacity:1; }
+}
 
 /* ═══════════════════════════════════════════════
    GAME SCREEN — CS2 HUD INSPIRED
@@ -1197,27 +1214,33 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     </div>
   </div>
   <div class="draft-layout">
-    <!-- left -->
+    <!-- left: team slots -->
     <div class="draft-left">
       <div>
-        <div class="draft-left h3" style="font-family:var(--font-display);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--text2);margin-bottom:6px;">Nome do Time</div>
+        <div style="font-family:var(--font-display);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--text2);margin-bottom:6px;">Nome do Time</div>
         <input type="text" id="team-name-inp" class="team-name-inp" placeholder="Ex: FURIA, NaVi..." maxlength="28">
       </div>
-      <div class="draft-progress" id="draft-progress"></div>
+
+      <!-- Re-sort controls -->
+      <div class="reshuffle-bar">
+        <span id="reshuffle-team-name" style="font-family:var(--font-display);font-size:.8rem;font-weight:800;color:var(--orange);"></span>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <button class="btn btn-ghost btn-sm" id="btn-reshuffle" onclick="reshuffleTeam()">🔀 Outro Time</button>
+          <span id="reshuffle-count" style="font-size:.72rem;color:var(--text2);"></span>
+        </div>
+      </div>
+
       <div class="slot-list" id="slot-list"></div>
-      <label class="blind-toggle">
-        <input type="checkbox" id="blind-mode">
-        <span>🙈 Modo Blind (sem stats)</span>
-      </label>
+
       <div style="margin-top:auto;padding-top:10px;border-top:1px solid var(--border);">
         <button class="btn btn-green" id="btn-confirm" style="width:100%;justify-content:center;" disabled onclick="confirmDraft()">
           🚀 Iniciar Major
         </button>
       </div>
     </div>
-    <!-- right -->
+    <!-- right: team pool cards -->
     <div class="draft-right" id="draft-right">
-      <div class="draft-loading">Carregando…</div>
+      <div class="draft-loading">Carregando time…</div>
     </div>
   </div>
 </div>
@@ -1416,7 +1439,13 @@ let G = {
 async function api(path, method="GET", body=null) {
   const o={method,headers:{"Content-Type":"application/json"}};
   if(body) o.body=JSON.stringify(body);
-  return (await fetch("/api"+path,o)).json();
+  try {
+    const res = await fetch("/api"+path, o);
+    return await res.json();
+  } catch(e) {
+    console.error("API error:", path, e);
+    return {ok: false, error: e.message};
+  }
 }
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
@@ -1462,180 +1491,230 @@ function pickEra(id){
 
 async function goDraft(){
   if(!G.draft.eraId){toast("Escolha uma era!","err");return;}
-  G.draft.roleIdx=0; G.draft.picks=[]; G.draft.excluded=[]; G.draft.candidates=[];
+  G.draft.picks=[];          // [{slotIdx, player}]
+  G.draft.teamPool=[];       // current drawn team's 5 players
+  G.draft.teamName="";       // current drawn team's name
+  G.draft.reshuffles=3;      // chances remaining
+  G.draft.usedTeams=[];      // team names drawn so far
   showScreen("draft");
-  renderDraftLeft();
-  await loadDraftCandidates();
+  document.getElementById("draft-era-chip").textContent=G.draft.eraId;
+  await drawNewTeam();
 }
 
-async function openLoads(){
-  const panel=document.getElementById("load-saves-panel");
-  panel.style.display="block";
-  const r=await api("/saves");
-  if(!r.ok||!r.saves.length){
-    panel.innerHTML=`<div style="color:var(--text2);font-size:.8rem;text-align:center;padding:10px;">Nenhum save encontrado.</div>`;
+// Draw a new team from the era and render the pool
+// All team names across eras for the spin animation
+const ALL_TEAM_NAMES = [
+  "Astralis","fnatic","NiP","Luminosity","Virtus.pro",
+  "Natus Vincere","FaZe Clan","Team Vitality","G2 Esports",
+  "Team Spirit","FURIA","Heroic","Team Liquid","Cloud9",
+  "BIG","ENCE","Mouz","Outsiders","The MongolZ","paiN Gaming"
+];
+
+async function drawNewTeam(){
+  const right = document.getElementById("draft-right");
+
+  // Show roulette immediately
+  right.innerHTML = `
+    <div class="draft-spin-wrap">
+      <div class="draft-spin-label">Sorteando time…</div>
+      <div class="draft-spin-name" id="spin-name">–</div>
+    </div>`;
+
+  // Fire API and animation in parallel
+  const fetchPromise = api("/draft_team","POST",{
+    era_id: G.draft.eraId,
+    exclude_teams: G.draft.usedTeams.slice()
+  });
+
+  // Roulette spin — deceleration table
+  const intervals = [50,55,60,70,80,100,120,150,180,220,270,320];
+  const spinPool = ALL_TEAM_NAMES.slice().sort(()=>Math.random()-.5);
+  let spinIdx = 0;
+  for(let i = 0; i < intervals.length; i++){
+    const el = document.getElementById("spin-name");
+    if(!el) break;
+    el.textContent = spinPool[spinIdx++ % spinPool.length];
+    await new Promise(res=>setTimeout(res, intervals[i]));
+  }
+
+  // Now wait for API (may already be done)
+  const r = await fetchPromise;
+  if(!r || !r.ok){
+    right.innerHTML=`<div class="draft-loading" style="color:var(--red);">Erro: ${r?.error||"falha na API"}.<br><small>Verifique o console do servidor.</small></div>`;
     return;
   }
-  panel.innerHTML=r.saves.map(s=>`
-    <div class="save-item">
-      <span>${s}</span>
-      <button class="btn btn-orange btn-sm" onclick="loadSave('${s}')">Carregar</button>
-    </div>`).join("");
+
+  // Land on real team name
+  const el = document.getElementById("spin-name");
+  if(el){
+    el.textContent = r.team.name;
+    el.classList.add("landing");
+    await new Promise(res=>setTimeout(res, 520));
+  }
+
+  // Commit to state only after animation fully done
+  G.draft.teamPool = r.team.players;
+  G.draft.teamName = r.team.name;
+  if(!G.draft.usedTeams.includes(r.team.name)){
+    G.draft.usedTeams.push(r.team.name);
+  }
+
+  renderDraftLeft();
+  renderDraftPool();
 }
 
-async function loadSave(fn){
-  const r=await api("/load","POST",{filename:fn});
-  if(!r.ok){toast("Erro: "+r.error,"err");return;}
-  G.team=r.team; G.campaign=r.campaign;
-  G._prevStage=r.campaign.stage;
-  document.getElementById("game-main").innerHTML=`
-    <div class="campaign-card">
-      <div class="cc-stage-name" id="cc-stage">–</div>
-      <div class="cc-desc" id="cc-desc">–</div>
-    </div>
-    <div class="result-card" id="result-card">
-      <div class="rc-label">Último Resultado</div>
-      <div class="rc-text" id="rc-text"></div>
-    </div>
-    <div class="section-head">Jogadores</div>
-    <div class="players-grid" id="players-grid"></div>`;
-  showScreen("game"); updateGameUI(null);
-  toast("Jogo carregado!","ok");
+async function reshuffleTeam(){
+  if(G.draft.reshuffles<=0){toast("Sem re-sorteios disponíveis!","err");return;}
+  G.draft.reshuffles--;
+  // Remove picks that came from the current pool (free those slots)
+  const poolNicks=new Set(G.draft.teamPool.map(p=>p.nickname));
+  G.draft.picks=G.draft.picks.filter(pk=>!poolNicks.has(pk.player.nickname));
+  await drawNewTeam();
 }
 
-// ═══════════════════════════════════════════
-// DRAFT
-// ═══════════════════════════════════════════
 function renderDraftLeft(){
-  // progress pips
-  document.getElementById("draft-progress").innerHTML=
-    ROLE_ORDER.map((_,i)=>{
-      const cls=i<G.draft.roleIdx?"dp-pip done":i===G.draft.roleIdx?"dp-pip current":"dp-pip";
-      return `<div class="${cls}"></div>`;
-    }).join("");
+  const SLOTS=["IGL","AWPer","Entry Fragger","Support","Lurker"];
+  const reshufflesLeft=G.draft.reshuffles;
 
-  // slots
-  document.getElementById("slot-list").innerHTML=ROLE_ORDER.map((role,i)=>{
-    const pick=G.draft.picks[i];
-    const isCur=i===G.draft.roleIdx;
-    if(pick) return `
-      <div class="slot filled">
-        <div class="slot-role-lbl">${ROLE_EMOJI[role]} ${role}</div>
+  // reshuffle bar
+  document.getElementById("reshuffle-team-name").textContent=G.draft.teamName||"–";
+  document.getElementById("reshuffle-count").textContent=
+    `${reshufflesLeft} re-sorteio${reshufflesLeft!==1?"s":""} restante${reshufflesLeft!==1?"s":""}`;
+  const btn=document.getElementById("btn-reshuffle");
+  btn.disabled=reshufflesLeft<=0;
+
+  // slot list — 5 positional slots (IGL, AWP, Entry, Support, Lurk)
+  document.getElementById("slot-list").innerHTML=SLOTS.map((role,i)=>{
+    const pick=G.draft.picks.find(pk=>pk.slotIdx===i);
+    if(pick){
+      const p=pick.player;
+      return `<div class="slot filled">
+        <div class="slot-role-lbl">${ROLE_EMOJI[role]||""} ${role}</div>
         <div class="slot-filled-row">
           <div>
-            <div class="slot-nick">${flag(pick.country)} ${pick.nickname}</div>
-            <div class="slot-sub">RTG ${pick.attributes.rating.toFixed(1)} · ${pick.era||"?"}</div>
+            <div class="slot-nick">${flag(p.country)} ${p.nickname}</div>
+            <div class="slot-sub">RTG ${p.attributes.rating.toFixed(1)} · ${p.era||"?"}</div>
           </div>
+          <span style="font-size:.65rem;color:var(--green);">✓</span>
         </div>
       </div>`;
-    return `
-      <div class="slot ${isCur?"active":""}">
-        <div class="slot-role-lbl ${isCur?"active":""}">${ROLE_EMOJI[role]} ${role}</div>
-        <div class="slot-empty">${isCur?"↑ Escolhendo agora":"Aguardando…"}</div>
-      </div>`;
+    }
+    return `<div class="slot active">
+      <div class="slot-role-lbl">${ROLE_EMOJI[role]||""} ${role}</div>
+      <div class="slot-empty">Clique em um jogador →</div>
+    </div>`;
   }).join("");
 
   document.getElementById("btn-confirm").disabled=G.draft.picks.length<5;
 }
 
-async function loadDraftCandidates(){
-  if(G.draft.roleIdx>=ROLE_ORDER.length) return;
-  const role=ROLE_ORDER[G.draft.roleIdx];
+function renderDraftPool(){
   const right=document.getElementById("draft-right");
-  right.innerHTML=`<div class="draft-loading">Buscando ${role}s da era ${G.draft.eraId}…</div>`;
-
-  const r=await api("/draft_candidates","POST",{
-    era_id:G.draft.eraId, role, exclude:G.draft.excluded
-  });
-  if(!r.ok){right.innerHTML=`<div class="draft-loading" style="color:var(--red);">Erro.</div>`;return;}
-
-  G.draft.candidates=r.candidates;
-  const rd=ROLE_DESCS[role]||{desc:"",keys:[]};
-  const ks=new Set(KEY_STATS[role]||[]);
-  const blind=document.getElementById("blind-mode").checked;
+  const usedNicks=new Set(G.draft.picks.map(pk=>pk.player.nickname));
 
   right.innerHTML=`
-    <div class="role-header">
-      <div class="role-name ${roleCls(role)}">${ROLE_EMOJI[role]} ${role}</div>
-      <div class="role-desc">${rd.desc}</div>
-      <div class="role-keys">${rd.keys.map(k=>`<span class="role-key">↑ ${k}</span>`).join("")}</div>
+    <div class="draft-pool-header">${G.draft.teamName}</div>
+    <div class="draft-hint">
+      Clique em um jogador para adicioná-lo ao seu elenco.<br>
+      Escolha a posição desejada — qualquer jogador pode ocupar qualquer slot.<br>
+      Clique em um slot preenchido para remover o jogador.
     </div>
-    <div class="cand-grid">
-      ${r.candidates.map((p,i)=>renderCandCard(p,i,ks,blind)).join("")}
+    <div class="pool-grid">
+      ${G.draft.teamPool.map((p,i)=>renderPoolCard(p,i,usedNicks)).join("")}
     </div>`;
 }
 
-function renderCandCard(p,idx,keyStats,blind){
-  const a=p.attributes;
-  const STATS=[["rating","RTG","c-rtg"],["kast","KAST","c-kast"],["impact","IMP","c-imp"],["adr","ADR","c-adr"],["kpr","KPR","c-kpr"]];
-  const statsHtml=STATS.map(([k,l,c])=>`
-    <div class="cs-box ${keyStats.has(k)?"hl":""}">
-      <div class="cs-v ${c} ${vColor(a[k])}">${a[k].toFixed(1)}</div>
-      <div class="cs-k">${l}</div>
-    </div>`).join("");
-  return `
-    <div class="cand-card ${blind?"blind":""}" onclick="pickCandidate(${idx})">
-      <div class="cc-top">
-        <span class="cc-flag">${flag(p.country)}</span>
-        <div class="cc-names">
-          <div class="cc-nick">${blind?"?????":p.nickname}</div>
-          <div class="cc-real">${blind?"Identidade oculta":p.name}</div>
-        </div>
-      </div>
-      <div class="cc-era">${p.era||"?"}</div>
-      <span class="cc-trait">${p.trait}</span>
-      <div class="cc-stats">${statsHtml}</div>
+function renderPoolCard(p,idx,usedNicks){
+  const used=usedNicks.has(p.nickname);
+  const a=p.attributes||{};
+  const role=p.role_hint||p.role||"";
+  const keyStats=new Set(KEY_STATS[role]||[]);
+  const STAT_KEYS=[["rating","RTG"],["kast","KAST"],["impact","IMP"],["adr","ADR"],["kpr","KPR"]];
+  const statsHtml=STAT_KEYS.map(([k,l])=>{
+    const val=a[k];
+    const isKey=keyStats.has(k);
+    return `<div class="ps-mini">
+      <div class="ps-mini-v${isKey?" key-stat":""}">${val!=null?val.toFixed(1):"–"}</div>
+      <div class="ps-mini-k">${l}</div>
     </div>`;
+  }).join("");
+
+  return `<div class="pool-card ${used?"pool-used pool-selected":""}"
+      onclick="${used?"":"pickPoolPlayer("+idx+")"}">
+    <div style="font-size:.9rem;">${flag(p.country||"")}</div>
+    <div class="pool-nick">${p.nickname||"?"}</div>
+    <div class="pool-real">${p.name||""}</div>
+    <div class="pool-role">${ROLE_EMOJI[role]||""} ${role}</div>
+    <span class="pool-trait">${p.trait||""}</span>
+    <div class="pool-stats">${statsHtml}</div>
+    ${used?`<div style="text-align:center;font-size:.68rem;color:var(--green);margin-top:6px;font-family:var(--font-display);">✓ Selecionado</div>`:""}
+  </div>`;
 }
 
-// re-render if blind toggled
-document.addEventListener("DOMContentLoaded",()=>{
-  document.getElementById("blind-mode").addEventListener("change",()=>{
-    if(G.draft.candidates.length&&G.draft.roleIdx<ROLE_ORDER.length){
-      const role=ROLE_ORDER[G.draft.roleIdx];
-      const ks=new Set(KEY_STATS[role]||[]);
-      const blind=document.getElementById("blind-mode").checked;
-      const grid=document.querySelector(".cand-grid");
-      if(grid) grid.innerHTML=G.draft.candidates.map((p,i)=>renderCandCard(p,i,ks,blind)).join("");
-    }
-  });
-});
-
-async function pickCandidate(idx){
-  const p=G.draft.candidates[idx];
+async function pickPoolPlayer(idx){
+  const p=G.draft.teamPool[idx];
   if(!p) return;
-  const cards=document.querySelectorAll(".cand-card");
-  if(cards[idx]) { cards[idx].classList.add("picked"); }
-  await sleep(200);
-  p.role=ROLE_ORDER[G.draft.roleIdx];
-  G.draft.picks.push(p);
-  G.draft.excluded.push(p.nickname);
-  G.draft.roleIdx++;
-  renderDraftLeft();
-  if(G.draft.roleIdx<ROLE_ORDER.length){
-    await loadDraftCandidates();
+
+  // Find the first empty slot
+  const SLOTS=["IGL","AWPer","Entry Fragger","Support","Lurker"];
+  const filledIdxs=new Set(G.draft.picks.map(pk=>pk.slotIdx));
+  
+  // Prefer the slot matching the player's role hint
+  const roleHint=p.role_hint||p.role||"";
+  let targetSlot=-1;
+  const roleToIdx={"IGL":0,"AWPer":1,"Entry Fragger":2,"Support":3,"Lurker":4};
+  const preferredIdx=roleToIdx[roleHint]??-1;
+  if(preferredIdx>=0 && !filledIdxs.has(preferredIdx)){
+    targetSlot=preferredIdx;
   } else {
-    document.getElementById("draft-right").innerHTML=`
-      <div style="text-align:center;padding:70px 30px;">
-        <div style="font-size:2.5rem;margin-bottom:14px;">✅</div>
-        <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Elenco Completo!</div>
-        <div style="color:var(--text2);font-size:.86rem;line-height:1.7;">
-          ${G.draft.picks.map(p=>`${ROLE_EMOJI[p.role]} <b style="color:var(--orange)">${p.nickname}</b> (${p.role})`).join("<br>")}
-        </div>
-        <div style="color:var(--text3);font-size:.78rem;margin-top:14px;">Dê um nome ao time e clique em <b>Iniciar Major</b>.</div>
-      </div>`;
-    document.getElementById("btn-confirm").disabled=false;
+    // fall back to first open slot
+    for(let i=0;i<5;i++){
+      if(!filledIdxs.has(i)){targetSlot=i;break;}
+    }
   }
+
+  if(targetSlot===-1){toast("Todos os slots preenchidos! Remova um para trocar.","err");return;}
+
+  // Assign role to player based on target slot
+  const slotRole=SLOTS[targetSlot];
+  const playerWithRole={...p, role:slotRole};
+  G.draft.picks.push({slotIdx:targetSlot, player:playerWithRole});
+
+  // Auto-sortear próximo time após escolha (lógica 7-a-0)
+  if(G.draft.picks.length < 5){
+    await drawNewTeam();
+  } else {
+    renderDraftLeft();
+    renderDraftPool();
+  }
+}
+
+function unpickSlot(slotIdx){
+  G.draft.picks=G.draft.picks.filter(pk=>pk.slotIdx!==slotIdx);
+  // Não sorteia novo time — mantém o pool atual para o jogador re-escolher
+  renderDraftLeft();
+  renderDraftPool();
 }
 
 async function confirmDraft(){
   const teamName=document.getElementById("team-name-inp").value.trim()||null;
-  const r=await api("/new_game","POST",{team_name:teamName, player_picks:G.draft.picks, events_enabled:false});
+  // Sort picks by slot order and format for backend
+  const sortedPicks=G.draft.picks
+    .sort((a,b)=>a.slotIdx-b.slotIdx)
+    .map(pk=>({...pk.player, role:["IGL","AWPer","Entry Fragger","Support","Lurker"][pk.slotIdx]}));
+
+  const r=await api("/new_game","POST",{
+    team_name:teamName,
+    player_picks:sortedPicks,
+    events_enabled:false,
+    era_id:G.draft.eraId,
+  });
   if(!r.ok){toast("Erro: "+r.error,"err");return;}
   G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code;
   G._prevStage=r.campaign.stage;
   G._lastTeamScore=r.team_score??null;
-  // Reset game-main to its original structure (fixes gameover screen persisting)
+  G._lastPlayerStats=null;
+  G._lastStageMvp=null;
   document.getElementById("game-main").innerHTML=`
     <div class="campaign-card">
       <div class="cc-stage-name" id="cc-stage">–</div>
@@ -1647,7 +1726,7 @@ async function confirmDraft(){
     </div>
     <div class="section-head">Jogadores</div>
     <div class="players-grid" id="players-grid"></div>`;
-  showScreen("game"); updateGameUI(null);
+  showScreen("game"); updateGameUI();
   toast("Major iniciado! Boa sorte 🏆","ok");
 }
 

@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Match resolution — CS2 MR12 format (first to 13, OT at MR3 blocks)."""
 import random
 import math
@@ -62,14 +63,15 @@ class MapResult:
 
 @dataclass
 class SeriesDetail:
-    maps:               list[MapResult] = field(default_factory=list)
-    team_maps_won:      int   = 0
-    opponent_maps_won:  int   = 0
-    team_won:           bool  = False
-    team_strength:      float = 0.0
-    opponent_strength:  float = 0.0
-    win_probability:    float = 0.5
-    player_stats:       list  = field(default_factory=list)   # list[PlayerMatchStats]
+    maps:                   List[MapResult] = field(default_factory=list)
+    team_maps_won:          int   = 0
+    opponent_maps_won:      int   = 0
+    team_won:               bool  = False
+    team_strength:          float = 0.0
+    opponent_strength:      float = 0.0
+    win_probability:        float = 0.5
+    player_stats:           list  = field(default_factory=list)
+    opponent_player_stats:  list  = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -83,13 +85,14 @@ class SeriesDetail:
                 }
                 for m in self.maps
             ],
-            "team_maps_won":     self.team_maps_won,
-            "opponent_maps_won": self.opponent_maps_won,
-            "team_won":          self.team_won,
-            "team_strength":     round(self.team_strength, 2),
-            "opponent_strength": round(self.opponent_strength, 2),
-            "win_probability":   round(self.win_probability, 3),
-            "player_stats":      [s.to_dict() for s in self.player_stats],
+            "team_maps_won":         self.team_maps_won,
+            "opponent_maps_won":     self.opponent_maps_won,
+            "team_won":              self.team_won,
+            "team_strength":         round(self.team_strength, 2),
+            "opponent_strength":     round(self.opponent_strength, 2),
+            "win_probability":       round(self.win_probability, 3),
+            "player_stats":          [s.to_dict() for s in self.player_stats],
+            "opponent_player_stats": self.opponent_player_stats,
         }
 
 
@@ -139,8 +142,8 @@ def _simulate_map(ts: float, os_: float) -> MapResult:
 
 def _simulate_player_stats(
     players: list,
-    maps: list[MapResult],
-) -> list[PlayerMatchStats]:
+    maps: List[MapResult],
+) -> List[PlayerMatchStats]:
     """
     Simulate kills round by round for each map.
 
@@ -199,7 +202,7 @@ def _simulate_player_stats(
     return stats
 
 
-def _alloc(total: int, shares: list[float]) -> list[int]:
+def _alloc(total: int, shares: List[float]) -> List[int]:
     """Distribute `total` kills among players by share, keeping the sum exact."""
     raw    = [total * s for s in shares]
     result = [int(x) for x in raw]
@@ -211,7 +214,7 @@ def _alloc(total: int, shares: list[float]) -> list[int]:
     return result
 
 
-def _simulate_opponent_player_stats(opponent_name: str, opp_strength: float, maps: list[MapResult]) -> list[dict]:
+def _simulate_opponent_player_stats(opponent_name: str, opp_strength: float, maps: List[MapResult]) -> List[dict]:
     """
     Generate plausible round-by-round stats for 5 fictional opponent players.
     Opponent won the rounds they won (opponent_score) and lost the rest.
@@ -277,6 +280,65 @@ def _simulate_opponent_player_stats(opponent_name: str, opp_strength: float, map
     return result
 
 
+def _simulate_opponent_stats_real(opp_players: List[dict], maps: List[MapResult]) -> List[dict]:
+    """
+    Simulate kill stats for real opponent players using their actual kpr/adr attributes.
+    opp_players is a list of enriched dicts from team_factory.enrich_team_players().
+    """
+    n = len(opp_players)
+    totals = [{"kills":0,"deaths":0,"assists":0,"adr_total":0.0,"rounds":0} for _ in range(n)]
+
+    kpr_vals = [p["attributes"]["kpr"] for p in opp_players]
+    adr_vals = [p["attributes"]["adr"]  for p in opp_players]
+
+    for m in maps:
+        # From opponent perspective: they won opp_score rounds
+        opp_rounds_won = m.opponent_score
+        total_rounds   = m.team_score + m.opponent_score
+
+        total_opp_kills  = int(round(opp_rounds_won * 2.5 + m.team_score * 1.2))
+        total_opp_deaths = int(round(m.team_score   * 2.5 + opp_rounds_won * 1.2))
+
+        kpr_w = [max(0.01, (v ** 2) * (1.0 + random.gauss(0, 0.18))) for v in kpr_vals]
+        kw_sum = sum(kpr_w)
+        shares = [w / kw_sum for w in kpr_w]
+
+        dw = [max(0.01, (1.0 / max(v, 0.5)) * (1.0 + random.gauss(0, 0.15))) for v in kpr_vals]
+        dw_sum = sum(dw)
+        death_shares = [w / dw_sum for w in dw]
+
+        map_kills  = _alloc(total_opp_kills,  shares)
+        map_deaths = _alloc(total_opp_deaths, death_shares)
+
+        for i in range(n):
+            adr_per_round = max(0.0, (40.0 + adr_vals[i] * 7.0 + random.gauss(0, 10.0)))
+            totals[i]["kills"]     += map_kills[i]
+            totals[i]["deaths"]    += map_deaths[i]
+            totals[i]["assists"]   += max(0, int(map_kills[i] * random.uniform(0.12, 0.22)))
+            totals[i]["adr_total"] += adr_per_round * total_rounds
+            totals[i]["rounds"]    += total_rounds
+
+    result = []
+    for i, p in enumerate(opp_players):
+        t = totals[i]
+        kd  = round(t["kills"] / max(t["deaths"], 1), 2)
+        adr = round(t["adr_total"] / max(t["rounds"], 1), 1)
+        kpr = round(t["kills"] / max(t["rounds"], 1), 2)
+        result.append({
+            "nickname": p["nickname"],
+            "team":     p.get("team", "?"),
+            "role":     p.get("role", "?"),
+            "kills":    t["kills"],
+            "deaths":   t["deaths"],
+            "assists":  t["assists"],
+            "kd":       kd,
+            "adr":      adr,
+            "kpr":      kpr,
+            "rounds":   t["rounds"],
+        })
+    return result
+
+
 def resolve_series(team: Team, opponent: Opponent) -> SeriesDetail:
     """Resolve a BO3 series with CS2 MR12 rules, including player kill stats."""
     ts  = round(team.team_score(), 2)
@@ -301,6 +363,16 @@ def resolve_series(team: Team, opponent: Opponent) -> SeriesDetail:
 
     # Simulate player stats for team players
     detail.player_stats = _simulate_player_stats(team.players, detail.maps)
+
+    # Opponent stats — use real players if available, else generate fictional ones
+    if opponent.players:
+        detail.opponent_player_stats = _simulate_opponent_stats_real(
+            opponent.players, detail.maps
+        )
+    else:
+        detail.opponent_player_stats = _simulate_opponent_player_stats(
+            opponent.name, opponent.strength, detail.maps
+        )
 
     return detail
 

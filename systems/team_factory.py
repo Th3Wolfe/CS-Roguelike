@@ -1,4 +1,4 @@
-"""Factory: draft pool by era+position, team generation, synergy."""
+"""Factory: draft pool by era+team, team generation, synergy, opponent rosters."""
 import json, os, random, base64
 from models.player import Player, PlayerAttributes, PlayerStatus, PlayerRole
 from models.team import Team
@@ -37,38 +37,83 @@ def _load_db() -> dict:
 
 
 def get_eras() -> list[dict]:
-    """Return list of era descriptors {id, label, description}."""
     db = _load_db()
     return [{"id": e["id"], "label": e["label"], "description": e["description"]}
             for e in db.get("eras", [])]
 
 
-def _role_score(p: dict, role: PlayerRole) -> float:
-    w = ROLE_WEIGHTS[role]
-    total_w = sum(w.values())
-    return sum(p.get(stat, 5.0) * weight for stat, weight in w.items()) / total_w
+def get_teams_for_era(era_id: str) -> list[dict]:
+    """Return all real teams for a given era, each with their 5 players."""
+    db = _load_db()
+    for era in db.get("eras", []):
+        if era["id"] == era_id:
+            return era.get("teams", [])
+    return []
+
+
+def get_random_team_for_era(era_id: str, exclude_team_names: list[str] = None) -> dict | None:
+    """Pick a random real team from the era, excluding already-used teams."""
+    teams = get_teams_for_era(era_id)
+    exclude = exclude_team_names or []
+    available = [t for t in teams if t["name"] not in exclude]
+    if not available:
+        available = teams  # fallback: repeat if all used
+    return random.choice(available) if available else None
+
+
+def _enrich(p: dict, role: PlayerRole) -> dict:
+    """Add small jitter to stats and resolve role from role_hint."""
+    jitter = lambda v: round(max(1.0, min(10.0, v + random.uniform(-0.3, 0.3))), 2)
+    return {
+        "name":      p["name"],
+        "nickname":  p["nickname"],
+        "era":       p.get("era", "?"),
+        "country":   p.get("country", "??"),
+        "role":      role.value,
+        "role_hint": p.get("role_hint", role.value),
+        "attributes": {k: jitter(p[k]) for k in ("rating","kast","impact","adr","kpr")},
+        "trait":     p.get("trait", "Veterano"),
+    }
+
+
+def _role_from_hint(hint: str) -> PlayerRole:
+    mapping = {
+        "IGL": PlayerRole.IGL,
+        "AWPer": PlayerRole.AWP,
+        "Entry Fragger": PlayerRole.ENTRY,
+        "Support": PlayerRole.SUPPORT,
+        "Lurker": PlayerRole.LURK,
+    }
+    return mapping.get(hint, PlayerRole.ENTRY)
+
+
+def enrich_team_players(team: dict) -> list[dict]:
+    """Return enriched player dicts for a real team (with role resolved from role_hint)."""
+    result = []
+    for p in team.get("players", []):
+        role = _role_from_hint(p.get("role_hint", "Entry Fragger"))
+        result.append(_enrich(p, role))
+    return result
 
 
 def get_candidates_for_role(role: PlayerRole, era_id: str,
                             exclude_nicknames: list[str], n: int = 5) -> list[dict]:
-    """Return n candidates for role from a specific era."""
+    """Legacy: return n candidates for role from a specific era (flat pool)."""
     db = _load_db()
-    era_players: list[dict] = []
+    all_players: list[dict] = []
     for era in db.get("eras", []):
         if era["id"] == era_id:
-            era_players = era["players"]
+            for team in era.get("teams", []):
+                all_players.extend(team.get("players", []))
+            all_players.extend(era.get("players", []))
             break
 
-    if not era_players:
+    if not all_players:
         return _random_candidates(role, n)
 
-    available = [p for p in era_players if p["nickname"] not in exclude_nicknames]
-
-    # Filter by preferred role hint if possible
-    role_hint_match = [p for p in available
-                       if p.get("role_hint","") == role.value]
-    # If we have enough role-specific candidates, prefer those; otherwise fall back to all
-    pool = role_hint_match if len(role_hint_match) >= n else available
+    available = [p for p in all_players if p["nickname"] not in exclude_nicknames]
+    role_match = [p for p in available if p.get("role_hint", "") == role.value]
+    pool = role_match if len(role_match) >= n else available
 
     if not pool:
         return _random_candidates(role, n)
@@ -76,22 +121,13 @@ def get_candidates_for_role(role: PlayerRole, era_id: str,
     scored = sorted(pool, key=lambda p: _role_score(p, role), reverse=True)
     top_cut = max(n * 2, len(scored) // 2)
     selected = random.sample(scored[:top_cut], min(n, len(scored[:top_cut])))
-
     return [_enrich(p, role) for p in selected]
 
 
-def _enrich(p: dict, role: PlayerRole) -> dict:
-    """Add role and jitter to a player dict."""
-    jitter = lambda v: round(max(1.0, min(10.0, v + random.uniform(-0.3, 0.3))), 2)
-    return {
-        "name":     p["name"],
-        "nickname": p["nickname"],
-        "era":      p.get("era", "?"),
-        "country":  p.get("country", "??"),
-        "role":     role.value,
-        "attributes": {k: jitter(p[k]) for k in ("rating","kast","impact","adr","kpr")},
-        "trait":    p.get("trait", "Veterano"),
-    }
+def _role_score(p: dict, role: PlayerRole) -> float:
+    w = ROLE_WEIGHTS[role]
+    total_w = sum(w.values())
+    return sum(p.get(stat, 5.0) * weight for stat, weight in w.items()) / total_w
 
 
 def _random_candidates(role: PlayerRole, n: int) -> list[dict]:
@@ -144,8 +180,27 @@ def generate_team(team_name: str | None = None, player_picks: list[dict] | None 
     return Team(name=team_name, players=players, synergy=round(synergy, 1))
 
 
+def build_opponent_team(era_id: str, exclude_team_names: list[str] = None) -> dict | None:
+    """
+    Pick a real team from the era to use as opponent with real player stats.
+    Returns dict with name, players (enriched), strength.
+    """
+    team = get_random_team_for_era(era_id, exclude_team_names)
+    if not team:
+        return None
+    enriched = enrich_team_players(team)
+    # Derive team strength from average rating
+    avg_rating = sum(p["attributes"]["rating"] for p in enriched) / len(enriched)
+    strength = round(avg_rating * 0.65, 2)  # scale to match opponent range ~5-7
+    return {
+        "name":     team["name"],
+        "players":  enriched,
+        "strength": strength,
+        "country":  team.get("country", "?"),
+    }
+
+
 def generate_share_code(team: Team) -> str:
-    """Generate a compact shareable code for the team."""
     data = {
         "n": team.name,
         "s": round(team.synergy, 1),

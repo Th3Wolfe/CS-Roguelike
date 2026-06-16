@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Campaign manager: orchestrates stage progression and series flow."""
 import random
 from models.campaign import CampaignState, CampaignStage, HistoryEntry
@@ -25,15 +26,18 @@ def _compute_rating(stats: dict) -> float:
 class CampaignManager:
     """Controls the flow of the Major campaign."""
 
-    def __init__(self, team: Team, events_enabled: bool = False) -> None:
+    def __init__(self, team: Team, events_enabled: bool = False,
+                 era_id: Optional[str] = None) -> None:
         self.team = team
         self.state = CampaignState()
         self.events_enabled = events_enabled
         self.event_manager = EventManager()
-        self._used_event_ids: list[str] = []
+        self._used_event_ids: List[str] = []
         # Accumulated stats for current stage: nickname -> {kills,deaths,assists,adr_total,rounds,team,role}
         self._stage_stats: dict = {}
-        self._last_stage_mvp: dict | None = None   # best player in just-finished stage
+        self._last_stage_mvp: Optional[dict] = None   # best player in just-finished stage
+        self.era_id: Optional[str] = era_id
+        self._used_team_names: List[str] = []
 
     # ── events ──────────────────────────────────────────────────────────────
 
@@ -45,7 +49,7 @@ class CampaignManager:
             self._used_event_ids.append(e.id)
         return events
 
-    def apply_event_choice(self, event, choice_index: int) -> list[str]:
+    def apply_event_choice(self, event, choice_index: int) -> List[str]:
         choice = event.choices[choice_index]
         return self.event_manager.apply_choice(choice, self.team, event.id)
 
@@ -53,7 +57,13 @@ class CampaignManager:
 
     def play_series(self) -> dict:
         """Play a series. Returns full result dict with series_detail and stage MVP."""
-        opponent = generate_opponent(self.state.stage.value, self.state.total_series)
+        opponent = generate_opponent(
+            self.state.stage.value, self.state.total_series,
+            era_id=self.era_id,
+            used_team_names=self._used_team_names,
+        )
+        if opponent.name not in self._used_team_names:
+            self._used_team_names.append(opponent.name)
         detail: SeriesDetail = resolve_series(self.team, opponent)
         description = describe_result(detail, opponent.name)
 
@@ -113,25 +123,23 @@ class CampaignManager:
             s["adr_total"] += ps.adr_total
             s["rounds"]    += ps.rounds
 
-        # Opponent fictional players
-        opp_stats = _simulate_opponent_player_stats(opponent.name, opponent.strength, detail.maps)
-        for os_ in opp_stats:
+        # Opponent players (real or fictional — both come as dicts)
+        for os_ in detail.opponent_player_stats:
             key = os_["nickname"]
             if key not in self._stage_stats:
                 self._stage_stats[key] = {
-                    "nickname": os_["nickname"], "team": os_["team"],
-                    "role": os_["role"], "kills": 0, "deaths": 0,
-                    "assists": 0, "adr_total": os_.get("adr", 75) * os_["rounds"],
-                    "rounds": 0,
+                    "nickname": os_["nickname"], "team": opponent.name,
+                    "role": os_.get("role", "?"), "kills": 0, "deaths": 0,
+                    "assists": 0, "adr_total": 0.0, "rounds": 0,
                 }
             s = self._stage_stats[key]
             s["kills"]     += os_["kills"]
             s["deaths"]    += os_["deaths"]
-            s["assists"]   += os_["assists"]
+            s["assists"]   += os_.get("assists", 0)
             s["adr_total"] += os_.get("adr", 75) * os_["rounds"]
             s["rounds"]    += os_["rounds"]
 
-    def _finalise_stage_mvp(self) -> dict | None:
+    def _finalise_stage_mvp(self) -> Optional[dict]:
         """Return the player with the best rating across all teams in the stage."""
         if not self._stage_stats:
             return None
@@ -229,14 +237,18 @@ class CampaignManager:
 
     def to_dict(self) -> dict:
         return {
-            "state":           self.state.to_dict(),
-            "used_event_ids":  self._used_event_ids,
-            "events_enabled":  self.events_enabled,
-            "stage_stats":     self._stage_stats,
+            "state":            self.state.to_dict(),
+            "used_event_ids":   self._used_event_ids,
+            "events_enabled":   self.events_enabled,
+            "stage_stats":      self._stage_stats,
+            "era_id":           self.era_id,
+            "used_team_names":  self._used_team_names,
         }
 
     def load_from_dict(self, data: dict) -> None:
         self.state = CampaignState.from_dict(data["state"])
-        self._used_event_ids = data.get("used_event_ids", [])
-        self.events_enabled  = data.get("events_enabled", False)
-        self._stage_stats    = data.get("stage_stats", {})
+        self._used_event_ids  = data.get("used_event_ids", [])
+        self.events_enabled   = data.get("events_enabled", False)
+        self._stage_stats     = data.get("stage_stats", {})
+        self.era_id           = data.get("era_id")
+        self._used_team_names = data.get("used_team_names", [])

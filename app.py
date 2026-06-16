@@ -63,6 +63,20 @@ def eras():
     return jsonify({"ok": True, "eras": get_eras()})
 
 
+@app.route("/api/draft_team", methods=["POST"])
+def draft_team():
+    """Return a random real team from the era for the draft screen."""
+    data   = request.get_json(silent=True) or {}
+    era_id = data.get("era_id", "2023")
+    exclude = data.get("exclude_teams", [])
+    from systems.team_factory import get_random_team_for_era, enrich_team_players
+    team = get_random_team_for_era(era_id, exclude_team_names=exclude)
+    if not team:
+        return jsonify({"ok": False, "error": "Sem times disponíveis"}), 404
+    enriched = enrich_team_players(team)
+    return jsonify({"ok": True, "team": {"name": team["name"], "players": enriched}})
+
+
 @app.route("/api/draft_candidates", methods=["POST"])
 def draft_candidates():
     data    = request.get_json(silent=True) or {}
@@ -79,16 +93,18 @@ def draft_candidates():
 
 @app.route("/api/new_game", methods=["POST"])
 def new_game():
-    data         = request.get_json(silent=True) or {}
-    team_name    = data.get("team_name","").strip() or None
-    player_picks = data.get("player_picks")
-    events_enabled = data.get("events_enabled", False)   # disabled by default
+    data           = request.get_json(silent=True) or {}
+    team_name      = data.get("team_name","").strip() or None
+    player_picks   = data.get("player_picks")
+    events_enabled = data.get("events_enabled", False)
+    era_id         = data.get("era_id", "2023")
 
     team     = generate_team(team_name, player_picks)
-    campaign = CampaignManager(team, events_enabled=events_enabled)
+    campaign = CampaignManager(team, events_enabled=events_enabled, era_id=era_id)
     set_game(team, campaign)
     code = generate_share_code(team)
     return jsonify({"ok":True, "team":team.to_dict(), "campaign":campaign.state.to_dict(),
+                    "team_score": round(team.team_score(), 2),
                     "share_code": code})
 
 
