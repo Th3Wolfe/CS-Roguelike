@@ -244,6 +244,41 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .slot.selecting { border-color:var(--blue); background:rgba(80,140,255,.07); animation:slot-pulse .8s ease-in-out infinite; }
 @keyframes slot-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(80,140,255,.3);} 50%{box-shadow:0 0 8px rgba(80,140,255,.15);} }
 
+/* touch select highlights */
+.slot.touch-target  { border-color:var(--teal) !important; background:rgba(0,200,170,.07) !important; }
+.pool-card.touch-selected { border-color:var(--orange) !important; background:rgba(232,160,32,.1) !important; box-shadow:0 0 12px rgba(232,160,32,.2); }
+
+/* drag-and-drop */
+.pool-card[draggable="true"] { cursor:grab; }
+.pool-card[draggable="true"]:active { cursor:grabbing; }
+.pool-card.dragging { opacity:.35; transform:scale(.96); border-color:var(--orange); pointer-events:none; }
+.slot.drag-over { border-color:var(--teal) !important; background:rgba(0,200,170,.12) !important; transform:scale(1.02); }
+.slot { transition:border-color .12s, background .12s, transform .1s; }
+.slot.filled { cursor:grab; }
+.slot.filled:active { cursor:grabbing; }
+
+/* drag ghost */
+#drag-ghost {
+  position:fixed; z-index:9999; pointer-events:none;
+  background:var(--bg2); border:2px solid var(--orange); border-radius:var(--r);
+  padding:8px 12px; font-family:var(--font-display); font-weight:800; font-size:.85rem;
+  color:var(--orange); white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.5);
+  display:none; transform:translate(-50%,-50%);
+}
+
+/* team banner in pool header */
+.draft-team-banner {
+  display:flex; align-items:center; gap:12px; margin-bottom:14px;
+  background:var(--bg2); border:1px solid var(--border2); border-radius:var(--r);
+  padding:12px 16px; border-left:3px solid var(--orange);
+}
+.dtb-label { font-size:.6rem; font-family:var(--font-display); font-weight:700;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--text3); margin-bottom:2px; }
+.dtb-name { font-family:var(--font-display); font-size:1.15rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--orange); }
+.dtb-meta { font-size:.72rem; color:var(--text2); margin-top:1px; }
+.dtb-icon { font-size:1.6rem; flex-shrink:0; }
+
 .draft-loading { text-align:center; padding:60px; color:var(--text2); font-family:var(--font-display); font-size:.9rem; letter-spacing:.1em; text-transform:uppercase; }
 
 /* slot-spin: team name roulette during draw */
@@ -422,6 +457,186 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   text-transform:uppercase; letter-spacing:.12em; color:var(--orange); margin-bottom:4px;
 }
 .cc-desc { font-size:.83rem; color:var(--text2); line-height:1.6; }
+
+/* ═══════════════════════════════════════════════
+   TAB SWITCHER
+═══════════════════════════════════════════════ */
+.view-tabs {
+  display:flex; gap:2px; margin-bottom:16px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  padding:3px;
+}
+.view-tab {
+  flex:1; padding:7px 0; font-family:var(--font-display); font-size:.72rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--text2); background:transparent; border:none; border-radius:3px;
+  cursor:pointer; transition:background .15s, color .15s;
+}
+.view-tab.active {
+  background:var(--bg4); color:var(--orange);
+}
+.view-panel { display:none; }
+.view-panel.active { display:block; }
+
+/* ═══════════════════════════════════════════════
+   MAJOR BRACKET
+═══════════════════════════════════════════════ */
+.bracket-wrap { padding-bottom:20px; }
+
+/* ── Swiss Stage Header ── */
+.swiss-header {
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  border-bottom:1px solid var(--border); padding-bottom:10px;
+}
+.swiss-title {
+  font-family:var(--font-display); font-size:.75rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.18em; color:var(--text3);
+}
+.swiss-record {
+  font-family:var(--font-display); font-size:.82rem; font-weight:800;
+  color:var(--orange);
+}
+.swiss-status-pill {
+  font-family:var(--font-display); font-size:.62rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em; padding:2px 8px; border-radius:10px;
+}
+.ssp-current { background:rgba(232,160,32,.18); color:var(--orange); border:1px solid rgba(232,160,32,.4); }
+.ssp-done    { background:rgba(40,200,80,.12);  color:var(--green);  border:1px solid rgba(40,200,80,.3); }
+.ssp-locked  { background:rgba(255,255,255,.04); color:var(--text3); border:1px solid var(--border); }
+
+/* ── Swiss round columns ── */
+.swiss-grid {
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:8px;
+  margin-bottom:20px;
+}
+.swiss-col-head {
+  font-family:var(--font-display); font-size:.62rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--text3);
+  text-align:center; padding:4px 0 8px;
+  border-bottom:1px solid var(--border); margin-bottom:6px;
+}
+.swiss-col-elim { color:var(--red); }
+.swiss-col-adv  { color:var(--green); }
+
+/* ── Individual Swiss match slot ── */
+.sw-slot {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  padding:7px 8px; min-height:48px;
+  transition:border-color .2s;
+  position:relative;
+}
+.sw-slot.sw-win  { border-color:rgba(40,200,80,.5);  background:rgba(40,200,80,.04); }
+.sw-slot.sw-loss { border-color:rgba(224,48,48,.45); background:rgba(224,48,48,.04); }
+.sw-slot.sw-current {
+  border-color:rgba(232,160,32,.6);
+  box-shadow:0 0 10px rgba(232,160,32,.15);
+  animation:bracket-pulse 2s ease-in-out infinite;
+}
+.sw-slot.sw-empty { border-style:dashed; opacity:.45; }
+@keyframes bracket-pulse {
+  0%,100% { box-shadow:0 0 8px rgba(232,160,32,.1); }
+  50%      { box-shadow:0 0 16px rgba(232,160,32,.3); }
+}
+.sw-round-label {
+  font-family:var(--font-display); font-size:.55rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em;
+  color:var(--text3); margin-bottom:4px;
+}
+.sw-opp {
+  font-family:var(--font-display); font-size:.78rem; font-weight:800;
+  color:var(--text); text-transform:uppercase; letter-spacing:.03em;
+  line-height:1.2; word-break:break-all;
+}
+.sw-opp.sw-opp-win  { color:var(--green); }
+.sw-opp.sw-opp-loss { color:var(--red); }
+.sw-opp-empty { color:var(--text3); font-style:italic; font-size:.7rem; font-family:var(--font-body); font-weight:400; letter-spacing:0; }
+.sw-badge {
+  position:absolute; top:5px; right:6px;
+  font-family:var(--font-display); font-size:.58rem; font-weight:700;
+  padding:1px 5px; border-radius:2px;
+}
+.sw-badge.w { background:rgba(40,200,80,.2);  color:var(--green); }
+.sw-badge.l { background:rgba(224,48,48,.2);  color:var(--red); }
+.sw-badge.c { background:rgba(232,160,32,.2); color:var(--orange); }
+
+/* ── Bracket divider ── */
+.bracket-divider {
+  height:1px; background:var(--border); margin:20px 0;
+}
+
+/* ── Playoff bracket ── */
+.playoff-bracket {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:0;
+  align-items:center;
+  margin-bottom:20px;
+  min-height:220px;
+}
+.pb-round { display:flex; flex-direction:column; gap:10px; padding:0 8px; }
+.pb-round-head {
+  font-family:var(--font-display); font-size:.65rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--text3);
+  text-align:center; margin-bottom:6px; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.pb-round-head.ph-qf  { color:var(--blue); }
+.pb-round-head.ph-sf  { color:var(--purple); }
+.pb-round-head.ph-f   { color:var(--orange); }
+
+/* playoff match card */
+.pb-match {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  overflow:hidden; flex:1;
+}
+.pb-match.pm-current {
+  border-color:rgba(232,160,32,.7);
+  box-shadow:0 0 14px rgba(232,160,32,.2);
+  animation:bracket-pulse 2s ease-in-out infinite;
+}
+.pb-match.pm-done { border-color:var(--border); }
+.pb-team {
+  display:flex; align-items:center; gap:7px;
+  padding:7px 10px; font-size:.78rem; border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.pb-team:last-child { border-bottom:none; }
+.pb-team.pt-winner { background:rgba(40,200,80,.08); }
+.pb-team.pt-loser  { background:rgba(224,48,48,.06); opacity:.65; }
+.pb-team-name {
+  font-family:var(--font-display); font-size:.8rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.04em; color:var(--text); flex:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pb-team-name.pt-you { color:var(--orange); }
+.pb-team-name.pt-empty { color:var(--text3); font-size:.7rem; font-weight:400;
+  font-family:var(--font-body); text-transform:none; font-style:italic; letter-spacing:0; }
+.pb-res {
+  font-family:var(--font-display); font-size:.68rem; font-weight:700;
+  padding:2px 5px; border-radius:2px; flex-shrink:0;
+}
+.pb-res.pr-win  { background:rgba(40,200,80,.18); color:var(--green); }
+.pb-res.pr-loss { background:rgba(224,48,48,.18); color:var(--red); }
+.pb-res.pr-vs   { color:var(--text3); font-weight:400; }
+
+/* connector lines for playoff bracket */
+.pb-connector {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:var(--border2); font-size:1.4rem; padding:0 2px;
+}
+
+/* ── Legend ── */
+.bracket-legend {
+  display:flex; gap:16px; flex-wrap:wrap; margin-top:4px;
+}
+.bl-item { display:flex; align-items:center; gap:5px; font-size:.65rem; color:var(--text3); }
+.bl-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.bl-win  { background:var(--green); }
+.bl-loss { background:var(--red); }
+.bl-cur  { background:var(--orange); }
+.bl-emp  { background:var(--bg4); border:1px dashed var(--border2); }
 
 /* last result card */
 .result-card {
@@ -742,433 +957,333 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 
 @media (max-width:768px){
 
-  html,
-  body{
-    overflow-y:auto;
-  }
+  /* ── BASE ── */
+  html, body { overflow-y:auto; }
+  .screen.active { height:auto; min-height:100vh; }
 
-  .screen.active{
-    height:auto;
-    min-height:100vh;
-  }
+  /* ── BUTTONS ── */
+  .btn    { min-height:44px; }
+  .btn-sm { min-height:38px; }
 
-  .game-layout{
-    display:block;
-    overflow:visible;
-  }
+  /* ── MENU ── */
+  .menu-logo h1 { font-size:2.4rem; }
+  .menu-logo    { margin-bottom:32px; }
+  .menu-btns    { width:92vw; max-width:380px; }
+  #load-saves-panel { width:92vw; }
 
-  .game-main{
-    overflow:visible;
-  }
+  /* ── ERA SELECT ── */
+  .era-grid { width:95vw; }
+  .era-card { padding:14px; }
+  .era-year { font-size:1.5rem; min-width:50px; }
 
-  /* =========================
-     GERAL
-  ========================= */
+  /* ────────────────────────────────
+     DRAFT — layout compacto sem scroll
+  ──────────────────────────────── */
 
-  .btn{
-    min-height:44px;
-  }
-
-  .btn-sm{
-    min-height:38px;
-  }
-
-  .menu-logo h1{
-    font-size:2.4rem;
-  }
-
-  .menu-logo{
-    margin-bottom:32px;
-  }
-
-  .menu-btns{
-    width:92vw;
-    max-width:380px;
-  }
-
-  #load-saves-panel{
-    width:92vw;
-  }
-
-  /* =========================
-     ERA SELECT
-  ========================= */
-
-  .era-grid{
-    width:95vw;
-  }
-
-  .era-card{
-    padding:14px;
-  }
-
-  .era-year{
-    font-size:1.5rem;
-    min-width:50px;
-  }
-
-  /* =========================
-     DRAFT
-  ========================= */
-
-  .draft-layout{
+  /* Coluna esquerda (slots) fica sticky no topo */
+  .draft-layout {
     display:flex;
     flex-direction:column;
     overflow:auto;
+    height:calc(100vh - 52px); /* deixa a topbar visível */
   }
 
-  .draft-left{
+  /* Top-bar do draft fica preso */
+  #screen-draft .top-bar {
+    position:sticky;
+    top:0;
+    z-index:200;
+  }
+
+  /* Slots: sticky no topo dentro do scroll */
+  .draft-left {
+    position:sticky;
+    top:0;
+    z-index:100;
     border-right:none;
-    border-bottom:1px solid var(--border);
+    border-bottom:2px solid var(--orange);
+    background:var(--bg);
     flex:none;
-    max-height:none;
-    overflow:visible;
-  }
-
-  .draft-right{
-    overflow:visible;
-    padding:14px;
-  }
-
-  .role-name{
-    font-size:1.2rem;
-  }
-
-  .cand-grid{
-    grid-template-columns:1fr;
+    padding:10px 12px;
     gap:8px;
   }
 
-  .cand-card{
-    padding:14px;
+  /* Esconde o input de nome e reshuffle bar em telas pequenas
+     — mantém só os slots e o botão confirmar */
+  .draft-left > div:first-child { display:none; }  /* nome do time — move para depois */
+  .reshuffle-bar { padding:8px 10px; }
+
+  /* Slots em grade 2×3 para caber sem scroll */
+  .slot-list {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    overflow:visible;
   }
 
-  .cc-stats{
-    gap:4px;
-  }
-
-  .slot{
+  /* Slot compacto */
+  .slot {
     min-height:auto;
+    padding:7px 10px;
+  }
+  .slot-role-lbl { font-size:.6rem; margin-bottom:2px; }
+  .slot-nick     { font-size:.82rem; }
+  .slot-sub      { font-size:.62rem; }
+  .slot-empty    { font-size:.72rem; }
+
+  /* Pool (direita): área de scroll natural */
+  .draft-right {
+    overflow:visible;
+    padding:12px;
+    flex:1;
   }
 
-  /* =========================
-     TOP BAR
-  ========================= */
+  /* Banner do time mais compacto */
+  .draft-team-banner {
+    padding:8px 12px;
+    margin-bottom:10px;
+    gap:8px;
+  }
+  .dtb-icon  { font-size:1.2rem; }
+  .dtb-name  { font-size:.95rem; }
+  .dtb-label { font-size:.55rem; }
+  .dtb-meta  { display:none; }
 
-  .game-topbar{
+  /* Pool: 2 colunas compactas */
+  .pool-grid {
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .pool-card  { padding:10px; }
+  .pool-nick  { font-size:.88rem; }
+  .pool-real  { font-size:.65rem; }
+  .pool-role  { font-size:.65rem; margin:3px 0 4px; }
+  .pool-trait { font-size:.58rem; padding:1px 5px; margin-bottom:5px; }
+  .pool-stats { gap:2px; margin-top:5px; }
+  .ps-mini    { padding:4px 0; }
+  .ps-mini-v  { font-size:.68rem; }
+  .ps-mini-k  { font-size:.45rem; }
+
+  /* Desativa hover/transform em touch */
+  .pool-card:hover:not(.pool-used) { transform:none; }
+
+  /* Botão confirmar sempre visível */
+  #btn-confirm {
+    margin-top:6px;
+  }
+
+  /* ── TOP BAR (game) ── */
+  .game-topbar {
     position:sticky;
     top:0;
     z-index:500;
-    height:58px;
+    height:52px;
     padding:0 10px;
   }
-
-  .team-title{
-    font-size:.95rem;
-    max-width:140px;
+  .team-title {
+    font-size:.9rem;
+    max-width:120px;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
   }
+  .gtb-left  { gap:6px; }
+  .gtb-right { gap:4px; }
+  .stage-chip { font-size:.6rem; }
 
-  .gtb-left{
-    gap:8px;
-  }
-
-  .gtb-right{
-    gap:4px;
-  }
-
-  .stage-chip{
-    font-size:.65rem;
-  }
-
-  /* =========================
-     GAME LAYOUT
-  ========================= */
-
-  .game-layout{
+  /* ── GAME LAYOUT — sidebar acima, botão sticky no bottom ── */
+  .game-layout {
     display:flex;
     flex-direction:column;
-    min-height:100vh;
+    min-height:calc(100vh - 52px);
+    position:relative;
   }
 
-  .game-main{
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-
-    padding:12px 12px 95px;
-  }
-
-  /* =========================
-     SIDEBAR -> APP CARD
-  ========================= */
-
-  .game-sidebar{
+  /* Sidebar compactada: mostra só stage + record + botão */
+  .game-sidebar {
     order:-1;
     border-right:none;
     border-bottom:1px solid var(--border);
     overflow:visible;
+    flex-shrink:0;
   }
 
-  .hist-feed{
-    max-height:180px;
+  /* Esconde histórico no topo — já está no main */
+  .game-sidebar .sb-section:has(.hist-feed) { display:none; }
+
+  /* Botão "Próxima Série" sticky no bottom */
+  .sidebar-action {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:400;
+    background:var(--bg2);
+    border-top:2px solid var(--orange);
+    padding:10px 14px max(10px, env(safe-area-inset-bottom));
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .sidebar-action .btn { font-size:.85rem; }
+
+  /* Main: padding bottom para não ficar atrás do botão sticky */
+  .game-main {
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:12px 12px 100px;
   }
 
-  /* =========================
-     PLAYER CARDS
-  ========================= */
+  /* Histórico: aparece no main em mobile */
+  .hist-feed { max-height:160px; }
 
-  .players-grid{
+  /* ── PLAYER CARDS ── */
+  .players-grid {
     grid-template-columns:1fr;
     gap:8px;
   }
+  .player-card  { padding:11px; }
+  .pc-stats     { gap:3px; }
 
-  .player-card{
-    padding:12px;
-  }
-
-  .pc-stats{
-    gap:4px;
-  }
-
-  .pc-status{
+  /* Status: 2 colunas × 2 linhas em vez de 4×1 */
+  .pc-status {
     grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-
-  /* =========================
-     CAMPAIGN CARD
-  ========================= */
-
-  .campaign-card{
-    padding:12px;
-  }
-
-  .cc-stage-name{
-    font-size:1rem;
-  }
-
-  /* =========================
-     RESULT CARD
-  ========================= */
-
-  .result-card{
-    padding:12px;
-  }
-
-  /* =========================
-     MATCH OVERLAY
-  ========================= */
-
-  #match-overlay{
-    padding:0;
-  }
-
-  .match-modal{
-    width:100vw;
-    height:100vh;
-    max-width:none;
-    border-radius:0;
-    padding:14px;
-    overflow-y:auto;
-  }
-
-  .mm-matchup{
-    gap:10px;
-  }
-
-  .mm-team-name{
-    min-width:auto;
-    font-size:1rem;
-  }
-
-  .series-maps{
     gap:6px;
   }
 
-  .sm-dot{
-    width:30px;
-    height:30px;
-    font-size:.75rem;
-  }
+  /* ── CARDS ── */
+  .campaign-card { padding:11px; }
+  .cc-stage-name { font-size:1rem; }
+  .result-card   { padding:11px; }
 
-  .score-dig{
-    font-size:2rem;
-    min-width:40px;
-  }
-
-  .msc-team-lbl{
-    width:auto;
-    font-size:.65rem;
-  }
-
-  .pst-table{
-    font-size:.65rem;
-  }
-
-  .pst-table th,
-  .pst-table td{
-    padding:3px;
-  }
-
-  /* =========================
-     STAGE OVERLAY
-  ========================= */
-
-  #stage-overlay{
-    padding:0;
-  }
-
-  .stage-modal{
+  /* ── MATCH OVERLAY — full screen ── */
+  #match-overlay { padding:0; }
+  .match-modal {
     width:100vw;
-    min-height:100vh;
+    height:100dvh;
     max-width:none;
     border-radius:0;
-    padding:16px;
+    padding:12px 12px max(12px, env(safe-area-inset-bottom));
+    overflow-y:auto;
+    padding-top:max(12px, env(safe-area-inset-top));
   }
+  .mm-matchup   { gap:8px; }
+  .mm-team-name { min-width:auto; font-size:.95rem; }
+  .series-maps  { gap:6px; }
+  .sm-dot       { width:30px; height:30px; font-size:.72rem; }
+  .score-dig    { font-size:2rem; min-width:38px; }
+  .msc-team-lbl { width:auto; font-size:.62rem; }
 
-  .stm-title{
-    font-size:1.6rem;
-  }
+  /* Stats table: remove coluna KPR em mobile */
+  .pst-table    { font-size:.68rem; }
+  .pst-table th, .pst-table td { padding:4px 3px; }
+  .pst-col-kpr  { display:none; }
 
-  .stm-roster{
-    grid-template-columns:1fr;
-  }
-
-  /* =========================
-     EVENTS
-  ========================= */
-
-  #event-overlay{
-    padding:0;
-  }
-
-  .ev-modal{
+  /* ── STAGE OVERLAY — full screen ── */
+  #stage-overlay { padding:0; }
+  .stage-modal {
     width:100vw;
-    min-height:100vh;
+    min-height:100dvh;
     max-width:none;
     border-radius:0;
-    padding:18px;
+    padding:16px 16px max(16px, env(safe-area-inset-bottom));
+    padding-top:max(16px, env(safe-area-inset-top));
   }
+  .stm-title   { font-size:1.6rem; }
+  .stm-roster  { grid-template-columns:1fr 1fr; }
 
-  /* =========================
-     SHARE PANEL
-  ========================= */
-
-  .panel-overlay{
-    padding:0;
-  }
-
-  .panel-box{
+  /* ── EVENT OVERLAY ── */
+  #event-overlay { padding:0; }
+  .ev-modal {
     width:100vw;
-    height:100vh;
+    min-height:100dvh;
+    max-width:none;
+    border-radius:0;
+    padding:18px 18px max(18px, env(safe-area-inset-bottom));
+    padding-top:max(18px, env(safe-area-inset-top));
+  }
+
+  /* ── SHARE PANEL ── */
+  .panel-overlay { padding:0; }
+  .panel-box {
+    width:100vw;
+    height:100dvh;
     max-width:none;
     max-height:none;
     border-radius:0;
   }
 
-  /* =========================
-     END SCREEN
-  ========================= */
+  /* ── END SCREEN ── */
+  .end-wrap  { padding:24px; }
+  .end-title { font-size:2.2rem; }
+  .end-acts  { flex-direction:column; width:100%; }
+  .end-acts .btn { width:100%; }
 
-  .end-wrap{
-    padding:24px;
-  }
+  /* ── TOAST ── */
+  #toast { width:100%; padding:0 12px; }
+  .ti    { width:100%; max-width:none; }
 
-  .end-title{
-    font-size:2.2rem;
-  }
+  /* ── BRACKET (mobile) ── */
+  .swiss-grid { grid-template-columns:repeat(3,1fr); gap:5px; }
+  .swiss-grid > div:nth-child(4),
+  .swiss-grid > div:nth-child(5) { display:none; }
+  .playoff-bracket { grid-template-columns:1fr; gap:14px; }
+  .pb-round-head { font-size:.6rem; }
+  .sw-opp { font-size:.7rem; }
+  .sw-col-head { font-size:.55rem; }
 
-  .end-acts{
-    flex-direction:column;
-    width:100%;
-  }
-
-  .end-acts .btn{
-    width:100%;
-  }
-
-  /* =========================
-     TOAST
-  ========================= */
-
-  #toast{
-    width:100%;
-    padding:0 12px;
-  }
-
-  .ti{
-    width:100%;
-    max-width:none;
-  }
 }
 
-
 /* ═══════════════════════════════════════════════
-   SMALL PHONES
+   TELAS PEQUENAS (≤480px)
 ═══════════════════════════════════════════════ */
+@media (max-width:480px){
 
-@media (max-width: 480px){
+  .menu-logo h1   { font-size:2rem; }
+  .cc-stage-name  { font-size:.9rem; }
+  .pc-nick        { font-size:.88rem; }
+  .team-title     { max-width:90px; }
+  .gtb-right .btn { padding:5px 8px; }
+  .score-dig      { font-size:1.6rem; }
+  .stm-title      { font-size:1.3rem; }
+  .mm-team-name   { font-size:.82rem; }
 
-  .menu-logo h1{
-    font-size:2rem;
-  }
+  /* Pool: 1 coluna em telas muito estreitas */
+  .pool-grid { grid-template-columns:1fr; }
 
-  .role-name{
-    font-size:1rem;
-  }
+  /* Slots: 1 coluna */
+  .slot-list { grid-template-columns:1fr; }
 
-  .cc-stage-name{
-    font-size:.9rem;
-  }
+  /* Stats player card: compacta labels */
+  .ps-v { font-size:.8rem; }
+  .ps-k { font-size:.5rem; }
 
-  .pc-nick{
-    font-size:.9rem;
-  }
+  /* Status: 2 colunas mantidas */
+  .pc-status { grid-template-columns:1fr 1fr; }
 
-  .team-title{
-    max-width:90px;
-  }
+  /* Stm roster: 1 coluna */
+  .stm-roster { grid-template-columns:1fr; }
 
-  .gtb-right .btn{
-    padding:5px 8px;
-  }
-
-  .score-dig{
-    font-size:1.6rem;
-  }
-
-  .stm-title{
-    font-size:1.3rem;
-  }
-
-  .mm-team-name{
-    font-size:.85rem;
-  }
 }
 
-
 /* ═══════════════════════════════════════════════
-   SAFE AREA (iPhone)
+   SAFE AREA (iPhone — notch + home indicator)
 ═══════════════════════════════════════════════ */
-
-@supports (padding: max(0px)) {
-
-  .game-main{
-    padding-bottom:max(95px, env(safe-area-inset-bottom));
+@supports (padding: max(0px)){
+  .game-main {
+    padding-bottom:max(100px, calc(env(safe-area-inset-bottom) + 80px));
   }
-
+  .sidebar-action {
+    padding-bottom:max(10px, env(safe-area-inset-bottom));
+  }
   .match-modal,
   .stage-modal,
   .panel-box,
-  .ev-modal{
+  .ev-modal {
     padding-bottom:max(16px, env(safe-area-inset-bottom));
   }
-
 }
-
 </style>
 </head>
 <body>
@@ -1307,8 +1422,16 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
         <div class="rc-label">Último Resultado</div>
         <div class="rc-text" id="rc-text"></div>
       </div>
-      <div class="section-head">Jogadores</div>
-      <div class="players-grid" id="players-grid"></div>
+      <div class="view-tabs">
+        <button class="view-tab active" onclick="switchTab('bracket')">🏆 Bracket</button>
+        <button class="view-tab" onclick="switchTab('roster')">👥 Escalação</button>
+      </div>
+      <div class="view-panel active" id="panel-bracket">
+        <div class="bracket-wrap" id="bracket-wrap"></div>
+      </div>
+      <div class="view-panel" id="panel-roster">
+        <div class="players-grid" id="players-grid"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1498,6 +1621,16 @@ async function goDraft(){
   G.draft.usedTeams=[];      // team names drawn so far
   showScreen("draft");
   document.getElementById("draft-era-chip").textContent=G.draft.eraId;
+  document.getElementById("slot-list").innerHTML=
+    ["IGL","AWPer","Entry Fragger","Support","Lurker"].map((role,i)=>`
+      <div class="slot active" data-slot-idx="${i}">
+        <div class="slot-role-lbl">${ROLE_EMOJI[role]||""} ${role}</div>
+        <div class="slot-empty">Arraste um jogador aqui</div>
+      </div>`).join("");
+  document.getElementById("reshuffle-team-name").textContent="";
+  document.getElementById("reshuffle-count").textContent="";
+  document.getElementById("btn-confirm").disabled=true;
+  document.getElementById("draft-right").innerHTML=`<div class="draft-loading">Carregando time…</div>`;
   await drawNewTeam();
 }
 
@@ -1572,52 +1705,202 @@ async function reshuffleTeam(){
   await drawNewTeam();
 }
 
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// DRAFT — DRAG & DROP + TOUCH SELECT STATE
+// ═══════════════════════════════════════════
+let _drag = { source:null, player:null, poolIdx:null, slotIdx:null };
+
+// Touch mode: player selected waiting for slot tap
+let _touchSel = null; // { player, source, slotIdx? }
+
+const _isTouch = () => window.matchMedia('(pointer:coarse)').matches;
+
+function _ghostEl() {
+  let g = document.getElementById("drag-ghost");
+  if (!g) { g=document.createElement("div"); g.id="drag-ghost"; document.body.appendChild(g); }
+  return g;
+}
+
+// ── MOUSE DRAG (desktop) ─────────────────────
+
+function _startDrag(source, playerJson, poolIdx, slotIdx) {
+  if (_isTouch()) return; // touch devices use tap flow
+  const player = typeof playerJson === 'string' ? JSON.parse(playerJson) : playerJson;
+  _drag = { source, player, poolIdx, slotIdx };
+  const g = _ghostEl();
+  g.textContent = player.nickname;
+  g.style.display = "block";
+  document.addEventListener("mousemove", _onDragMove);
+  document.addEventListener("mouseup",   _onDragEnd);
+}
+
+function _onDragMove(e) {
+  const g = _ghostEl();
+  g.style.left = e.clientX + "px";
+  g.style.top  = e.clientY + "px";
+  document.querySelectorAll(".slot[data-slot-idx]").forEach(s => s.classList.remove("drag-over"));
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const slot = el && el.closest(".slot[data-slot-idx]");
+  if (slot) slot.classList.add("drag-over");
+}
+
+function _onDragEnd(e) {
+  document.removeEventListener("mousemove", _onDragMove);
+  document.removeEventListener("mouseup",   _onDragEnd);
+  _ghostEl().style.display = "none";
+  document.querySelectorAll(".slot").forEach(s => s.classList.remove("drag-over"));
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const slotEl = el && el.closest(".slot[data-slot-idx]");
+  if (slotEl) _dropOnSlot(parseInt(slotEl.dataset.slotIdx));
+  _drag = {};
+}
+
+// ── TOUCH TAP-TO-SELECT flow (mobile) ────────
+
+function _touchSelectPool(playerJson, idx) {
+  if (!_isTouch()) return false; // let click/mousedown handle on desktop
+  const player = typeof playerJson === 'string' ? JSON.parse(playerJson) : playerJson;
+
+  if (_touchSel && _touchSel.source === 'pool' && _touchSel.player.nickname === player.nickname) {
+    // Tapped same card again → deselect
+    _touchSel = null;
+    _touchClearHighlight();
+    return true;
+  }
+  _touchSel = { source:'pool', player, poolIdx:idx };
+  _touchHighlightSlots();
+  toast(player.nickname + " selecionado — toque em um slot", "inf");
+  return true;
+}
+
+function _touchSelectSlot(slotIdx) {
+  if (!_isTouch()) return false;
+  if (!_touchSel) {
+    // No pool player selected — select the filled slot to move it
+    const pick = G.draft.picks.find(pk => pk.slotIdx === slotIdx);
+    if (!pick) return true; // empty slot tapped, nothing to do
+    _touchSel = { source:'slot', player: pick.player, slotIdx };
+    _touchHighlightSlots();
+    toast(pick.player.nickname + " — toque em outro slot para mover", "inf");
+    return true;
+  }
+  // Drop into this slot
+  _drag = { ..._touchSel };
+  _touchSel = null;
+  _touchClearHighlight();
+  _dropOnSlot(slotIdx);
+  return true;
+}
+
+function _touchHighlightSlots() {
+  document.querySelectorAll(".slot[data-slot-idx]").forEach(s => s.classList.add("touch-target"));
+  // Highlight selected pool card
+  if (_touchSel && _touchSel.source === 'pool') {
+    const card = document.querySelector(`.pool-card[data-pool-idx="${_touchSel.poolIdx}"]`);
+    if (card) card.classList.add("touch-selected");
+  }
+}
+
+function _touchClearHighlight() {
+  document.querySelectorAll(".slot").forEach(s => s.classList.remove("touch-target","drag-over"));
+  document.querySelectorAll(".pool-card").forEach(c => c.classList.remove("touch-selected"));
+}
+
+function _dropOnSlot(targetIdx) {
+  const SLOTS = ["IGL","AWPer","Entry Fragger","Support","Lurker"];
+  if (!_drag.player) return;
+  const slotRole = SLOTS[targetIdx];
+  const playerWithRole = { ..._drag.player, role: slotRole };
+  const existingPick = G.draft.picks.find(pk => pk.slotIdx === targetIdx);
+
+  if (_drag.source === "pool") {
+    G.draft.picks = G.draft.picks.filter(pk => pk.slotIdx !== targetIdx);
+    G.draft.picks = G.draft.picks.filter(pk => pk.player.nickname !== _drag.player.nickname);
+    G.draft.picks.push({ slotIdx: targetIdx, player: playerWithRole });
+    renderDraftLeft();
+    if(G.draft.picks.length < 5){
+      drawNewTeam();
+    } else {
+      renderDraftPool();
+    }
+  } else if (_drag.source === "slot") {
+    const fromIdx = _drag.slotIdx;
+    if (fromIdx === targetIdx) return;
+    G.draft.picks = G.draft.picks.filter(pk => pk.slotIdx !== fromIdx);
+    if (existingPick) {
+      const swapRole = SLOTS[fromIdx];
+      G.draft.picks = G.draft.picks.filter(pk => pk.slotIdx !== targetIdx);
+      G.draft.picks.push({ slotIdx: fromIdx, player: { ...existingPick.player, role: swapRole } });
+    }
+    G.draft.picks.push({ slotIdx: targetIdx, player: playerWithRole });
+    renderDraftLeft();
+    renderDraftPool();
+  }
+}
+
+// ───────────────────────────────────────────
+
 function renderDraftLeft(){
   const SLOTS=["IGL","AWPer","Entry Fragger","Support","Lurker"];
   const reshufflesLeft=G.draft.reshuffles;
 
-  // reshuffle bar
   document.getElementById("reshuffle-team-name").textContent=G.draft.teamName||"–";
   document.getElementById("reshuffle-count").textContent=
     `${reshufflesLeft} re-sorteio${reshufflesLeft!==1?"s":""} restante${reshufflesLeft!==1?"s":""}`;
-  const btn=document.getElementById("btn-reshuffle");
-  btn.disabled=reshufflesLeft<=0;
+  document.getElementById("btn-reshuffle").disabled=reshufflesLeft<=0;
 
-  // slot list — 5 positional slots (IGL, AWP, Entry, Support, Lurk)
   document.getElementById("slot-list").innerHTML=SLOTS.map((role,i)=>{
     const pick=G.draft.picks.find(pk=>pk.slotIdx===i);
     if(pick){
       const p=pick.player;
-      return `<div class="slot filled">
+      const pj=JSON.stringify(p).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+      return `<div class="slot filled" data-slot-idx="${i}"
+          onmousedown="event.preventDefault();_startDrag('slot','${pj}',null,${i});"
+          onclick="_touchSelectSlot(${i})"
+          ondblclick="unpickSlot(${i})"
+          title="Arraste para trocar · Duplo-clique para remover">
         <div class="slot-role-lbl">${ROLE_EMOJI[role]||""} ${role}</div>
         <div class="slot-filled-row">
           <div>
             <div class="slot-nick">${flag(p.country)} ${p.nickname}</div>
-            <div class="slot-sub">RTG ${p.attributes.rating.toFixed(1)} · ${p.era||"?"}</div>
+            <div class="slot-sub">RTG ${p.attributes.rating.toFixed(1)} · ${p.era||"?"} · ${p.name||""}</div>
           </div>
-          <span style="font-size:.65rem;color:var(--green);">✓</span>
+          <span style="font-size:.6rem;color:var(--text3);">⠿</span>
         </div>
       </div>`;
     }
-    return `<div class="slot active">
+    return `<div class="slot active" data-slot-idx="${i}"
+      onclick="_touchSelectSlot(${i})">
       <div class="slot-role-lbl">${ROLE_EMOJI[role]||""} ${role}</div>
-      <div class="slot-empty">Clique em um jogador →</div>
+      <div class="slot-empty">Arraste ou toque para colocar</div>
     </div>`;
   }).join("");
 
   document.getElementById("btn-confirm").disabled=G.draft.picks.length<5;
 }
 
+function _guessTeamCountry(pool) {
+  if (!pool || !pool.length) return "🏴";
+  const counts={};
+  pool.forEach(p=>{ const c=p.country||""; counts[c]=(counts[c]||0)+1; });
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0]?.[0]||"";
+  return flag(top)||"🏴";
+}
+
 function renderDraftPool(){
   const right=document.getElementById("draft-right");
   const usedNicks=new Set(G.draft.picks.map(pk=>pk.player.nickname));
+  const teamFlag = _guessTeamCountry(G.draft.teamPool);
 
   right.innerHTML=`
-    <div class="draft-pool-header">${G.draft.teamName}</div>
-    <div class="draft-hint">
-      Clique em um jogador para adicioná-lo ao seu elenco.<br>
-      Escolha a posição desejada — qualquer jogador pode ocupar qualquer slot.<br>
-      Clique em um slot preenchido para remover o jogador.
+    <div class="draft-team-banner">
+      <div class="dtb-icon">${teamFlag}</div>
+      <div>
+        <div class="dtb-label">Time disponível · Era ${G.draft.eraId||""}</div>
+        <div class="dtb-name">${G.draft.teamName||"–"}</div>
+        <div class="dtb-meta">Arraste jogadores para os slots · Clique para adicionar automaticamente</div>
+      </div>
     </div>
     <div class="pool-grid">
       ${G.draft.teamPool.map((p,i)=>renderPoolCard(p,i,usedNicks)).join("")}
@@ -1639,27 +1922,36 @@ function renderPoolCard(p,idx,usedNicks){
     </div>`;
   }).join("");
 
-  return `<div class="pool-card ${used?"pool-used pool-selected":""}"
-      onclick="${used?"":"pickPoolPlayer("+idx+")"}">
+  if(used){
+    return `<div class="pool-card pool-used pool-selected">
+      <div style="font-size:.9rem;">${flag(p.country||"")}</div>
+      <div class="pool-nick">${p.nickname||"?"}</div>
+      <div class="pool-real">${p.name||""}</div>
+      <div class="pool-role">${ROLE_EMOJI[role]||""} ${role}</div>
+      <span class="pool-trait">${p.trait||""}</span>
+      <div class="pool-stats">${statsHtml}</div>
+      <div style="text-align:center;font-size:.68rem;color:var(--green);margin-top:6px;font-family:var(--font-display);">✓ Selecionado</div>
+    </div>`;
+  }
+
+  const pj=JSON.stringify(p).replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+  return `<div class="pool-card" data-pool-idx="${idx}"
+      onclick="if(!_touchSelectPool('${pj}',${idx})) pickPoolPlayer(${idx})"
+      onmousedown="event.preventDefault();_startDrag('pool','${pj}',${idx},null);">
     <div style="font-size:.9rem;">${flag(p.country||"")}</div>
     <div class="pool-nick">${p.nickname||"?"}</div>
     <div class="pool-real">${p.name||""}</div>
     <div class="pool-role">${ROLE_EMOJI[role]||""} ${role}</div>
     <span class="pool-trait">${p.trait||""}</span>
     <div class="pool-stats">${statsHtml}</div>
-    ${used?`<div style="text-align:center;font-size:.68rem;color:var(--green);margin-top:6px;font-family:var(--font-display);">✓ Selecionado</div>`:""}
   </div>`;
 }
 
 async function pickPoolPlayer(idx){
   const p=G.draft.teamPool[idx];
   if(!p) return;
-
-  // Find the first empty slot
   const SLOTS=["IGL","AWPer","Entry Fragger","Support","Lurker"];
   const filledIdxs=new Set(G.draft.picks.map(pk=>pk.slotIdx));
-  
-  // Prefer the slot matching the player's role hint
   const roleHint=p.role_hint||p.role||"";
   let targetSlot=-1;
   const roleToIdx={"IGL":0,"AWPer":1,"Entry Fragger":2,"Support":3,"Lurker":4};
@@ -1667,34 +1959,27 @@ async function pickPoolPlayer(idx){
   if(preferredIdx>=0 && !filledIdxs.has(preferredIdx)){
     targetSlot=preferredIdx;
   } else {
-    // fall back to first open slot
     for(let i=0;i<5;i++){
       if(!filledIdxs.has(i)){targetSlot=i;break;}
     }
   }
-
-  if(targetSlot===-1){toast("Todos os slots preenchidos! Remova um para trocar.","err");return;}
-
-  // Assign role to player based on target slot
+  if(targetSlot===-1){toast("Todos os slots preenchidos! Arraste para trocar.","err");return;}
   const slotRole=SLOTS[targetSlot];
-  const playerWithRole={...p, role:slotRole};
-  G.draft.picks.push({slotIdx:targetSlot, player:playerWithRole});
-
-  // Auto-sortear próximo time após escolha (lógica 7-a-0)
+  G.draft.picks.push({slotIdx:targetSlot, player:{...p, role:slotRole}});
+  renderDraftLeft();
   if(G.draft.picks.length < 5){
     await drawNewTeam();
   } else {
-    renderDraftLeft();
     renderDraftPool();
   }
 }
 
 function unpickSlot(slotIdx){
   G.draft.picks=G.draft.picks.filter(pk=>pk.slotIdx!==slotIdx);
-  // Não sorteia novo time — mantém o pool atual para o jogador re-escolher
   renderDraftLeft();
   renderDraftPool();
 }
+
 
 async function confirmDraft(){
   const teamName=document.getElementById("team-name-inp").value.trim()||null;
@@ -1724,8 +2009,16 @@ async function confirmDraft(){
       <div class="rc-label">Último Resultado</div>
       <div class="rc-text" id="rc-text"></div>
     </div>
-    <div class="section-head">Jogadores</div>
-    <div class="players-grid" id="players-grid"></div>`;
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="switchTab('bracket')">🏆 Bracket</button>
+      <button class="view-tab" onclick="switchTab('roster')">👥 Escalação</button>
+    </div>
+    <div class="view-panel active" id="panel-bracket">
+      <div class="bracket-wrap" id="bracket-wrap"></div>
+    </div>
+    <div class="view-panel" id="panel-roster">
+      <div class="players-grid" id="players-grid"></div>
+    </div>`;
   showScreen("game"); updateGameUI();
   toast("Major iniciado! Boa sorte 🏆","ok");
 }
@@ -1775,6 +2068,7 @@ function updateGameUI(){
 
   renderHistoryFeed(campaign.history||[]);
   renderPlayersGrid(team.players);
+  renderBracket();
 
   const finished=stg==="finished_win"||stg==="finished_loss";
   const btn=document.getElementById("btn-next");
@@ -1864,6 +2158,254 @@ function renderPlayersGrid(players){
         ${(p.buffs||[]).length?`<div style="margin-top:6px;font-size:.68rem;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px;">${p.buffs.map(b=>`<span style="background:var(--bg4);padding:1px 6px;border-radius:2px;color:${b.effect>=0?"var(--green)":"var(--red)"};">${b.name}(${b.duration})</span>`).join("")}</div>`:""}
       </div>`;
   }).join("");
+}
+
+// ═══════════════════════════════════════════
+// TAB SWITCHER
+// ═══════════════════════════════════════════
+function switchTab(name){
+  document.querySelectorAll(".view-tab").forEach((t,i)=>{
+    t.classList.toggle("active", (i===0&&name==="bracket")||(i===1&&name==="roster"));
+  });
+  document.getElementById("panel-bracket")?.classList.toggle("active", name==="bracket");
+  document.getElementById("panel-roster")?.classList.toggle("active",  name==="roster");
+}
+
+// ═══════════════════════════════════════════
+// MAJOR BRACKET RENDERER
+// ═══════════════════════════════════════════
+/*
+  CS2 Major format:
+  Stage 1 & 2 — Swiss (Bo3): 3 wins = advance, 3 losses = eliminate
+    Rounds: 1-0/0-1, 1-1/2-0/0-2, 2-1/1-2, 3-1/1-3, 2-2
+    We track which round each match happened using history + stage1/stage2 records
+  Playoffs — Single elimination Bo3: QF → SF → Final
+*/
+
+function renderBracket(){
+  const wrap = document.getElementById("bracket-wrap");
+  if(!wrap) return;
+  const {campaign, team} = G;
+  if(!campaign || !team) return;
+
+  const history = campaign.history || [];
+  const stg = campaign.stage;
+
+  // Separate history by stage
+  const s1h = history.filter(h=>h.stage==="stage1");
+  const s2h = history.filter(h=>h.stage==="stage2");
+  const poh = history.filter(h=>["playoffs_qf","playoffs_sf","playoffs_final"].includes(h.stage));
+
+  const isFinished = stg==="finished_win"||stg==="finished_loss";
+
+  // Determine which stages are active/complete
+  const pastStages = ["stage1","stage2","playoffs_qf","playoffs_sf","playoffs_final","finished_win","finished_loss"];
+  const stgIdx = pastStages.indexOf(stg);
+
+  const s1done = stgIdx > 0;
+  const s2done = stgIdx > 1;
+  const playoffStarted = stgIdx >= 2;
+
+  let html = "";
+
+  // ── Stage 1 ──
+  html += renderSwissStage("Stage 1", s1h, campaign.stage1, stg==="stage1", s1done);
+
+  // Divider
+  html += `<div class="bracket-divider"></div>`;
+
+  // ── Stage 2 ──
+  const s2locked = stgIdx < 1 && stg!=="stage2";
+  html += renderSwissStage("Stage 2", s2h, campaign.stage2, stg==="stage2", s2done, s2locked);
+
+  // Divider + Playoffs
+  html += `<div class="bracket-divider"></div>`;
+  html += renderPlayoffs(poh, stg, isFinished, playoffStarted);
+
+  // Legend
+  html += `
+  <div class="bracket-legend">
+    <div class="bl-item"><div class="bl-dot bl-win"></div>Vitória</div>
+    <div class="bl-item"><div class="bl-dot bl-loss"></div>Derrota</div>
+    <div class="bl-item"><div class="bl-dot bl-cur"></div>Fase Atual</div>
+    <div class="bl-item"><div class="bl-dot bl-emp"></div>Pendente</div>
+  </div>`;
+
+  wrap.innerHTML = html;
+}
+
+function renderSwissStage(title, stageHistory, record, isCurrent, isDone, isLocked){
+  const wins = record?.wins ?? 0;
+  const losses = record?.losses ?? 0;
+
+  let statusHtml = "";
+  if(isLocked){
+    statusHtml = `<span class="swiss-status-pill ssp-locked">Bloqueado</span>`;
+  } else if(isDone){
+    if(wins>=3) statusHtml = `<span class="swiss-status-pill ssp-done">✓ Avançou (${wins}-${losses})</span>`;
+    else        statusHtml = `<span class="swiss-status-pill ssp-locked">✗ Eliminado (${wins}-${losses})</span>`;
+  } else if(isCurrent){
+    statusHtml = `<span class="swiss-status-pill ssp-current">Em curso — ${wins}W ${losses}L</span>`;
+  }
+
+  // Swiss format: each match is placed in the column corresponding to the record BEFORE that match
+  // Column index = wins_before + losses_before (0..4)
+  // Col 0: record 0-0 (round 1)
+  // Col 1: record 1-0 or 0-1 (round 2)
+  // Col 2: record 2-0, 1-1, or 0-2 (round 3)
+  // Col 3: record 2-1 or 1-2 (round 4)
+  // Col 4: record 2-2 (round 5 — decisive)
+
+  // Group history by column
+  const cols = [[],[],[],[],[]];
+  for(const h of stageHistory){
+    const wb = h.wins_before ?? 0;
+    const lb = h.losses_before ?? 0;
+    const colIdx = Math.min(wb + lb, 4);
+    cols[colIdx].push(h);
+  }
+
+  const COL_RECORDS = ["0–0", "1–0 / 0–1", "2–0 / 1–1 / 0–2", "2–1 / 1–2", "2–2"];
+  const COL_NOTE    = ["Rodada 1","Rodada 2","Rodada 3","Rodada 4","Rodada 5"];
+
+  // Current round index = wins + losses (capped at 4)
+  const currentRound = Math.min(wins + losses, 4);
+
+  let colsHtml = "";
+  for(let ri=0; ri<5; ri++){
+    const played = cols[ri];
+    const isThisRound = isCurrent && ri === currentRound && played.length === 0;
+
+    colsHtml += `<div>
+      <div class="swiss-col-head">${COL_RECORDS[ri]}</div>`;
+
+    if(played.length){
+      for(const m of played){
+        const won = m.result==="win";
+        colsHtml += `
+        <div class="sw-slot ${won?"sw-win":"sw-loss"}">
+          <div class="sw-round-label">${COL_NOTE[ri]}</div>
+          <div class="sw-opp ${won?"sw-opp-win":"sw-opp-loss"}">${truncateTeam(m.opponent_name)}</div>
+          <span class="sw-badge ${won?"w":"l"}">${won?"W":"L"}</span>
+        </div>`;
+      }
+    } else if(isThisRound){
+      colsHtml += `
+      <div class="sw-slot sw-current">
+        <div class="sw-round-label">${COL_NOTE[ri]}</div>
+        <div class="sw-opp"><span class="sw-opp-empty">Próxima série…</span></div>
+        <span class="sw-badge c">NOW</span>
+      </div>`;
+    } else {
+      // Only show empty slot if this round is reachable given current record
+      // A round ri is reachable if: wins < 3 && losses < 3 && wins+losses <= ri (future)
+      // or simply if we haven't been eliminated before reaching it
+      const reachable = !isLocked && !isDone && ri >= currentRound;
+      colsHtml += `
+      <div class="sw-slot sw-empty">
+        <div class="sw-round-label">${COL_NOTE[ri]}</div>
+        <div class="sw-opp"><span class="sw-opp-empty">${isLocked||(!reachable&&!played.length)?"–":"pendente"}</span></div>
+      </div>`;
+    }
+    colsHtml += `</div>`;
+  }
+
+  return `
+  <div class="swiss-header" style="margin-bottom:14px;">
+    <div class="swiss-title section-head" style="margin:0;">${title}</div>
+    <div style="flex:1"></div>
+    ${statusHtml}
+  </div>
+  <div class="swiss-grid">${colsHtml}</div>`;
+}
+
+function renderPlayoffs(poHistory, stg, isFinished, playoffStarted){
+  const teamName = G.team?.name || "Seu Time";
+
+  // Map stage → match result from history
+  const qfMatch = poHistory.find(h=>h.stage==="playoffs_qf");
+  const sfMatch = poHistory.find(h=>h.stage==="playoffs_sf");
+  const fMatch  = poHistory.find(h=>h.stage==="playoffs_final");
+
+  const qfCurrent = stg==="playoffs_qf";
+  const sfCurrent = stg==="playoffs_sf";
+  const fCurrent  = stg==="playoffs_final";
+
+  const playoffActive = playoffStarted;
+
+  function pbMatch(match, isCurrent, stageLabel, teamIsWinner){
+    const opponentName = match?.opponent_name;
+    const done = !!match;
+    const won  = match?.result==="win";
+
+    // Row for player's team
+    const myRowCls = done ? (won?"pt-winner":"pt-loser") : "";
+    const oppRowCls= done ? (won?"pt-loser":"pt-winner") : "";
+    const myRes    = done ? `<span class="pb-res ${won?"pr-win":"pr-loss"}">${won?"W":"L"}</span>` : `<span class="pb-res pr-vs">BO3</span>`;
+    const oppRes   = done ? `<span class="pb-res ${won?"pr-loss":"pr-win"}">${won?"L":"W"}</span>` : "";
+
+    const cardCls = isCurrent?"pm-current":(done?"pm-done":"");
+    const locked  = !playoffActive && !done;
+
+    return `
+    <div class="pb-match ${cardCls}">
+      <div class="pb-team ${myRowCls}">
+        <div class="pb-team-name pt-you">${teamName}</div>
+        ${myRes}
+      </div>
+      <div class="pb-team ${oppRowCls}">
+        <div class="pb-team-name ${opponentName?"":"pt-empty"}">${opponentName ? truncateTeam(opponentName) : (locked?"–":"???")}</div>
+        ${oppRes}
+      </div>
+    </div>`;
+  }
+
+  const qfHtml = pbMatch(qfMatch, qfCurrent, "QF");
+  const sfHtml = pbMatch(sfMatch, sfCurrent, "SF");
+  const fHtml  = pbMatch(fMatch,  fCurrent,  "Final");
+
+  // Champion display
+  const champHtml = (isFinished && stg==="finished_win") ? `
+  <div style="text-align:center;padding:18px 10px;">
+    <div style="font-size:2.4rem;">🏆</div>
+    <div style="font-family:var(--font-display);font-size:1rem;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:.12em;margin-top:6px;">CAMPEÃO</div>
+    <div style="font-size:.75rem;color:var(--text2);margin-top:3px;">${teamName}</div>
+  </div>` : `
+  <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:60px;">
+    <div style="text-align:center;opacity:.35;">
+      <div style="font-size:1.6rem;">🏆</div>
+      <div style="font-family:var(--font-display);font-size:.6rem;color:var(--text3);margin-top:4px;letter-spacing:.1em;">TROFÉU</div>
+    </div>
+  </div>`;
+
+  return `
+  <div class="swiss-header" style="margin-bottom:14px;">
+    <div class="swiss-title section-head" style="margin:0;">Playoffs</div>
+    <div style="flex:1"></div>
+    ${!playoffActive ? `<span class="swiss-status-pill ssp-locked">Bloqueado</span>` :
+      isFinished ? `<span class="swiss-status-pill ssp-done">${stg==="finished_win"?"🏆 Campeão!":"Eliminado"}</span>` :
+      `<span class="swiss-status-pill ssp-current">Em curso</span>`}
+  </div>
+  <div class="playoff-bracket">
+    <div class="pb-round">
+      <div class="pb-round-head ph-qf">Quartas de Final</div>
+      ${qfHtml}
+    </div>
+    <div class="pb-round">
+      <div class="pb-round-head ph-sf">Semifinal</div>
+      ${sfHtml}
+    </div>
+    <div class="pb-round">
+      <div class="pb-round-head ph-f">Grande Final</div>
+      ${fHtml}
+      ${champHtml}
+    </div>
+  </div>`;
+}
+
+function truncateTeam(name, maxLen=14){
+  if(!name) return "?";
+  return name.length > maxLen ? name.slice(0,maxLen)+"…" : name;
 }
 
 // ═══════════════════════════════════════════

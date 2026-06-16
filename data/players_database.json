@@ -1,24 +1,14 @@
 {
-  "_comment": "Players organized by era. Each entry = a player at a specific point in time.",
+  "_comment": "Players organized by era with real teams — good, average and weak — to make draft challenging.",
   "eras": [
     {
       "id": "2015",
       "label": "2015 — Era do Ouro (CSGO)",
-      "description": "Astralis nascendo, Virtus.pro dominando, NaVi com GuardiaN e flamie.",
+      "description": "Astralis nascendo, Virtus.pro dominando, NaVi com GuardiaN.",
       "teams": [
         {
-          "name": "Astralis",
-          "country": "DK",
-          "players": [
-            {"name":"Nicolai Reedtz","nickname":"dev1ce","country":"DK","rating":8.2,"kast":7.8,"impact":7.4,"adr":7.6,"kpr":7.7,"trait":"Veterano","role_hint":"AWPer"},
-            {"name":"Andreas Hojsleth","nickname":"Xyp9x","country":"DK","rating":7.2,"kast":8.0,"impact":6.8,"adr":6.9,"kpr":6.8,"trait":"Clutcher","role_hint":"Support"},
-            {"name":"Lukas Rossander","nickname":"gla1ve","country":"DK","rating":6.9,"kast":7.4,"impact":6.6,"adr":6.7,"kpr":6.5,"trait":"IGL Nato","role_hint":"IGL"},
-            {"name":"Peter Rasmussen","nickname":"dupreeh","country":"DK","rating":8.0,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.9,"trait":"Workaholic","role_hint":"Entry Fragger"},
-            {"name":"Emil Reif","nickname":"Magisk","country":"DK","rating":7.8,"kast":7.6,"impact":7.5,"adr":7.7,"kpr":7.8,"trait":"Clutcher","role_hint":"Lurker"}
-          ]
-        },
-        {
           "name": "fnatic",
+          "tier": 1,
           "country": "SE",
           "players": [
             {"name":"Olof Kajbjer","nickname":"olofmeister","country":"SE","rating":9.1,"kast":8.4,"impact":8.8,"adr":8.7,"kpr":8.9,"trait":"Veterano","role_hint":"Entry Fragger"},
@@ -30,17 +20,19 @@
         },
         {
           "name": "NiP",
+          "tier": 1,
           "country": "SE",
           "players": [
             {"name":"Christopher Alesund","nickname":"GeT_RiGhT","country":"SE","rating":8.8,"kast":8.2,"impact":8.5,"adr":8.1,"kpr":8.6,"trait":"Veterano","role_hint":"Lurker"},
-            {"name":"Erik Gustafsson","nickname":"friberg","country":"SE","rating":7.4,"kast":7.6,"impact":7.2,"adr":7.3,"kpr":7.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
             {"name":"Patrik Lindberg","nickname":"f0rest","country":"SE","rating":8.6,"kast":8.0,"impact":8.3,"adr":8.2,"kpr":8.4,"trait":"Veterano","role_hint":"Lurker"},
-            {"name":"Richard Landstrom","nickname":"Xizt","country":"SE","rating":6.8,"kast":7.3,"impact":6.5,"adr":6.6,"kpr":6.4,"trait":"IGL Nato","role_hint":"IGL"},
-            {"name":"Adam Friberg","nickname":"allu","country":"FI","rating":7.5,"kast":7.2,"impact":7.1,"adr":7.4,"kpr":6.9,"trait":"Piadista","role_hint":"AWPer"}
+            {"name":"Adam Friberg","nickname":"allu","country":"FI","rating":7.5,"kast":7.2,"impact":7.1,"adr":7.4,"kpr":6.9,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Erik Gustafsson","nickname":"friberg","country":"SE","rating":7.4,"kast":7.6,"impact":7.2,"adr":7.3,"kpr":7.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Richard Landstrom","nickname":"Xizt","country":"SE","rating":6.8,"kast":7.3,"impact":6.5,"adr":6.6,"kpr":6.4,"trait":"IGL Nato","role_hint":"IGL"}
           ]
         },
         {
           "name": "Luminosity",
+          "tier": 1,
           "country": "BR",
           "players": [
             {"name":"Gabriel Toledo","nickname":"FalleN","country":"BR","rating":8.7,"kast":8.1,"impact":8.4,"adr":8.2,"kpr":7.8,"trait":"IGL Nato","role_hint":"IGL"},
@@ -52,6 +44,7 @@
         },
         {
           "name": "Virtus.pro",
+          "tier": 1,
           "country": "PL",
           "players": [
             {"name":"Janusz Pogorzelski","nickname":"Snax","country":"PL","rating":8.4,"kast":7.9,"impact":8.1,"adr":7.9,"kpr":8.0,"trait":"Inconsistente","role_hint":"Lurker"},
@@ -59,6 +52,78 @@
             {"name":"Wiktor Wojtas","nickname":"TaZ","country":"PL","rating":7.0,"kast":7.6,"impact":6.8,"adr":6.9,"kpr":6.7,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Pawel Wojtas","nickname":"pasha","country":"PL","rating":7.5,"kast":7.3,"impact":7.3,"adr":7.6,"kpr":7.7,"trait":"Piadista","role_hint":"Entry Fragger"},
             {"name":"Filip Kubski","nickname":"NEO","country":"PL","rating":7.2,"kast":7.8,"impact":7.0,"adr":6.8,"kpr":7.1,"trait":"Veterano","role_hint":"Lurker"}
+          ]
+        },
+        {
+          "name": "Natus Vincere",
+          "tier": 1,
+          "country": "UA",
+          "players": [
+            {"name":"Oleksandr Kostyliev","nickname":"s1mple","country":"UA","rating":8.8,"kast":7.9,"impact":8.6,"adr":8.7,"kpr":8.5,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Ladislav Kovacs","nickname":"GuardiaN","country":"SK","rating":8.3,"kast":7.7,"impact":8.0,"adr":8.1,"kpr":7.7,"trait":"Veterano","role_hint":"AWPer"},
+            {"name":"Egor Kryvonos","nickname":"flamie","country":"RU","rating":7.8,"kast":7.6,"impact":7.5,"adr":7.7,"kpr":7.8,"trait":"Inconsistente","role_hint":"Entry Fragger"},
+            {"name":"Denis Sharipov","nickname":"electronic","country":"RU","rating":7.5,"kast":7.4,"impact":7.3,"adr":7.4,"kpr":7.6,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Ivan Kochevoi","nickname":"Edward","country":"UA","rating":6.6,"kast":7.2,"impact":6.3,"adr":6.5,"kpr":6.5,"trait":"Veterano","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "Team EnVyUs",
+          "tier": 2,
+          "country": "FR",
+          "players": [
+            {"name":"Kenny Schrub","nickname":"kennyS","country":"FR","rating":8.5,"kast":7.8,"impact":8.2,"adr":8.3,"kpr":7.9,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Richard Papillon","nickname":"shox","country":"FR","rating":8.0,"kast":7.7,"impact":7.8,"adr":7.9,"kpr":7.8,"trait":"Ego Elevado","role_hint":"Lurker"},
+            {"name":"Dan Madesclaire","nickname":"apEX","country":"FR","rating":7.5,"kast":7.7,"impact":7.4,"adr":7.5,"kpr":7.7,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Edouard Dubourdeaux","nickname":"bodyy","country":"FR","rating":6.9,"kast":7.2,"impact":6.7,"adr":6.8,"kpr":6.9,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Nathan Schmitt","nickname":"NBK","country":"FR","rating":7.1,"kast":7.5,"impact":6.9,"adr":7.0,"kpr":7.0,"trait":"Piadista","role_hint":"Lurker"}
+          ]
+        },
+        {
+          "name": "Team Liquid 2015",
+          "tier": 2,
+          "country": "US",
+          "players": [
+            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":7.4,"kast":7.3,"impact":7.2,"adr":7.3,"kpr":7.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Nicholas Cannella","nickname":"nitr0","country":"US","rating":6.9,"kast":7.5,"impact":6.7,"adr":6.8,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Jonathan Jablonowski","nickname":"EliGE","country":"US","rating":7.8,"kast":7.6,"impact":7.6,"adr":7.8,"kpr":7.9,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Keith Markovic","nickname":"NAF","country":"CA","rating":7.5,"kast":7.5,"impact":7.3,"adr":7.4,"kpr":7.4,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Josh Wilkinson","nickname":"jdm64","country":"US","rating":6.8,"kast":6.9,"impact":6.6,"adr":6.9,"kpr":6.4,"trait":"Inconsistente","role_hint":"AWPer"}
+          ]
+        },
+        {
+          "name": "Cloud9 2015",
+          "tier": 2,
+          "country": "US",
+          "players": [
+            {"name":"Jordan Gilbert","nickname":"n0thing","country":"US","rating":7.2,"kast":7.3,"impact":7.0,"adr":7.1,"kpr":7.3,"trait":"Piadista","role_hint":"Entry Fragger"},
+            {"name":"Michael Grzesiek","nickname":"shroud","country":"CA","rating":7.6,"kast":7.4,"impact":7.4,"adr":7.5,"kpr":7.7,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Timothy Ta","nickname":"autimatic","country":"US","rating":7.4,"kast":7.3,"impact":7.2,"adr":7.3,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Sean Gares","nickname":"sgares","country":"US","rating":6.5,"kast":7.4,"impact":6.3,"adr":6.4,"kpr":6.2,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Tyler Rosen","nickname":"Skadoodle","country":"US","rating":7.0,"kast":7.0,"impact":6.8,"adr":7.0,"kpr":6.6,"trait":"Clutcher","role_hint":"AWPer"}
+          ]
+        },
+        {
+          "name": "Mousesports 2015",
+          "tier": 3,
+          "country": "DE",
+          "players": [
+            {"name":"Timo Richter","nickname":"Spiidi","country":"DE","rating":6.4,"kast":6.8,"impact":6.1,"adr":6.3,"kpr":6.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Johannes Maget","nickname":"nex","country":"DE","rating":6.7,"kast":6.9,"impact":6.5,"adr":6.6,"kpr":6.7,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Denis Howell","nickname":"denis","country":"DE","rating":6.5,"kast":7.0,"impact":6.3,"adr":6.4,"kpr":6.4,"trait":"Piadista","role_hint":"Lurker"},
+            {"name":"Kevin Dorow","nickname":"chrisJ","country":"NL","rating":6.8,"kast":7.2,"impact":6.6,"adr":6.6,"kpr":6.5,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Martin Styk","nickname":"STYKO","country":"SK","rating":5.9,"kast":7.0,"impact":5.7,"adr":5.8,"kpr":5.7,"trait":"Workaholic","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "Flipsid3 2015",
+          "tier": 3,
+          "country": "UA",
+          "players": [
+            {"name":"Andriy Gorodenski","nickname":"B1ad3","country":"UA","rating":6.2,"kast":7.0,"impact":6.0,"adr":6.1,"kpr":5.9,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Kirill Pankov","nickname":"bondik","country":"UA","rating":6.6,"kast":6.8,"impact":6.4,"adr":6.5,"kpr":6.7,"trait":"Inconsistente","role_hint":"Entry Fragger"},
+            {"name":"Mikhail Stolyarov","nickname":"WorldEdit","country":"RU","rating":6.5,"kast":6.7,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Clutcher","role_hint":"AWPer"},
+            {"name":"Dmitriy Pedan","nickname":"markeloff","country":"UA","rating":6.3,"kast":6.6,"impact":6.1,"adr":6.2,"kpr":6.0,"trait":"Veterano","role_hint":"AWPer"},
+            {"name":"Danil Teslenko","nickname":"peet","country":"UA","rating":5.8,"kast":6.5,"impact":5.6,"adr":5.7,"kpr":5.7,"trait":"Workaholic","role_hint":"Support"}
           ]
         }
       ],
@@ -71,6 +136,7 @@
       "teams": [
         {
           "name": "Astralis",
+          "tier": 1,
           "country": "DK",
           "players": [
             {"name":"Nicolai Reedtz","nickname":"dev1ce","country":"DK","rating":8.8,"kast":8.4,"impact":8.2,"adr":8.5,"kpr":8.3,"trait":"Veterano","role_hint":"AWPer"},
@@ -82,46 +148,110 @@
         },
         {
           "name": "Natus Vincere",
+          "tier": 1,
           "country": "UA",
           "players": [
             {"name":"Oleksandr Kostyliev","nickname":"s1mple","country":"UA","rating":9.8,"kast":8.6,"impact":9.5,"adr":9.6,"kpr":9.4,"trait":"Ego Elevado","role_hint":"AWPer"},
             {"name":"Denis Sharipov","nickname":"electronic","country":"RU","rating":8.5,"kast":8.0,"impact":8.2,"adr":8.3,"kpr":8.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
             {"name":"Kirill Bityukov","nickname":"Boombl4","country":"RU","rating":7.0,"kast":7.6,"impact":6.8,"adr":6.9,"kpr":6.7,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Ilya Zalutskiy","nickname":"Perfecto","country":"RU","rating":7.1,"kast":7.8,"impact":6.9,"adr":7.0,"kpr":6.8,"trait":"Workaholic","role_hint":"Support"},
-            {"name":"Ladislav Kovacs","nickname":"GuardiaN","country":"SK","rating":8.0,"kast":7.5,"impact":7.8,"adr":7.9,"kpr":7.5,"trait":"Veterano","role_hint":"AWPer"}
+            {"name":"Egor Kryvonos","nickname":"flamie","country":"RU","rating":7.6,"kast":7.5,"impact":7.4,"adr":7.5,"kpr":7.6,"trait":"Inconsistente","role_hint":"Entry Fragger"}
           ]
         },
         {
           "name": "FaZe Clan",
+          "tier": 1,
           "country": "INT",
           "players": [
             {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.0,"kast":8.3,"impact":8.8,"adr":8.9,"kpr":8.7,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
-            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.0,"kast":7.8,"impact":7.2,"adr":7.0,"kpr":6.9,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Ladislav Kovacs","nickname":"GuardiaN","country":"SK","rating":8.3,"kast":7.7,"impact":8.0,"adr":8.1,"kpr":7.7,"trait":"Veterano","role_hint":"AWPer"},
             {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":8.2,"kast":7.9,"impact":8.0,"adr":8.1,"kpr":8.3,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.0,"kast":7.8,"impact":7.2,"adr":7.0,"kpr":6.9,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Olof Kajbjer","nickname":"olofmeister","country":"SE","rating":7.8,"kast":7.7,"impact":7.6,"adr":7.7,"kpr":7.8,"trait":"Veterano","role_hint":"Entry Fragger"}
           ]
         },
         {
           "name": "Team Vitality",
+          "tier": 1,
           "country": "FR",
           "players": [
             {"name":"Mathieu Herbaut","nickname":"ZywOo","country":"FR","rating":9.2,"kast":8.5,"impact":9.0,"adr":9.1,"kpr":8.8,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Dan Madesclaire","nickname":"apEX","country":"FR","rating":7.5,"kast":7.7,"impact":7.4,"adr":7.5,"kpr":7.7,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Cedric Guipouy","nickname":"RpK","country":"FR","rating":7.2,"kast":7.6,"impact":7.0,"adr":7.1,"kpr":7.2,"trait":"Veterano","role_hint":"Entry Fragger"},
-            {"name":"Alex McMeekin","nickname":"ALEX","country":"GB","rating":6.8,"kast":7.4,"impact":6.6,"adr":6.7,"kpr":6.5,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Nathan Schmitt","nickname":"NBK","country":"FR","rating":7.0,"kast":7.5,"impact":6.8,"adr":6.9,"kpr":6.7,"trait":"Piadista","role_hint":"Lurker"},
             {"name":"Kévin Rabier","nickname":"misutaaa","country":"FR","rating":7.4,"kast":7.3,"impact":7.1,"adr":7.3,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"}
           ]
         },
         {
           "name": "G2 Esports",
+          "tier": 2,
           "country": "FR",
           "players": [
             {"name":"Richard Papillon","nickname":"shox","country":"FR","rating":8.0,"kast":7.7,"impact":7.8,"adr":7.9,"kpr":7.8,"trait":"Ego Elevado","role_hint":"Lurker"},
             {"name":"Kenny Schrub","nickname":"kennyS","country":"FR","rating":8.5,"kast":7.8,"impact":8.2,"adr":8.3,"kpr":7.9,"trait":"Inconsistente","role_hint":"AWPer"},
-            {"name":"Edouard Dubourdeaux","nickname":"bodyy","country":"FR","rating":7.0,"kast":7.4,"impact":6.8,"adr":6.9,"kpr":6.8,"trait":"Workaholic","role_hint":"Support"},
             {"name":"Adil Benrlitom","nickname":"ScreaM","country":"BE","rating":7.8,"kast":7.3,"impact":7.5,"adr":7.7,"kpr":8.0,"trait":"Piadista","role_hint":"Entry Fragger"},
+            {"name":"Edouard Dubourdeaux","nickname":"bodyy","country":"FR","rating":7.0,"kast":7.4,"impact":6.8,"adr":6.9,"kpr":6.8,"trait":"Workaholic","role_hint":"Support"},
             {"name":"Markus Kjærbye","nickname":"Markus","country":"DK","rating":7.5,"kast":7.5,"impact":7.3,"adr":7.4,"kpr":7.4,"trait":"Veterano","role_hint":"Lurker"}
+          ]
+        },
+        {
+          "name": "Team Liquid 2018",
+          "tier": 2,
+          "country": "US",
+          "players": [
+            {"name":"Jonathan Jablonowski","nickname":"EliGE","country":"US","rating":8.1,"kast":7.8,"impact":7.9,"adr":8.0,"kpr":8.2,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Nicholas Cannella","nickname":"nitr0","country":"US","rating":7.0,"kast":7.6,"impact":6.8,"adr":6.9,"kpr":6.7,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Keith Markovic","nickname":"NAF","country":"CA","rating":7.7,"kast":7.7,"impact":7.5,"adr":7.6,"kpr":7.7,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":7.9,"kast":7.7,"impact":7.7,"adr":7.8,"kpr":8.0,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Peter Gurney","nickname":"stanislaw","country":"US","rating":6.8,"kast":7.4,"impact":6.6,"adr":6.7,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"}
+          ]
+        },
+        {
+          "name": "MIBR 2018",
+          "tier": 2,
+          "country": "BR",
+          "players": [
+            {"name":"Gabriel Toledo","nickname":"FalleN","country":"BR","rating":8.0,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.3,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Marcelo David","nickname":"coldzera","country":"BR","rating":8.8,"kast":8.2,"impact":8.5,"adr":8.6,"kpr":8.4,"trait":"Veterano","role_hint":"Lurker"},
+            {"name":"Fernando Alvarenga","nickname":"fer","country":"BR","rating":7.9,"kast":7.6,"impact":7.7,"adr":7.8,"kpr":8.0,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Epitacio de Melo","nickname":"TACO","country":"BR","rating":6.6,"kast":7.6,"impact":6.3,"adr":6.4,"kpr":6.3,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Tarik Celik","nickname":"tarik","country":"US","rating":7.1,"kast":7.3,"impact":6.9,"adr":7.0,"kpr":7.1,"trait":"Piadista","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "BIG 2018",
+          "tier": 3,
+          "country": "DE",
+          "players": [
+            {"name":"Johannes Maget","nickname":"nex","country":"DE","rating":6.8,"kast":7.0,"impact":6.6,"adr":6.7,"kpr":6.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Fatih Dayik","nickname":"gob b","country":"DE","rating":6.3,"kast":7.2,"impact":6.1,"adr":6.1,"kpr":5.9,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Timo Richter","nickname":"Spiidi","country":"DE","rating":6.5,"kast":6.8,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Nikola Maraovic","nickname":"tabseN","country":"DE","rating":7.2,"kast":7.2,"impact":7.0,"adr":7.1,"kpr":7.2,"trait":"Inconsistente","role_hint":"Lurker"},
+            {"name":"Owen Price","nickname":"smooya","country":"GB","rating":6.9,"kast":6.7,"impact":6.7,"adr":7.0,"kpr":6.5,"trait":"Ego Elevado","role_hint":"AWPer"}
+          ]
+        },
+        {
+          "name": "Renegades 2018",
+          "tier": 3,
+          "country": "AU",
+          "players": [
+            {"name":"Justin Savage","nickname":"jks","country":"AU","rating":7.3,"kast":7.3,"impact":7.1,"adr":7.2,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Aaron Ward","nickname":"AZR","country":"AU","rating":6.6,"kast":7.1,"impact":6.4,"adr":6.5,"kpr":6.5,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Jay Tardif","nickname":"Liazz","country":"AU","rating":6.9,"kast":7.0,"impact":6.7,"adr":6.8,"kpr":7.0,"trait":"Piadista","role_hint":"Lurker"},
+            {"name":"Sean Hiley","nickname":"Gratisfaction","country":"AU","rating":6.5,"kast":6.8,"impact":6.3,"adr":6.5,"kpr":6.2,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Karlo Pivac","nickname":"USTILO","country":"AU","rating":5.9,"kast":6.5,"impact":5.7,"adr":5.8,"kpr":5.8,"trait":"Workaholic","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "OpTic Gaming 2018",
+          "tier": 3,
+          "country": "DK",
+          "players": [
+            {"name":"René Borg","nickname":"cajunb","country":"DK","rating":6.7,"kast":7.0,"impact":6.5,"adr":6.6,"kpr":6.7,"trait":"Veterano","role_hint":"Entry Fragger"},
+            {"name":"Philip Aistrup","nickname":"aizy","country":"DK","rating":6.8,"kast":6.9,"impact":6.6,"adr":6.7,"kpr":6.8,"trait":"Inconsistente","role_hint":"Entry Fragger"},
+            {"name":"Marco Pfeiffer","nickname":"Snappi","country":"DK","rating":6.4,"kast":7.1,"impact":6.2,"adr":6.2,"kpr":6.1,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Patrick Hansen","nickname":"es3tag","country":"DK","rating":6.9,"kast":7.1,"impact":6.7,"adr":6.8,"kpr":6.8,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Lucas Tchaikovsky","nickname":"ISSAA","country":"JO","rating":6.6,"kast":6.8,"impact":6.4,"adr":6.5,"kpr":6.6,"trait":"Piadista","role_hint":"Lurker"}
           ]
         }
       ],
@@ -134,6 +264,7 @@
       "teams": [
         {
           "name": "Natus Vincere",
+          "tier": 1,
           "country": "UA",
           "players": [
             {"name":"Oleksandr Kostyliev","nickname":"s1mple","country":"UA","rating":9.9,"kast":8.8,"impact":9.7,"adr":9.8,"kpr":9.6,"trait":"Ego Elevado","role_hint":"AWPer"},
@@ -145,6 +276,7 @@
         },
         {
           "name": "Team Vitality",
+          "tier": 1,
           "country": "FR",
           "players": [
             {"name":"Mathieu Herbaut","nickname":"ZywOo","country":"FR","rating":9.4,"kast":8.6,"impact":9.2,"adr":9.3,"kpr":9.0,"trait":"Veterano","role_hint":"AWPer"},
@@ -156,35 +288,98 @@
         },
         {
           "name": "G2 Esports",
+          "tier": 1,
           "country": "INT",
           "players": [
             {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.2,"kast":8.4,"impact":9.0,"adr":9.1,"kpr":8.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
             {"name":"Nemanja Kovacs","nickname":"huNter-","country":"BA","rating":8.3,"kast":8.0,"impact":8.1,"adr":8.2,"kpr":8.3,"trait":"Workaholic","role_hint":"Lurker"},
-            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.0,"kast":7.7,"impact":7.0,"adr":7.0,"kpr":6.8,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Robin Kool","nickname":"ropz","country":"EE","rating":8.4,"kast":8.1,"impact":8.2,"adr":8.1,"kpr":8.2,"trait":"Veterano","role_hint":"Lurker"},
+            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.0,"kast":7.7,"impact":7.0,"adr":7.0,"kpr":6.8,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Helvijs Saukants","nickname":"broky","country":"LV","rating":7.9,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.6,"trait":"Piadista","role_hint":"AWPer"}
           ]
         },
         {
           "name": "FURIA",
+          "tier": 1,
           "country": "BR",
           "players": [
-            {"name":"Henrique Teles","nickname":"HooXi","country":"BR","rating":6.6,"kast":7.4,"impact":6.4,"adr":6.5,"kpr":6.3,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Kaike Cerato","nickname":"KSCERATO","country":"BR","rating":8.5,"kast":8.0,"impact":8.3,"adr":8.4,"kpr":8.6,"trait":"Workaholic","role_hint":"Entry Fragger"},
             {"name":"Yuri Santos","nickname":"yuurih","country":"BR","rating":7.9,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.9,"trait":"Piadista","role_hint":"Lurker"},
             {"name":"Andre Pereira","nickname":"arT","country":"BR","rating":7.4,"kast":7.5,"impact":7.2,"adr":7.3,"kpr":7.5,"trait":"Ego Elevado","role_hint":"IGL"},
-            {"name":"Vinicius Figueiredo","nickname":"VINI","country":"BR","rating":7.3,"kast":7.4,"impact":7.1,"adr":7.2,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"}
+            {"name":"Vinicius Figueiredo","nickname":"VINI","country":"BR","rating":7.3,"kast":7.4,"impact":7.1,"adr":7.2,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Henrique Teles","nickname":"HooXi","country":"BR","rating":6.6,"kast":7.4,"impact":6.4,"adr":6.5,"kpr":6.3,"trait":"IGL Nato","role_hint":"IGL"}
           ]
         },
         {
           "name": "Heroic",
+          "tier": 2,
           "country": "DK",
           "players": [
-            {"name":"Benjamin Brix","nickname":"blameF","country":"DK","rating":8.0,"kast":7.8,"impact":7.8,"adr":7.9,"kpr":7.8,"trait":"IGL Nato","role_hint":"IGL"},
-            {"name":"Casper Moller","nickname":"cadiaN","country":"DK","rating":7.5,"kast":7.5,"impact":7.3,"adr":7.4,"kpr":7.1,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Casper Moller","nickname":"cadiaN","country":"DK","rating":7.6,"kast":7.7,"impact":7.4,"adr":7.5,"kpr":7.2,"trait":"IGL Nato","role_hint":"IGL"},
             {"name":"Jakob Hansen","nickname":"stavn","country":"DK","rating":8.2,"kast":8.0,"impact":8.0,"adr":8.1,"kpr":8.2,"trait":"Piadista","role_hint":"AWPer"},
             {"name":"Peter Ottosen","nickname":"niko","country":"DK","rating":7.4,"kast":7.4,"impact":7.2,"adr":7.3,"kpr":7.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
-            {"name":"Frederik Brochmann","nickname":"SandeN","country":"DK","rating":7.0,"kast":7.5,"impact":6.8,"adr":6.9,"kpr":6.8,"trait":"Clutcher","role_hint":"Support"}
+            {"name":"Frederik Brochmann","nickname":"SandeN","country":"DK","rating":7.0,"kast":7.5,"impact":6.8,"adr":6.9,"kpr":6.8,"trait":"Clutcher","role_hint":"Support"},
+            {"name":"Benjamin Brix","nickname":"blameF","country":"DK","rating":8.0,"kast":7.8,"impact":7.8,"adr":7.9,"kpr":7.8,"trait":"IGL Nato","role_hint":"IGL"}
+          ]
+        },
+        {
+          "name": "Astralis 2021",
+          "tier": 2,
+          "country": "DK",
+          "players": [
+            {"name":"Nicolai Reedtz","nickname":"dev1ce","country":"DK","rating":8.4,"kast":8.2,"impact":7.9,"adr":8.1,"kpr":7.9,"trait":"Veterano","role_hint":"AWPer"},
+            {"name":"Lukas Rossander","nickname":"gla1ve","country":"DK","rating":7.2,"kast":7.7,"impact":6.9,"adr":7.0,"kpr":6.8,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Peter Rasmussen","nickname":"dupreeh","country":"DK","rating":7.9,"kast":7.8,"impact":7.6,"adr":7.8,"kpr":7.9,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Emil Reif","nickname":"Magisk","country":"DK","rating":7.7,"kast":7.7,"impact":7.5,"adr":7.6,"kpr":7.7,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Patrick Hansen","nickname":"es3tag","country":"DK","rating":7.1,"kast":7.3,"impact":6.9,"adr":7.0,"kpr":7.0,"trait":"Workaholic","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "Team Liquid 2021",
+          "tier": 2,
+          "country": "US",
+          "players": [
+            {"name":"Jonathan Jablonowski","nickname":"EliGE","country":"US","rating":7.8,"kast":7.6,"impact":7.6,"adr":7.8,"kpr":7.9,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Keith Markovic","nickname":"NAF","country":"CA","rating":7.5,"kast":7.5,"impact":7.3,"adr":7.4,"kpr":7.4,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Nicholas Cannella","nickname":"nitr0","country":"US","rating":6.8,"kast":7.3,"impact":6.5,"adr":6.6,"kpr":6.5,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Josh Nissan","nickname":"oSee","country":"US","rating":7.3,"kast":7.2,"impact":7.1,"adr":7.3,"kpr":6.9,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Michael Grzesiek","nickname":"shroud","country":"CA","rating":6.9,"kast":7.0,"impact":6.7,"adr":6.9,"kpr":7.0,"trait":"Piadista","role_hint":"AWPer"}
+          ]
+        },
+        {
+          "name": "Complexity 2021",
+          "tier": 3,
+          "country": "US",
+          "players": [
+            {"name":"Justin Savage","nickname":"jks","country":"AU","rating":7.1,"kast":7.1,"impact":6.9,"adr":7.0,"kpr":7.2,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Paytyn Johnson","nickname":"junior","country":"US","rating":6.7,"kast":6.9,"impact":6.5,"adr":6.7,"kpr":6.7,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Peter Gurney","nickname":"stanislaw","country":"US","rating":6.5,"kast":7.1,"impact":6.3,"adr":6.3,"kpr":6.2,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ricardo Mulrooney","nickname":"percyfaith","country":"CA","rating":6.3,"kast":6.8,"impact":6.1,"adr":6.2,"kpr":6.2,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Omar Ali","nickname":"FaNg","country":"US","rating":6.6,"kast":6.8,"impact":6.4,"adr":6.5,"kpr":6.6,"trait":"Inconsistente","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "Sharks 2021",
+          "tier": 3,
+          "country": "BR",
+          "players": [
+            {"name":"Gustavo Kaled","nickname":"gustawOw","country":"BR","rating":6.8,"kast":6.9,"impact":6.6,"adr":6.8,"kpr":6.8,"trait":"Ego Elevado","role_hint":"AWPer"},
+            {"name":"Bruno Lima","nickname":"brnz4n","country":"BR","rating":6.5,"kast":6.8,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Lucas Schneider","nickname":"lux","country":"BR","rating":6.1,"kast":6.9,"impact":5.9,"adr":5.9,"kpr":5.9,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Renato Mourão","nickname":"rdnzao","country":"BR","rating":5.9,"kast":6.5,"impact":5.7,"adr":5.8,"kpr":5.8,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Pedro Alvim","nickname":"pedr0","country":"BR","rating":6.3,"kast":6.7,"impact":6.1,"adr":6.2,"kpr":6.2,"trait":"Piadista","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "GODSENT 2021",
+          "tier": 3,
+          "country": "SE",
+          "players": [
+            {"name":"Freddy Johansson","nickname":"KRIMZ","country":"SE","rating":7.2,"kast":7.5,"impact":7.0,"adr":7.1,"kpr":6.9,"trait":"Veterano","role_hint":"Lurker"},
+            {"name":"Simon Eliasson","nickname":"twist","country":"SE","rating":6.9,"kast":7.0,"impact":6.7,"adr":6.8,"kpr":7.0,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Jonas Elfving","nickname":"lekr0","country":"SE","rating":6.7,"kast":7.0,"impact":6.5,"adr":6.5,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Simon Sundstrom","nickname":"suNny","country":"FI","rating":6.8,"kast":6.9,"impact":6.6,"adr":6.7,"kpr":6.8,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Ludvig Wahlberg","nickname":"Brollan","country":"SE","rating":7.1,"kast":7.2,"impact":6.9,"adr":7.0,"kpr":7.1,"trait":"Piadista","role_hint":"Entry Fragger"}
           ]
         }
       ],
@@ -197,6 +392,7 @@
       "teams": [
         {
           "name": "Team Vitality",
+          "tier": 1,
           "country": "FR",
           "players": [
             {"name":"Mathieu Herbaut","nickname":"ZywOo","country":"FR","rating":9.5,"kast":8.7,"impact":9.3,"adr":9.4,"kpr":9.1,"trait":"Veterano","role_hint":"AWPer"},
@@ -208,6 +404,7 @@
         },
         {
           "name": "Team Spirit",
+          "tier": 1,
           "country": "RU",
           "players": [
             {"name":"Dmitry Sokolov","nickname":"Ax1Le","country":"RU","rating":8.7,"kast":8.2,"impact":8.5,"adr":8.6,"kpr":8.7,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
@@ -218,7 +415,20 @@
           ]
         },
         {
+          "name": "FaZe Clan",
+          "tier": 1,
+          "country": "INT",
+          "players": [
+            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.1,"kast":8.4,"impact":8.9,"adr":9.0,"kpr":8.7,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Helvijs Saukants","nickname":"broky","country":"LV","rating":8.2,"kast":8.0,"impact":8.0,"adr":8.1,"kpr":7.8,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":8.4,"kast":8.1,"impact":8.2,"adr":8.3,"kpr":8.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Nemanja Kovacs","nickname":"huNter-","country":"BA","rating":8.4,"kast":8.1,"impact":8.2,"adr":8.3,"kpr":8.4,"trait":"Workaholic","role_hint":"Lurker"},
+            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.1,"kast":7.8,"impact":7.1,"adr":7.1,"kpr":6.9,"trait":"IGL Nato","role_hint":"IGL"}
+          ]
+        },
+        {
           "name": "FURIA",
+          "tier": 1,
           "country": "BR",
           "players": [
             {"name":"Kaike Cerato","nickname":"KSCERATO","country":"BR","rating":8.6,"kast":8.1,"impact":8.4,"adr":8.5,"kpr":8.7,"trait":"Workaholic","role_hint":"Entry Fragger"},
@@ -230,6 +440,7 @@
         },
         {
           "name": "Heroic",
+          "tier": 2,
           "country": "DK",
           "players": [
             {"name":"Casper Moller","nickname":"cadiaN","country":"DK","rating":7.6,"kast":7.7,"impact":7.4,"adr":7.5,"kpr":7.2,"trait":"IGL Nato","role_hint":"IGL"},
@@ -240,14 +451,63 @@
           ]
         },
         {
-          "name": "FaZe Clan",
+          "name": "G2 Esports",
+          "tier": 2,
           "country": "INT",
           "players": [
-            {"name":"Helvijs Saukants","nickname":"broky","country":"LV","rating":8.2,"kast":8.0,"impact":8.0,"adr":8.1,"kpr":7.8,"trait":"Piadista","role_hint":"AWPer"},
-            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":7.1,"kast":7.8,"impact":7.1,"adr":7.1,"kpr":6.9,"trait":"IGL Nato","role_hint":"IGL"},
-            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":8.4,"kast":8.1,"impact":8.2,"adr":8.3,"kpr":8.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
-            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.1,"kast":8.4,"impact":8.9,"adr":9.0,"kpr":8.7,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
-            {"name":"Nemanja Kovacs","nickname":"huNter-","country":"BA","rating":8.4,"kast":8.1,"impact":8.2,"adr":8.3,"kpr":8.4,"trait":"Workaholic","role_hint":"Lurker"}
+            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.0,"kast":8.3,"impact":8.8,"adr":8.9,"kpr":8.6,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Nemanja Kovacs","nickname":"huNter-","country":"BA","rating":8.2,"kast":7.9,"impact":8.0,"adr":8.1,"kpr":8.2,"trait":"Workaholic","role_hint":"Lurker"},
+            {"name":"Aleksi Jalli","nickname":"Aleksib","country":"FI","rating":6.9,"kast":7.6,"impact":6.7,"adr":6.7,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ivan Shevchenko","nickname":"iNs","country":"UA","rating":7.1,"kast":7.2,"impact":6.9,"adr":7.0,"kpr":7.1,"trait":"Piadista","role_hint":"Entry Fragger"},
+            {"name":"Ilya Petrov","nickname":"m0NESY","country":"RU","rating":8.3,"kast":7.9,"impact":8.1,"adr":8.2,"kpr":8.0,"trait":"Inconsistente","role_hint":"AWPer"}
+          ]
+        },
+        {
+          "name": "MOUZ",
+          "tier": 2,
+          "country": "DE",
+          "players": [
+            {"name":"Tobias Flodstrom","nickname":"torzsi","country":"HU","rating":7.8,"kast":7.7,"impact":7.6,"adr":7.8,"kpr":7.4,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"David Quandt","nickname":"frozen","country":"SK","rating":7.9,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.9,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Dorian Berman","nickname":"xertioN","country":"DE","rating":7.5,"kast":7.6,"impact":7.3,"adr":7.4,"kpr":7.5,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Stefan Horvat","nickname":"sycrone","country":"SE","rating":6.8,"kast":7.3,"impact":6.6,"adr":6.7,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ádám Torzsás","nickname":"torzsi","country":"HU","rating":7.2,"kast":7.1,"impact":7.0,"adr":7.2,"kpr":6.9,"trait":"Piadista","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "Apeks",
+          "tier": 3,
+          "country": "NO",
+          "players": [
+            {"name":"Håkon Fjell","nickname":"hallzerk","country":"NO","rating":7.0,"kast":7.0,"impact":6.8,"adr":7.0,"kpr":6.7,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Daniel Mykjåland","nickname":"sense","country":"NO","rating":6.5,"kast":6.8,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Martin Lund","nickname":"PEPPZOR","country":"SE","rating":6.3,"kast":7.0,"impact":6.1,"adr":6.1,"kpr":6.0,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Jørgen Kleven","nickname":"jkaem","country":"NO","rating":6.7,"kast":6.9,"impact":6.5,"adr":6.6,"kpr":6.7,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Kjetil Aasheim","nickname":"koNfig","country":"NO","rating":6.8,"kast":7.0,"impact":6.6,"adr":6.7,"kpr":6.7,"trait":"Piadista","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "paiN Gaming 2023",
+          "tier": 3,
+          "country": "BR",
+          "players": [
+            {"name":"Pedro Augusto","nickname":"biguzera","country":"BR","rating":7.1,"kast":7.2,"impact":6.9,"adr":7.0,"kpr":7.1,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Lucas Linhares","nickname":"snow","country":"BR","rating":6.6,"kast":6.9,"impact":6.4,"adr":6.5,"kpr":6.6,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Paulo Henrique","nickname":"hardzao","country":"BR","rating":6.4,"kast":6.8,"impact":6.2,"adr":6.3,"kpr":6.4,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"André Abreu","nickname":"v$m","country":"BR","rating":6.3,"kast":7.0,"impact":6.1,"adr":6.1,"kpr":6.0,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Murilo Tuchtenhagen","nickname":"dav1deuS","country":"BR","rating":6.5,"kast":6.7,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Inconsistente","role_hint":"Lurker"}
+          ]
+        },
+        {
+          "name": "GamerLegion",
+          "tier": 3,
+          "country": "DE",
+          "players": [
+            {"name":"Maden Kjær","nickname":"Maden","country":"DK","rating":6.9,"kast":7.1,"impact":6.7,"adr":6.8,"kpr":6.9,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ismail Marhulia","nickname":"isak","country":"NO","rating":6.7,"kast":6.9,"impact":6.5,"adr":6.6,"kpr":6.7,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Thomas Utting","nickname":"Thomas","country":"AU","rating":6.6,"kast":6.8,"impact":6.4,"adr":6.5,"kpr":6.6,"trait":"Clutcher","role_hint":"AWPer"},
+            {"name":"Jonas Olofsson","nickname":"FASHR","country":"SE","rating":6.5,"kast":6.8,"impact":6.3,"adr":6.4,"kpr":6.5,"trait":"Piadista","role_hint":"Entry Fragger"},
+            {"name":"Karlo Pivac","nickname":"USTILO","country":"AU","rating":6.1,"kast":6.6,"impact":5.9,"adr":6.0,"kpr":5.9,"trait":"Workaholic","role_hint":"Support"}
           ]
         }
       ],
@@ -260,6 +520,7 @@
       "teams": [
         {
           "name": "Team Vitality",
+          "tier": 1,
           "country": "FR",
           "players": [
             {"name":"Mathieu Herbaut","nickname":"ZywOo","country":"FR","rating":9.6,"kast":8.8,"impact":9.4,"adr":9.5,"kpr":9.2,"trait":"Veterano","role_hint":"AWPer"},
@@ -271,6 +532,7 @@
         },
         {
           "name": "Team Spirit",
+          "tier": 1,
           "country": "RU",
           "players": [
             {"name":"Dmitry Sokolov","nickname":"Ax1Le","country":"RU","rating":8.8,"kast":8.3,"impact":8.6,"adr":8.7,"kpr":8.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
@@ -281,7 +543,20 @@
           ]
         },
         {
+          "name": "FaZe Clan",
+          "tier": 1,
+          "country": "INT",
+          "players": [
+            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.2,"kast":8.5,"impact":9.0,"adr":9.1,"kpr":8.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":8.5,"kast":8.2,"impact":8.3,"adr":8.4,"kpr":8.6,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Helvijs Saukants","nickname":"broky","country":"LV","rating":8.3,"kast":8.1,"impact":8.1,"adr":8.2,"kpr":7.9,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Jakob Hansen","nickname":"stavn","country":"DK","rating":8.5,"kast":8.2,"impact":8.3,"adr":8.4,"kpr":8.5,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Casper Moller","nickname":"cadiaN","country":"DK","rating":7.7,"kast":7.8,"impact":7.5,"adr":7.6,"kpr":7.3,"trait":"IGL Nato","role_hint":"IGL"}
+          ]
+        },
+        {
           "name": "FURIA",
+          "tier": 1,
           "country": "BR",
           "players": [
             {"name":"Kaike Cerato","nickname":"KSCERATO","country":"BR","rating":8.7,"kast":8.2,"impact":8.5,"adr":8.6,"kpr":8.8,"trait":"Workaholic","role_hint":"Entry Fragger"},
@@ -292,18 +567,8 @@
           ]
         },
         {
-          "name": "FaZe Clan",
-          "country": "INT",
-          "players": [
-            {"name":"Helvijs Saukants","nickname":"broky","country":"LV","rating":8.3,"kast":8.1,"impact":8.1,"adr":8.2,"kpr":7.9,"trait":"Piadista","role_hint":"AWPer"},
-            {"name":"Russel Van Dulken","nickname":"Twistzz","country":"CA","rating":8.5,"kast":8.2,"impact":8.3,"adr":8.4,"kpr":8.6,"trait":"Workaholic","role_hint":"Entry Fragger"},
-            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":9.2,"kast":8.5,"impact":9.0,"adr":9.1,"kpr":8.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
-            {"name":"Jakob Hansen","nickname":"stavn","country":"DK","rating":8.5,"kast":8.2,"impact":8.3,"adr":8.4,"kpr":8.5,"trait":"Piadista","role_hint":"AWPer"},
-            {"name":"Casper Moller","nickname":"cadiaN","country":"DK","rating":7.7,"kast":7.8,"impact":7.5,"adr":7.6,"kpr":7.3,"trait":"IGL Nato","role_hint":"IGL"}
-          ]
-        },
-        {
           "name": "Natus Vincere",
+          "tier": 1,
           "country": "UA",
           "players": [
             {"name":"Robin Kool","nickname":"ropz","country":"EE","rating":8.6,"kast":8.3,"impact":8.4,"adr":8.3,"kpr":8.4,"trait":"Veterano","role_hint":"Lurker"},
@@ -311,6 +576,90 @@
             {"name":"Mihai Ivascu","nickname":"w0nderful","country":"RO","rating":8.1,"kast":8.0,"impact":7.9,"adr":8.0,"kpr":7.8,"trait":"Clutcher","role_hint":"AWPer"},
             {"name":"Valerii Vakhovskyi","nickname":"b1t","country":"UA","rating":8.2,"kast":8.1,"impact":8.0,"adr":8.1,"kpr":8.2,"trait":"Workaholic","role_hint":"Entry Fragger"},
             {"name":"Dmitri Chervak","nickname":"Jame","country":"KZ","rating":7.8,"kast":7.7,"impact":7.6,"adr":7.5,"kpr":7.2,"trait":"Clutcher","role_hint":"IGL"}
+          ]
+        },
+        {
+          "name": "G2 Esports",
+          "tier": 2,
+          "country": "INT",
+          "players": [
+            {"name":"Ilya Petrov","nickname":"m0NESY","country":"RU","rating":8.5,"kast":8.0,"impact":8.3,"adr":8.4,"kpr":8.1,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Nikola Kovacs","nickname":"NiKo","country":"BA","rating":8.8,"kast":8.2,"impact":8.6,"adr":8.7,"kpr":8.5,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Nemanja Kovacs","nickname":"huNter-","country":"BA","rating":8.0,"kast":7.9,"impact":7.8,"adr":7.9,"kpr":8.0,"trait":"Workaholic","role_hint":"Lurker"},
+            {"name":"Finn Andersen","nickname":"karrigan","country":"DK","rating":6.9,"kast":7.7,"impact":6.8,"adr":6.8,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ivan Shevchenko","nickname":"iNs","country":"UA","rating":7.0,"kast":7.1,"impact":6.8,"adr":6.9,"kpr":7.0,"trait":"Piadista","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "Heroic",
+          "tier": 2,
+          "country": "DK",
+          "players": [
+            {"name":"Benjamin Brix","nickname":"blameF","country":"DK","rating":7.9,"kast":7.8,"impact":7.7,"adr":7.8,"kpr":7.8,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Patrick Hansen","nickname":"es3tag","country":"DK","rating":7.3,"kast":7.5,"impact":7.1,"adr":7.2,"kpr":7.2,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Jakob Hansen","nickname":"stavn","country":"DK","rating":8.0,"kast":7.9,"impact":7.8,"adr":7.9,"kpr":8.0,"trait":"Piadista","role_hint":"AWPer"},
+            {"name":"Lovre Ljubic","nickname":"YEKINDAR","country":"LV","rating":7.9,"kast":7.7,"impact":7.7,"adr":7.8,"kpr":8.0,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Jonathan Jablonowski","nickname":"jL","country":"DE","rating":7.6,"kast":7.5,"impact":7.4,"adr":7.5,"kpr":7.6,"trait":"Workaholic","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "Astralis 2025",
+          "tier": 2,
+          "country": "DK",
+          "players": [
+            {"name":"Nicolai Reedtz","nickname":"dev1ce","country":"DK","rating":7.8,"kast":7.9,"impact":7.4,"adr":7.6,"kpr":7.3,"trait":"Veterano","role_hint":"AWPer"},
+            {"name":"Philip Aistrup","nickname":"aizy","country":"DK","rating":7.0,"kast":7.1,"impact":6.8,"adr":6.9,"kpr":7.0,"trait":"Inconsistente","role_hint":"Entry Fragger"},
+            {"name":"Marco Pfeiffer","nickname":"Snappi","country":"DK","rating":6.5,"kast":7.3,"impact":6.3,"adr":6.3,"kpr":6.2,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Lucas Tchaikovsky","nickname":"ISSAA","country":"JO","rating":6.8,"kast":7.0,"impact":6.6,"adr":6.7,"kpr":6.7,"trait":"Piadista","role_hint":"Lurker"},
+            {"name":"Lukas Rossander","nickname":"gla1ve","country":"DK","rating":6.9,"kast":7.4,"impact":6.7,"adr":6.7,"kpr":6.6,"trait":"IGL Nato","role_hint":"IGL"}
+          ]
+        },
+        {
+          "name": "The MongolZ",
+          "tier": 2,
+          "country": "MN",
+          "players": [
+            {"name":"Enkhsaikhan Mygdbayar","nickname":"mzinho","country":"MN","rating":7.8,"kast":7.7,"impact":7.6,"adr":7.8,"kpr":7.8,"trait":"Inconsistente","role_hint":"Entry Fragger"},
+            {"name":"Shinetevas Dagvadorj","nickname":"Techno4K","country":"MN","rating":8.0,"kast":7.8,"impact":7.8,"adr":7.9,"kpr":7.6,"trait":"Clutcher","role_hint":"AWPer"},
+            {"name":"Anand Tsogbadrakh","nickname":"bLitz","country":"MN","rating":7.2,"kast":7.4,"impact":7.0,"adr":7.1,"kpr":7.1,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Ariunbaatar Narmandakh","nickname":"chr0nicz","country":"MN","rating":7.1,"kast":7.2,"impact":6.9,"adr":7.0,"kpr":7.0,"trait":"Workaholic","role_hint":"Support"},
+            {"name":"Gantulga Tserenpuntsag","nickname":"X2PT3k","country":"MN","rating":7.5,"kast":7.4,"impact":7.3,"adr":7.4,"kpr":7.5,"trait":"Ego Elevado","role_hint":"Entry Fragger"}
+          ]
+        },
+        {
+          "name": "Eternal Fire",
+          "tier": 3,
+          "country": "TR",
+          "players": [
+            {"name":"Ismailcan Dogan","nickname":"XANTARES","country":"TR","rating":7.6,"kast":7.3,"impact":7.4,"adr":7.7,"kpr":7.8,"trait":"Ego Elevado","role_hint":"Entry Fragger"},
+            {"name":"Özgür Eker","nickname":"woxic","country":"TR","rating":7.2,"kast":7.1,"impact":7.0,"adr":7.2,"kpr":6.8,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Burak Tezcan","nickname":"Calyx","country":"TR","rating":6.9,"kast":7.2,"impact":6.7,"adr":6.8,"kpr":6.8,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Ali Taran","nickname":"Zedko","country":"TR","rating":6.5,"kast":7.0,"impact":6.3,"adr":6.3,"kpr":6.3,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Doğukan Doğan","nickname":"imoRR","country":"TR","rating":6.3,"kast":6.7,"impact":6.1,"adr":6.2,"kpr":6.2,"trait":"Clutcher","role_hint":"Lurker"}
+          ]
+        },
+        {
+          "name": "Lynn Vision",
+          "tier": 3,
+          "country": "CN",
+          "players": [
+            {"name":"Wang Jianyu","nickname":"EmiliaQAQ","country":"CN","rating":7.0,"kast":7.0,"impact":6.8,"adr":7.0,"kpr":6.7,"trait":"Workaholic","role_hint":"AWPer"},
+            {"name":"Lin Junze","nickname":"afro","country":"CN","rating":6.6,"kast":6.8,"impact":6.4,"adr":6.5,"kpr":6.6,"trait":"Piadista","role_hint":"Entry Fragger"},
+            {"name":"Guo Haoxuan","nickname":"Mercury","country":"CN","rating":6.4,"kast":7.0,"impact":6.2,"adr":6.2,"kpr":6.1,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Zhao Zeyi","nickname":"Westmelon","country":"CN","rating":6.5,"kast":6.7,"impact":6.3,"adr":6.4,"kpr":6.4,"trait":"Clutcher","role_hint":"Lurker"},
+            {"name":"Yang Bicheng","nickname":"kaze","country":"CN","rating":6.3,"kast":6.6,"impact":6.1,"adr":6.2,"kpr":6.2,"trait":"Workaholic","role_hint":"Support"}
+          ]
+        },
+        {
+          "name": "Imperial 2025",
+          "tier": 3,
+          "country": "BR",
+          "players": [
+            {"name":"Vito Giuseppe","nickname":"VINI","country":"BR","rating":7.0,"kast":7.1,"impact":6.8,"adr":6.9,"kpr":7.0,"trait":"Workaholic","role_hint":"Entry Fragger"},
+            {"name":"Gabriel Figueiredo","nickname":"saffee","country":"BR","rating":6.8,"kast":6.9,"impact":6.6,"adr":6.8,"kpr":6.5,"trait":"Inconsistente","role_hint":"AWPer"},
+            {"name":"Adriano Gagliardi","nickname":"WOOD7","country":"BR","rating":6.5,"kast":7.0,"impact":6.3,"adr":6.3,"kpr":6.3,"trait":"IGL Nato","role_hint":"IGL"},
+            {"name":"Lincoln Lau","nickname":"fnx","country":"BR","rating":6.3,"kast":6.7,"impact":6.1,"adr":6.1,"kpr":6.2,"trait":"Piadista","role_hint":"Lurker"},
+            {"name":"Henrique Teles","nickname":"HooXi","country":"BR","rating":6.0,"kast":6.8,"impact":5.8,"adr":5.9,"kpr":5.8,"trait":"IGL Nato","role_hint":"IGL"}
           ]
         }
       ],

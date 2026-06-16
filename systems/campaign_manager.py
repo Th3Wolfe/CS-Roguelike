@@ -77,6 +77,10 @@ class CampaignManager:
             stage=self.state.stage.value,
             opponent_name=opponent.name,
             result="win" if detail.team_won else "loss",
+            wins_before=self.state.stage1.wins if self.state.stage == CampaignStage.STAGE1 else
+                        self.state.stage2.wins if self.state.stage == CampaignStage.STAGE2 else 0,
+            losses_before=self.state.stage1.losses if self.state.stage == CampaignStage.STAGE1 else
+                          self.state.stage2.losses if self.state.stage == CampaignStage.STAGE2 else 0,
         )
         self.state.history.append(entry)
         self.state.total_series += 1

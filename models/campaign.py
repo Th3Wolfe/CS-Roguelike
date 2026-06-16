@@ -47,6 +47,8 @@ class HistoryEntry:
     stage: str
     opponent_name: str
     result: str  # "win" or "loss"
+    wins_before: int = 0   # record in this stage before this match
+    losses_before: int = 0
     events_triggered: list = field(default_factory=list)
     choices_made: list = field(default_factory=list)
 
@@ -56,13 +58,24 @@ class HistoryEntry:
             "stage": self.stage,
             "opponent_name": self.opponent_name,
             "result": self.result,
+            "wins_before": self.wins_before,
+            "losses_before": self.losses_before,
             "events_triggered": self.events_triggered,
             "choices_made": self.choices_made,
         }
 
     @staticmethod
     def from_dict(data: dict) -> "HistoryEntry":
-        return HistoryEntry(**data)
+        return HistoryEntry(
+            series_number=data["series_number"],
+            stage=data["stage"],
+            opponent_name=data["opponent_name"],
+            result=data["result"],
+            wins_before=data.get("wins_before", 0),
+            losses_before=data.get("losses_before", 0),
+            events_triggered=data.get("events_triggered", []),
+            choices_made=data.get("choices_made", []),
+        )
 
 
 @dataclass
