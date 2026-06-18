@@ -105,7 +105,8 @@ def new_game():
     code = generate_share_code(team)
     return jsonify({"ok":True, "team":team.to_dict(), "campaign":campaign.state.to_dict(),
                     "team_score": round(team.team_score(), 2),
-                    "share_code": code})
+                    "share_code": code,
+                    "bracket": campaign.get_bracket_state()})
 
 
 @app.route("/api/state", methods=["GET"])
@@ -119,6 +120,7 @@ def get_state():
         "team_score":  round(team.team_score(), 2),
         "is_finished": campaign.state.is_finished(),
         "share_code":  generate_share_code(team),
+        "bracket":     campaign.get_bracket_state(),
     })
 
 
@@ -172,10 +174,11 @@ def play_series():
             "stage_label":       campaign.state.current_stage_label(),
             "stage_mvp":         result.get("stage_mvp"),
         },
-        "campaign": campaign.state.to_dict(),
-        "team":     team.to_dict(),
+        "campaign":   campaign.state.to_dict(),
+        "team":       team.to_dict(),
         "team_score": round(team.team_score(), 2),
         "share_code": generate_share_code(team),
+        "bracket":    campaign.get_bracket_state(),
     })
 
 
