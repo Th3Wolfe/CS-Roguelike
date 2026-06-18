@@ -51,6 +51,8 @@ class HistoryEntry:
     losses_before: int = 0
     events_triggered: list = field(default_factory=list)
     choices_made: list = field(default_factory=list)
+    maps_won: int = 0
+    maps_lost: int = 0
 
     def to_dict(self) -> dict:
         return {
@@ -62,6 +64,8 @@ class HistoryEntry:
             "losses_before": self.losses_before,
             "events_triggered": self.events_triggered,
             "choices_made": self.choices_made,
+            "maps_won": self.maps_won,
+            "maps_lost": self.maps_lost,
         }
 
     @staticmethod
@@ -75,6 +79,8 @@ class HistoryEntry:
             losses_before=data.get("losses_before", 0),
             events_triggered=data.get("events_triggered", []),
             choices_made=data.get("choices_made", []),
+            maps_won=data.get("maps_won", 0),
+            maps_lost=data.get("maps_lost", 0),
         )
 
 

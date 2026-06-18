@@ -15,15 +15,15 @@ def _compute_rating(stats: dict) -> float:
     return round(kd/1.0*0.4 + kpr/0.68*0.35 + adr/80.0*0.25, 3)
 
 
-def _sim_bo3(str_a: float, str_b: float) -> bool:
-    """True if team A wins the BO3 series."""
+def _sim_bo3(str_a: float, str_b: float) -> tuple:
+    """Returns (a_wins, b_wins) for the series."""
     import math
     p = max(0.1, min(0.9, 1.0 / (1.0 + math.exp(-(str_a - str_b) * 0.8))))
     a = b = 0
     while a < 2 and b < 2:
         if random.random() < p: a += 1
         else: b += 1
-    return a > b
+    return (a, b)
 
 
 # ── NPC team ─────────────────────────────────────────────────────────────────
@@ -79,9 +79,9 @@ def _run_swiss_round(npc_teams: list, stage: str,
             else:   t.s1_losses += 1
             if t.s1_wins >= 3 or t.s1_losses >= 3:
                 t.s1_done = True; t.advanced_s1 = t.s1_wins >= 3
-        def hist(t, w, l, opp, res):
+        def hist(t, w, l, opp, res, mw=0, ml=0):
             t.s1_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res})
+                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
     else:
         get_wl  = lambda t: (t.s2_wins, t.s2_losses)
         is_done = lambda t: t.s2_done
@@ -90,9 +90,9 @@ def _run_swiss_round(npc_teams: list, stage: str,
             else:   t.s2_losses += 1
             if t.s2_wins >= 3 or t.s2_losses >= 3:
                 t.s2_done = True; t.advanced_s2 = t.s2_wins >= 3
-        def hist(t, w, l, opp, res):
+        def hist(t, w, l, opp, res, mw=0, ml=0):
             t.s2_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res})
+                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
 
     active = [t for t in npc_teams if not is_done(t)]
 
@@ -119,10 +119,11 @@ def _run_swiss_round(npc_teams: list, stage: str,
         i = 0
         while i + 1 < len(pool):
             a, b = pool[i], pool[i+1]
-            a_wins = _sim_bo3(a.strength, b.strength)
+            a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
             winner, loser = (a, b) if a_wins else (b, a)
-            record(winner, True);  hist(winner, w, l, loser.name, "win")
-            record(loser,  False); hist(loser,  w, l, winner.name, "loss")
+            wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
+            record(winner, True);  hist(winner, w, l, loser.name, "win",  wmw, wml)
+            record(loser,  False); hist(loser,  w, l, winner.name, "loss", wml, wmw)
             i += 2
         # Odd team left over: they get a bye this round (will play next round)
         # This is expected when the player's bucket has an odd count AFTER the phantom
@@ -143,9 +144,9 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             else:   t.s1_losses += 1
             if t.s1_wins >= 3 or t.s1_losses >= 3:
                 t.s1_done = True; t.advanced_s1 = t.s1_wins >= 3
-        def hist(t, w, l, opp, res):
+        def hist(t, w, l, opp, res, mw=0, ml=0):
             t.s1_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res})
+                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
     else:
         get_wl  = lambda t: (t.s2_wins, t.s2_losses)
         is_done = lambda t: t.s2_done
@@ -154,9 +155,9 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             else:   t.s2_losses += 1
             if t.s2_wins >= 3 or t.s2_losses >= 3:
                 t.s2_done = True; t.advanced_s2 = t.s2_wins >= 3
-        def hist(t, w, l, opp, res):
+        def hist(t, w, l, opp, res, mw=0, ml=0):
             t.s2_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res})
+                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
 
     for _ in range(20):  # safety limit
         if stage == "stage1":
@@ -188,10 +189,11 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             while i + 1 < len(group):
                 a, b = group[i], group[i+1]
                 w, l = key
-                a_wins = _sim_bo3(a.strength, b.strength)
+                a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
                 winner, loser = (a, b) if a_wins else (b, a)
-                record(winner, True);  hist(winner, w, l, loser.name, "win")
-                record(loser, False);  hist(loser,  w, l, winner.name, "loss")
+                wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
+                record(winner, True);  hist(winner, w, l, loser.name, "win",  wmw, wml)
+                record(loser, False);  hist(loser,  w, l, winner.name, "loss", wml, wmw)
                 i += 2
                 paired_any = True
             if len(group) % 2 == 1:
@@ -203,11 +205,12 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
         while i + 1 < len(unpaired):
             a, b = unpaired[i], unpaired[i+1]
             wa, la = get_wl(a); wb, lb = get_wl(b)
-            a_wins = _sim_bo3(a.strength, b.strength)
+            a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
             winner, loser = (a, b) if a_wins else (b, a)
+            wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
             ww, wl = get_wl(winner); lw, ll = get_wl(loser)
-            record(winner, True);  hist(winner, ww, wl, loser.name, "win")
-            record(loser, False);  hist(loser,  lw, ll, winner.name, "loss")
+            record(winner, True);  hist(winner, ww, wl, loser.name, "win",  wmw, wml)
+            record(loser, False);  hist(loser,  lw, ll, winner.name, "loss", wml, wmw)
             i += 2
             paired_any = True
         if len(unpaired) % 2 == 1:
@@ -289,7 +292,7 @@ def _build_playoffs(qualifiers: list) -> dict:
             return {"a": a["name"], "b": b["name"],
                     "winner": None, "loser": None, "is_player_match": True,
                     "a_str": a["strength"], "b_str": b["strength"]}
-        won = _sim_bo3(a["strength"], b["strength"])
+        w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
         w, l = (a, b) if won else (b, a)
         return {"a": a["name"], "b": b["name"],
                 "winner": w["name"], "loser": l["name"], "is_player_match": False,
@@ -396,7 +399,7 @@ def _cascade_bracket(bracket: dict, player_name: str) -> None:
             sf_winners.append({"name": player_q["name"], "strength": player_q["strength"],
                                 "is_player": True})
         else:
-            won = _sim_bo3(a["strength"], b["strength"])
+            w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
             w, l = (a, b) if won else (b, a)
             m = {"a": a["name"], "b": b["name"], "winner": w["name"], "loser": l["name"],
                  "is_player_match": False, "a_str": a["strength"], "b_str": b["strength"]}
@@ -416,7 +419,7 @@ def _cascade_bracket(bracket: dict, player_name: str) -> None:
         bracket["final"] = {"a": a["name"], "b": b["name"], "winner": None, "loser": None,
                              "is_player_match": True, "a_str": a["strength"], "b_str": b["strength"]}
     else:
-        won = _sim_bo3(a["strength"], b["strength"])
+        w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
         w, l = (a, b) if won else (b, a)
         bracket["final"] = {"a": a["name"], "b": b["name"], "winner": w["name"],
                              "loser": l["name"], "is_player_match": False,
@@ -518,13 +521,16 @@ class CampaignManager:
             if opp_npc:
                 # Record the player's opponent result
                 opp_won = not player_won
+                opp_mw  = detail.opponent_maps_won
+                opp_ml  = detail.team_maps_won
                 if current_stage == "stage1":
                     if opp_won: opp_npc.s1_wins += 1
                     else:       opp_npc.s1_losses += 1
                     opp_npc.s1_history.append({
                         "wins_before": opp_npc.s1_wins - (1 if opp_won else 0),
                         "losses_before": opp_npc.s1_losses - (0 if opp_won else 1),
-                        "opponent": self.team.name, "result": "win" if opp_won else "loss"
+                        "opponent": self.team.name, "result": "win" if opp_won else "loss",
+                        "maps_won": opp_mw, "maps_lost": opp_ml,
                     })
                     if opp_npc.s1_wins >= 3 or opp_npc.s1_losses >= 3:
                         opp_npc.s1_done   = True
@@ -535,7 +541,8 @@ class CampaignManager:
                     opp_npc.s2_history.append({
                         "wins_before": opp_npc.s2_wins - (1 if opp_won else 0),
                         "losses_before": opp_npc.s2_losses - (0 if opp_won else 1),
-                        "opponent": self.team.name, "result": "win" if opp_won else "loss"
+                        "opponent": self.team.name, "result": "win" if opp_won else "loss",
+                        "maps_won": opp_mw, "maps_lost": opp_ml,
                     })
                     if opp_npc.s2_wins >= 3 or opp_npc.s2_losses >= 3:
                         opp_npc.s2_done   = True
@@ -555,6 +562,8 @@ class CampaignManager:
             result         = "win" if player_won else "loss",
             wins_before    = wins_before,
             losses_before  = losses_before,
+            maps_won       = detail.team_maps_won,
+            maps_lost      = detail.opponent_maps_won,
         )
         self.state.history.append(entry)
         self.state.total_series += 1
