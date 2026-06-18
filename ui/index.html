@@ -569,6 +569,63 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .bkr-loss { background:rgba(224,48,48,.18);  color:var(--red); }
 .bkr-vs   { color:var(--text3); font-size:.66rem; }
 
+/* ── Swiss round column: stacked buckets ── */
+.bk-round-col { display:flex; flex-direction:column; gap:18px; min-width:190px; padding:0 6px; }
+.bk-bucket {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  overflow:hidden;
+}
+.bk-bucket-head {
+  font-family:var(--font-display); font-size:.72rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--text2);
+  background:var(--bg3); padding:7px 12px; border-bottom:1px solid var(--border);
+}
+.bk-bucket-head.bbh-now { color:var(--orange); }
+.bk-bucket-row {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:7px 12px; border-bottom:1px solid var(--border2); font-size:.82rem;
+}
+.bk-bucket-row:last-child { border-bottom:none; }
+.bk-bucket-row.bbr-you { background:rgba(232,160,32,.07); }
+.bk-bucket-team {
+  font-family:var(--font-display); font-weight:700; text-transform:uppercase;
+  color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
+}
+.bk-bucket-team.bbt-you  { color:var(--orange); }
+.bk-bucket-team.bbt-win  { color:var(--green); }
+.bk-bucket-team.bbt-loss { color:var(--red); opacity:.7; }
+.bk-bucket-score {
+  font-family:var(--font-display); font-weight:800; font-size:.8rem; color:var(--text2);
+  flex-shrink:0; min-width:32px; text-align:center;
+}
+.bk-bucket-vs { color:var(--text3); font-size:.74rem; flex-shrink:0; }
+.bk-bucket-pending { color:var(--text3); font-style:italic; font-size:.78rem; font-family:var(--font-body); }
+
+/* ── Advanced / Eliminated summary strip ── */
+.bk-result-strip {
+  border-radius:var(--r); border:1px solid; padding:10px 14px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.bk-result-strip.brs-adv  { background:rgba(40,200,80,.08);  border-color:rgba(40,200,80,.3); }
+.bk-result-strip.brs-elim { background:rgba(224,48,48,.07);  border-color:rgba(224,48,48,.28); }
+.bk-result-label {
+  font-family:var(--font-display); font-weight:800; font-size:.78rem;
+  text-transform:uppercase; letter-spacing:.1em; padding:5px 12px; border-radius:4px;
+  flex-shrink:0;
+}
+.brs-adv  .bk-result-label { background:var(--green); color:#06140a; }
+.brs-elim .bk-result-label { background:var(--red);   color:#1a0606; }
+.bk-result-teams { display:flex; gap:7px; flex-wrap:wrap; flex:1; }
+.bk-result-chip {
+  font-family:var(--font-display); font-size:.74rem; font-weight:700;
+  text-transform:uppercase; padding:4px 9px; border-radius:3px;
+  background:var(--bg3); color:var(--text2);
+}
+.bk-result-chip.brc-you { background:rgba(232,160,32,.2); color:var(--orange); }
+
+/* connector between round columns (just a visual divider, simpler than playoff lines) */
+.bk-round-sep { width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:0 2px; }
+
 /* champion card (used at the end of a bracket column) */
 .bk-champion {
   margin-top:8px; text-align:center; padding:16px 8px;
@@ -1190,6 +1247,9 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-team-name { font-size:.78rem; }
   .bk-connector { width:18px; padding-top:34px; }
   .bk-connector-line { height:60px; }
+  .bk-round-col { min-width:168px; gap:14px; }
+  .bk-bucket-team { font-size:.78rem; }
+  .bk-bucket-row  { padding:6px 10px; }
 
 }
 
@@ -1231,6 +1291,13 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-col-head  { font-size:.66rem; }
   .bk-connector { width:14px; padding-top:30px; }
   .bk-connector-line { height:50px; }
+  .bk-round-col { min-width:148px; gap:12px; padding:0 4px; }
+  .bk-bucket-team   { font-size:.7rem; }
+  .bk-bucket-row    { padding:6px 8px; }
+  .bk-bucket-head   { font-size:.66rem; padding:6px 8px; }
+  .bk-result-strip  { padding:8px 10px; }
+  .bk-result-label  { font-size:.68rem; padding:4px 9px; }
+  .bk-result-chip   { font-size:.66rem; padding:3px 7px; }
 
 }
 
@@ -2155,6 +2222,7 @@ function renderBracket(){
   const history    = campaign.history || [];
   const stg        = campaign.stage;
   const bracket    = G.bracket || {};
+  const npcTeams   = bracket.npc_teams || [];
   const playerName = team.name;
 
   const s1h = history.filter(h=>h.stage==="stage1");
@@ -2165,14 +2233,14 @@ function renderBracket(){
 
   let html = "";
 
-  // ── Stage 1: Swiss as a 5-round bracket (player's path) ──
-  html += renderSwissBracket("Stage 1", s1h, campaign.stage1,
+  // ── Stage 1: full Swiss bracket (all 16 teams, grouped by record) ──
+  html += renderSwissBracket("Stage 1", s1h, campaign.stage1, npcTeams, "s1",
     stg==="stage1", stgIdx>0, false, playerName);
 
   html += `<div class="bracket-divider"></div>`;
 
   // ── Stage 2 ──
-  html += renderSwissBracket("Stage 2", s2h, campaign.stage2,
+  html += renderSwissBracket("Stage 2", s2h, campaign.stage2, npcTeams, "s2",
     stg==="stage2", stgIdx>1, stgIdx<1, playerName);
 
   html += `<div class="bracket-divider"></div>`;
@@ -2234,7 +2302,8 @@ function bkAssembleColumns(columns){
 }
 
 // ── Swiss stage rendered as a round-by-round bracket (player's own path) ─────
-function renderSwissBracket(title, playerHistory, playerRecord, isCurrent, isDone, isLocked, playerName){
+function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, stageKey,
+                            isCurrent, isDone, isLocked, playerName){
   const wins   = playerRecord?.wins   ?? 0;
   const losses = playerRecord?.losses ?? 0;
 
@@ -2259,38 +2328,151 @@ function renderSwissBracket(title, playerHistory, playerRecord, isCurrent, isDon
     </div>`;
   }
 
-  // Map history by round index (wins_before + losses_before)
-  const playedByRound = {};
-  for(const h of playerHistory){
-    const ri = Math.min((h.wins_before??0)+(h.losses_before??0), 4);
-    playedByRound[ri] = h;
+  // ── Gather every team's match history for this stage into one list ──────
+  // Each entry: {round, wb, lb, teamA, teamB, winner} — one per actual match
+  // We rebuild matches by pairing each team's recorded result with its opponent's.
+  const allTeamHist = []; // [{name, hist: [...]}]
+  allTeamHist.push({ name: playerName, hist: playerHistory.map(h => ({
+    wins_before: h.wins_before ?? 0, losses_before: h.losses_before ?? 0,
+    opponent: h.opponent_name || h.opponent, result: h.result
+  })) });
+  for(const t of npcTeams){
+    const hist = stageKey === "s1" ? (t.s1_history||[]) : (t.s2_history||[]);
+    if(stageKey === "s2" && !t.advanced_s1) continue;
+    allTeamHist.push({ name: t.name, hist });
   }
-  const currentRound = isCurrent ? Math.min(wins+losses, 4) : -1;
+
+  // Build matches per round bucket: key = `${round}|${wb}-${lb}`
+  // Dedup: each match appears twice (once per side) — keep only one canonical entry
+  const seen = new Set();
+  const roundBuckets = [{}, {}, {}, {}, {}]; // index = round 0..4, value = {bucketKey: [matches]}
+
+  for(const {name, hist} of allTeamHist){
+    for(const h of hist){
+      const ri = Math.min((h.wins_before||0)+(h.losses_before||0), 4);
+      const bucketKey = `${h.wins_before||0}-${h.losses_before||0}`;
+      // canonical pair key (order-independent) to dedupe the two sides of the same match
+      const pairKey = ri + "|" + [name, h.opponent].sort().join("~");
+      if(seen.has(pairKey)) continue;
+      seen.add(pairKey);
+
+      const won = h.result === "win";
+      const teamA = won ? name : h.opponent;
+      const teamB = won ? h.opponent : name;
+
+      if(!roundBuckets[ri][bucketKey]) roundBuckets[ri][bucketKey] = [];
+      roundBuckets[ri][bucketKey].push({ a: teamA, b: teamB, winner: teamA });
+    }
+  }
 
   const ROUND_LABELS = ["Rodada 1","Rodada 2","Rodada 3","Rodada 4","Rodada 5"];
+  const currentRound = isCurrent ? Math.min(wins+losses, 4) : -1;
 
-  const columns = [];
+  // Sort buckets within a round by record (most wins first, e.g. "2-0" before "1-1" before "0-2")
+  function sortBucketKeys(keys){
+    return keys.sort((a,b)=>{
+      const [aw,al] = a.split("-").map(Number);
+      const [bw,bl] = b.split("-").map(Number);
+      if(bw !== aw) return bw - aw;
+      return al - bl;
+    });
+  }
+
+  let colsHtml = "";
   for(let ri = 0; ri < 5; ri++){
-    const h = playedByRound[ri];
-    let headCls = "";
-    let matchHtml;
+    const buckets = roundBuckets[ri];
+    const bucketKeys = sortBucketKeys(Object.keys(buckets));
 
-    if(h){
-      const won = h.result === "win";
-      const oppName = h.opponent_name || h.opponent;
-      headCls = won ? "bkh-done" : "bkh-elim";
-      matchHtml = bkMatchCard(playerName, oppName, won ? playerName : oppName, false, playerName);
-    } else if(currentRound === ri){
-      headCls = "bkh-now";
-      matchHtml = bkMatchCard(playerName, "A definir", null, true, playerName);
+    let bucketsHtml = "";
+    if(bucketKeys.length === 0 && ri === currentRound){
+      // Player's upcoming match in an otherwise-empty round (no NPC data yet for this bucket)
+      const wb = wins, lb = losses;
+      bucketsHtml += `<div class="bk-bucket">
+        <div class="bk-bucket-head bbh-now">${wb}–${lb}</div>
+        <div class="bk-bucket-row bbr-you">
+          <div class="bk-bucket-team bbt-you">${truncateTeam(playerName,14)}</div>
+          <div class="bk-bucket-vs">vs</div>
+          <div class="bk-bucket-pending">a definir</div>
+        </div>
+      </div>`;
     } else {
-      matchHtml = bkMatchCard(null, null, null, false, playerName);
+      for(const bk of bucketKeys){
+        const matches = buckets[bk];
+        const isNowBucket = isCurrent && bk === `${wins}-${losses}`;
+        let rowsHtml = matches.map(m=>{
+          const aYou = m.a === playerName, bYou = m.b === playerName;
+          const aCls = aYou ? "bbt-you" : "bbt-win";
+          const bCls = bYou ? "bbt-you" : "bbt-loss";
+          return `<div class="bk-bucket-row ${aYou||bYou?"bbr-you":""}">
+            <div class="bk-bucket-team ${aCls}">${truncateTeam(m.a,14)}</div>
+            <div class="bk-bucket-score">W</div>
+            <div class="bk-bucket-team ${bCls}" style="text-align:right">${truncateTeam(m.b,14)}</div>
+          </div>`;
+        }).join("");
+
+        // If this is the player's current bucket and they haven't played yet this round
+        if(isNowBucket && !matches.some(m=>m.a===playerName||m.b===playerName)){
+          rowsHtml += `<div class="bk-bucket-row bbr-you">
+            <div class="bk-bucket-team bbt-you">${truncateTeam(playerName,14)}</div>
+            <div class="bk-bucket-vs">vs</div>
+            <div class="bk-bucket-pending">a definir</div>
+          </div>`;
+        }
+
+        bucketsHtml += `<div class="bk-bucket">
+          <div class="bk-bucket-head ${isNowBucket?"bbh-now":""}">${bk}</div>
+          ${rowsHtml}
+        </div>`;
+      }
     }
 
-    columns.push(`<div class="bk-col">
-      <div class="bk-col-head ${headCls}">${ROUND_LABELS[ri]}</div>
-      ${matchHtml}
-    </div>`);
+    colsHtml += `<div class="bk-round-col">
+      <div class="bk-col-head ${ri===currentRound?"bkh-now":""}">${ROUND_LABELS[ri]}</div>
+      ${bucketsHtml}
+    </div>`;
+    if(ri < 4) colsHtml += `<div class="bk-round-sep"></div>`;
+  }
+
+  // ── Advanced / Eliminated summary ──
+  const advanced = [], eliminated = [];
+  for(const {name} of allTeamHist){
+    const isPlayer = name === playerName;
+    let w, l, done, adv;
+    if(isPlayer){
+      w = wins; l = losses; done = isDone; adv = wins >= 3;
+    } else {
+      const t = npcTeams.find(t=>t.name===name);
+      if(!t) continue;
+      w    = stageKey==="s1" ? t.s1_wins   : t.s2_wins;
+      l    = stageKey==="s1" ? t.s1_losses : t.s2_losses;
+      done = stageKey==="s1" ? t.s1_done   : t.s2_done;
+      adv  = stageKey==="s1" ? t.advanced_s1 : t.advanced_s2;
+    }
+    if(done && adv) advanced.push(name);
+    else if(done && !adv) eliminated.push(name);
+  }
+
+  function chip(name){
+    const you = name === playerName;
+    return `<span class="bk-result-chip ${you?"brc-you":""}">${truncateTeam(name,16)}</span>`;
+  }
+
+  let summaryHtml = "";
+  if(advanced.length || eliminated.length){
+    summaryHtml = `<div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">`;
+    if(advanced.length){
+      summaryHtml += `<div class="bk-result-strip brs-adv">
+        <div class="bk-result-label">Avançaram</div>
+        <div class="bk-result-teams">${advanced.map(chip).join("")}</div>
+      </div>`;
+    }
+    if(eliminated.length){
+      summaryHtml += `<div class="bk-result-strip brs-elim">
+        <div class="bk-result-label">Eliminados</div>
+        <div class="bk-result-teams">${eliminated.map(chip).join("")}</div>
+      </div>`;
+    }
+    summaryHtml += `</div>`;
   }
 
   return `
@@ -2300,11 +2482,11 @@ function renderSwissBracket(title, playerHistory, playerRecord, isCurrent, isDon
     ${pill}
   </div>
   <div class="bk-wrap">
-    <div class="bk-grid">${bkAssembleColumns(columns)}</div>
-  </div>`;
+    <div class="bk-grid">${colsHtml}</div>
+  </div>
+  ${summaryHtml}`;
 }
 
-// ── Playoff rendering (QF -> SF -> Final), same visual system ────────────────
 function renderPlayoffBracket(bracket, stg, playerName, history){
   const stageOrder = ["stage1","stage2","playoffs_qf","playoffs_sf","playoffs_final","finished_win","finished_loss"];
   const stgIdx = stageOrder.indexOf(stg);
