@@ -15,15 +15,15 @@ def _compute_rating(stats: dict) -> float:
     return round(kd/1.0*0.4 + kpr/0.68*0.35 + adr/80.0*0.25, 3)
 
 
-def _sim_bo3(str_a: float, str_b: float) -> tuple:
-    """Returns (a_wins, b_wins) for the series."""
+def _sim_bo3(str_a: float, str_b: float) -> bool:
+    """True if team A wins the BO3 series."""
     import math
     p = max(0.1, min(0.9, 1.0 / (1.0 + math.exp(-(str_a - str_b) * 0.8))))
     a = b = 0
     while a < 2 and b < 2:
         if random.random() < p: a += 1
         else: b += 1
-    return (a, b)
+    return a > b
 
 
 # ── NPC team ─────────────────────────────────────────────────────────────────
@@ -57,76 +57,99 @@ class NpcTeam:
         return t
 
 
-# ── Swiss engine ──────────────────────────────────────────────────────────────
-
-def _run_swiss_round(npc_teams: list, stage: str,
-                     player_record: tuple,        # (wins, losses) BEFORE this round
-                     player_opponent_name: str,   # NPC the player faced this round
-                     player_won: bool = False):   # player result (to set opp record)
+def _pair_round_matchups(npc_teams: list, stage: str, player_name: str,
+                         player_wins: int, player_losses: int) -> list:
     """
-    Pair and resolve one Swiss round for all NPCs.
-
-    The player occupies one slot in the player_record bucket.
-    In every bucket, if the count is odd AND the player's bucket matches,
-    the player fills the odd slot (keeping the count even for NPC pairing).
-    The player's actual opponent is already resolved before calling this.
+    Build the pairing for the NEXT round (matchups only, no results yet).
+    Pairs teams within the same record bucket — same logic as _run_swiss_round's
+    grouping step, but stops short of simulating a winner.
+    Returns a list of {a, b} pairs covering every team still active in this stage,
+    including the player. Used so the bracket can reveal "who plays who" before
+    results are simulated.
     """
     if stage == "stage1":
         get_wl  = lambda t: (t.s1_wins, t.s1_losses)
+        is_done = lambda t: t.s1_done
+    else:
+        get_wl  = lambda t: (t.s2_wins, t.s2_losses) if t.advanced_s1 else (None, None)
+        is_done = lambda t: t.s2_done
+
+    if stage == "stage1":
+        active = [t for t in npc_teams if not is_done(t)]
+    else:
+        active = [t for t in npc_teams if t.advanced_s1 and not is_done(t)]
+
+    # Build a uniform list of "entrants" (name, record, strength), including the player
+    entrants = [{"name": player_name, "record": (player_wins, player_losses), "strength": None}]
+    for t in active:
+        entrants.append({"name": t.name, "record": get_wl(t), "strength": t.strength})
+
+    buckets: dict = {}
+    for e in entrants:
+        buckets.setdefault(e["record"], []).append(e)
+
+    pairs = []
+    for record, group in buckets.items():
+        random.shuffle(group)
+        i = 0
+        while i + 1 < len(group):
+            pairs.append({"a": group[i]["name"], "b": group[i+1]["name"], "record": record})
+            i += 2
+        # odd one out (bye) is simply left unpaired this round — handled by bye logic elsewhere
+
+    return pairs
+
+
+# ── Swiss engine ──────────────────────────────────────────────────────────────
+
+def _run_swiss_round(npc_teams: list, stage: str, pairings: list, player_name: str):
+    """
+    Resolve one Swiss round for all NPCs using the ALREADY-REVEALED pairings
+    (the same list shown to the player before they played their match).
+    This guarantees the bracket UI's "who plays who" preview matches exactly
+    what gets simulated — no re-shuffling happens here.
+
+    `pairings`: list of {"a": name, "b": name, "record": (w,l)} covering every
+    team (including the player, whose match was already resolved separately
+    by play_series — we simply skip that pair here).
+    """
+    if stage == "stage1":
         is_done = lambda t: t.s1_done
         def record(t, won):
             if won: t.s1_wins += 1
             else:   t.s1_losses += 1
             if t.s1_wins >= 3 or t.s1_losses >= 3:
                 t.s1_done = True; t.advanced_s1 = t.s1_wins >= 3
-        def hist(t, w, l, opp, res, mw=0, ml=0):
+        def hist(t, w, l, opp, res):
             t.s1_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
+                                  "opponent": opp, "result": res})
     else:
-        get_wl  = lambda t: (t.s2_wins, t.s2_losses)
         is_done = lambda t: t.s2_done
         def record(t, won):
             if won: t.s2_wins += 1
             else:   t.s2_losses += 1
             if t.s2_wins >= 3 or t.s2_losses >= 3:
                 t.s2_done = True; t.advanced_s2 = t.s2_wins >= 3
-        def hist(t, w, l, opp, res, mw=0, ml=0):
+        def hist(t, w, l, opp, res):
             t.s2_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
+                                  "opponent": opp, "result": res})
 
-    active = [t for t in npc_teams if not is_done(t)]
+    by_name = {t.name: t for t in npc_teams}
 
-    # The player's actual opponent this round — already has its result set; skip in pairing
-    opp_team = next((t for t in active if t.name == player_opponent_name), None)
+    for pair in pairings:
+        a_name, b_name = pair["a"], pair["b"]
+        if a_name == player_name or b_name == player_name:
+            continue  # player's match already resolved in play_series
 
-    # Group into record buckets (excluding the resolved opponent)
-    remaining = [t for t in active if t is not opp_team]
-    buckets: dict[tuple, list] = {}
-    for t in remaining:
-        key = get_wl(t)
-        buckets.setdefault(key, []).append(t)
+        a, b = by_name.get(a_name), by_name.get(b_name)
+        if not a or not b or is_done(a) or is_done(b):
+            continue
 
-    pw, pl = player_record
-
-    for key, group in buckets.items():
-        random.shuffle(group)
-        w, l = key
-        # If this bucket has the same record as the player, the player is a phantom here.
-        # That means the player takes one slot → group count should pair evenly.
-        # If still odd after accounting for player slot, one team gets a true bye.
-        phantom_used = (key == (pw, pl))
-        pool = list(group)
-        i = 0
-        while i + 1 < len(pool):
-            a, b = pool[i], pool[i+1]
-            a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
-            winner, loser = (a, b) if a_wins else (b, a)
-            wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
-            record(winner, True);  hist(winner, w, l, loser.name, "win",  wmw, wml)
-            record(loser,  False); hist(loser,  w, l, winner.name, "loss", wml, wmw)
-            i += 2
-        # Odd team left over: they get a bye this round (will play next round)
-        # This is expected when the player's bucket has an odd count AFTER the phantom
+        w, l = pair["record"]
+        a_wins = _sim_bo3(a.strength, b.strength)
+        winner, loser = (a, b) if a_wins else (b, a)
+        record(winner, True);  hist(winner, w, l, loser.name, "win")
+        record(loser,  False); hist(loser,  w, l, winner.name, "loss")
 
 
 
@@ -144,9 +167,9 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             else:   t.s1_losses += 1
             if t.s1_wins >= 3 or t.s1_losses >= 3:
                 t.s1_done = True; t.advanced_s1 = t.s1_wins >= 3
-        def hist(t, w, l, opp, res, mw=0, ml=0):
+        def hist(t, w, l, opp, res):
             t.s1_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
+                                  "opponent": opp, "result": res})
     else:
         get_wl  = lambda t: (t.s2_wins, t.s2_losses)
         is_done = lambda t: t.s2_done
@@ -155,9 +178,9 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             else:   t.s2_losses += 1
             if t.s2_wins >= 3 or t.s2_losses >= 3:
                 t.s2_done = True; t.advanced_s2 = t.s2_wins >= 3
-        def hist(t, w, l, opp, res, mw=0, ml=0):
+        def hist(t, w, l, opp, res):
             t.s2_history.append({"wins_before": w, "losses_before": l,
-                                  "opponent": opp, "result": res, "maps_won": mw, "maps_lost": ml})
+                                  "opponent": opp, "result": res})
 
     for _ in range(20):  # safety limit
         if stage == "stage1":
@@ -189,11 +212,10 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
             while i + 1 < len(group):
                 a, b = group[i], group[i+1]
                 w, l = key
-                a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
+                a_wins = _sim_bo3(a.strength, b.strength)
                 winner, loser = (a, b) if a_wins else (b, a)
-                wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
-                record(winner, True);  hist(winner, w, l, loser.name, "win",  wmw, wml)
-                record(loser, False);  hist(loser,  w, l, winner.name, "loss", wml, wmw)
+                record(winner, True);  hist(winner, w, l, loser.name, "win")
+                record(loser, False);  hist(loser,  w, l, winner.name, "loss")
                 i += 2
                 paired_any = True
             if len(group) % 2 == 1:
@@ -205,12 +227,11 @@ def _finish_swiss(npc_teams: list, stage: str) -> None:
         while i + 1 < len(unpaired):
             a, b = unpaired[i], unpaired[i+1]
             wa, la = get_wl(a); wb, lb = get_wl(b)
-            a_score = _sim_bo3(a.strength, b.strength); a_wins = a_score[0] > a_score[1]
+            a_wins = _sim_bo3(a.strength, b.strength)
             winner, loser = (a, b) if a_wins else (b, a)
-            wmw, wml = (a_score[0], a_score[1]) if a_wins else (a_score[1], a_score[0])
             ww, wl = get_wl(winner); lw, ll = get_wl(loser)
-            record(winner, True);  hist(winner, ww, wl, loser.name, "win",  wmw, wml)
-            record(loser, False);  hist(loser,  lw, ll, winner.name, "loss", wml, wmw)
+            record(winner, True);  hist(winner, ww, wl, loser.name, "win")
+            record(loser, False);  hist(loser,  lw, ll, winner.name, "loss")
             i += 2
             paired_any = True
         if len(unpaired) % 2 == 1:
@@ -292,7 +313,7 @@ def _build_playoffs(qualifiers: list) -> dict:
             return {"a": a["name"], "b": b["name"],
                     "winner": None, "loser": None, "is_player_match": True,
                     "a_str": a["strength"], "b_str": b["strength"]}
-        w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
+        won = _sim_bo3(a["strength"], b["strength"])
         w, l = (a, b) if won else (b, a)
         return {"a": a["name"], "b": b["name"],
                 "winner": w["name"], "loser": l["name"], "is_player_match": False,
@@ -399,7 +420,7 @@ def _cascade_bracket(bracket: dict, player_name: str) -> None:
             sf_winners.append({"name": player_q["name"], "strength": player_q["strength"],
                                 "is_player": True})
         else:
-            w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
+            won = _sim_bo3(a["strength"], b["strength"])
             w, l = (a, b) if won else (b, a)
             m = {"a": a["name"], "b": b["name"], "winner": w["name"], "loser": l["name"],
                  "is_player_match": False, "a_str": a["strength"], "b_str": b["strength"]}
@@ -419,7 +440,7 @@ def _cascade_bracket(bracket: dict, player_name: str) -> None:
         bracket["final"] = {"a": a["name"], "b": b["name"], "winner": None, "loser": None,
                              "is_player_match": True, "a_str": a["strength"], "b_str": b["strength"]}
     else:
-        w_score = _sim_bo3(a["strength"], b["strength"]); won = w_score[0] > w_score[1]
+        won = _sim_bo3(a["strength"], b["strength"])
         w, l = (a, b) if won else (b, a)
         bracket["final"] = {"a": a["name"], "b": b["name"], "winner": w["name"],
                              "loser": l["name"], "is_player_match": False,
@@ -440,8 +461,10 @@ class CampaignManager:
         self.era_id           = era_id
         self._used_team_names: List[str] = [team.name]
         self.npc_teams: List[NpcTeam]    = []
+        self._npc_team_data: dict        = {}  # name -> enriched team dict (players, country)
         self._bracket_initialized        = False
         self.playoff_bracket: dict       = {}
+        self.pending_pairings: list      = []  # current round's matchups (revealed before results)
 
         from events.event_manager import EventManager
         self.event_manager = EventManager()
@@ -465,13 +488,67 @@ class CampaignManager:
                 avg_rtg  = sum(p["attributes"]["rating"] for p in enriched) / max(len(enriched), 1)
                 strength = round(avg_rtg * 0.65 + random.uniform(-0.2, 0.2), 2)
                 self.npc_teams.append(NpcTeam(t["name"], strength))
+                self._npc_team_data[t["name"]] = {"players": enriched, "country": t.get("country", "?")}
                 used.add(t["name"])
 
         from models.opponent import FALLBACK_NAMES
         pool = [n for n in FALLBACK_NAMES if n not in used]
         random.shuffle(pool)
         while len(self.npc_teams) < 15 and pool:
-            self.npc_teams.append(NpcTeam(pool.pop(), round(random.uniform(4.8, 6.2), 2)))
+            name = pool.pop()
+            self.npc_teams.append(NpcTeam(name, round(random.uniform(4.8, 6.2), 2)))
+            self._npc_team_data[name] = {"players": [], "country": "?"}
+
+        # Reveal Round 1 pairings immediately (everyone starts at 0-0)
+        self._refresh_pending_pairings()
+
+    def _refresh_pending_pairings(self) -> None:
+        """Recompute the matchups for the CURRENT round so the bracket can show
+        'who plays who' before any result is simulated."""
+        stage = self.state.stage.value
+        if stage == "stage1":
+            pw, pl = self.state.stage1.wins, self.state.stage1.losses
+        elif stage == "stage2":
+            pw, pl = self.state.stage2.wins, self.state.stage2.losses
+        else:
+            self.pending_pairings = []
+            return
+        self.pending_pairings = _pair_round_matchups(
+            self.npc_teams, stage, self.team.name, pw, pl)
+
+    def _get_paired_opponent(self, stage: str) -> "Opponent":
+        """
+        Resolve the player's already-revealed pairing for this round into a
+        real Opponent (with real team data when available), instead of
+        picking a random unrelated team. Falls back to a random Swiss
+        opponent only if no pairing was found (shouldn't normally happen).
+        """
+        pairing = next(
+            (p for p in self.pending_pairings
+             if p["a"] == self.team.name or p["b"] == self.team.name),
+            None
+        )
+        opp_name = None
+        if pairing:
+            opp_name = pairing["b"] if pairing["a"] == self.team.name else pairing["a"]
+
+        if opp_name:
+            npc = next((t for t in self.npc_teams if t.name == opp_name), None)
+            if npc:
+                data = self._npc_team_data.get(opp_name, {})
+                synergy = round(random.uniform(0.5, 3.0), 2)
+                return Opponent(
+                    name=npc.name,
+                    strength=npc.strength,
+                    synergy=synergy,
+                    players=data.get("players", []),
+                )
+
+        # Fallback: shouldn't normally trigger (pairing always exists once
+        # the bracket is initialised), but guards against edge cases.
+        return generate_opponent(
+            stage, self.state.total_series,
+            era_id=self.era_id, used_team_names=self._used_team_names)
 
     # ── events ───────────────────────────────────────────────────────────────
 
@@ -491,9 +568,15 @@ class CampaignManager:
     def play_series(self) -> dict:
         self._init_bracket()
 
-        opponent = generate_opponent(
-            self.state.stage.value, self.state.total_series,
-            era_id=self.era_id, used_team_names=self._used_team_names)
+        current_stage_pre = self.state.stage.value
+
+        if current_stage_pre in ("stage1", "stage2"):
+            opponent = self._get_paired_opponent(current_stage_pre)
+        else:
+            opponent = generate_opponent(
+                self.state.stage.value, self.state.total_series,
+                era_id=self.era_id, used_team_names=self._used_team_names)
+
         if opponent.name not in self._used_team_names:
             self._used_team_names.append(opponent.name)
 
@@ -515,42 +598,40 @@ class CampaignManager:
 
         # ── Simulate NPC Swiss round in parallel ──────────────────────────
         # The player's opponent is an NPC; its result is the inverse of ours.
-        # We handle that here and let _run_swiss_round skip it in pairing.
+        # We register that result directly here (before _run_swiss_round which skips this pair).
         if current_stage in ("stage1", "stage2"):
             opp_npc = next((t for t in self.npc_teams if t.name == opponent.name), None)
             if opp_npc:
-                # Record the player's opponent result
                 opp_won = not player_won
-                opp_mw  = detail.opponent_maps_won
-                opp_ml  = detail.team_maps_won
                 if current_stage == "stage1":
+                    opp_wb = opp_npc.s1_wins
+                    opp_lb = opp_npc.s1_losses
                     if opp_won: opp_npc.s1_wins += 1
                     else:       opp_npc.s1_losses += 1
                     opp_npc.s1_history.append({
-                        "wins_before": opp_npc.s1_wins - (1 if opp_won else 0),
-                        "losses_before": opp_npc.s1_losses - (0 if opp_won else 1),
-                        "opponent": self.team.name, "result": "win" if opp_won else "loss",
-                        "maps_won": opp_mw, "maps_lost": opp_ml,
+                        "wins_before": opp_wb, "losses_before": opp_lb,
+                        "opponent": self.team.name, "result": "win" if opp_won else "loss"
                     })
                     if opp_npc.s1_wins >= 3 or opp_npc.s1_losses >= 3:
-                        opp_npc.s1_done   = True
+                        opp_npc.s1_done    = True
                         opp_npc.advanced_s1 = opp_npc.s1_wins >= 3
                 else:
+                    opp_wb = opp_npc.s2_wins
+                    opp_lb = opp_npc.s2_losses
                     if opp_won: opp_npc.s2_wins += 1
                     else:       opp_npc.s2_losses += 1
                     opp_npc.s2_history.append({
-                        "wins_before": opp_npc.s2_wins - (1 if opp_won else 0),
-                        "losses_before": opp_npc.s2_losses - (0 if opp_won else 1),
-                        "opponent": self.team.name, "result": "win" if opp_won else "loss",
-                        "maps_won": opp_mw, "maps_lost": opp_ml,
+                        "wins_before": opp_wb, "losses_before": opp_lb,
+                        "opponent": self.team.name, "result": "win" if opp_won else "loss"
                     })
                     if opp_npc.s2_wins >= 3 or opp_npc.s2_losses >= 3:
-                        opp_npc.s2_done   = True
+                        opp_npc.s2_done    = True
                         opp_npc.advanced_s2 = opp_npc.s2_wins >= 3
 
-            # Now run the rest of the round (all other NPCs paired among themselves)
+            # Now run the rest of the round using the pairings already revealed
+            # in the bracket UI (guarantees what's shown matches what's simulated)
             _run_swiss_round(self.npc_teams, current_stage,
-                             (wins_before, losses_before), opponent.name, player_won)
+                             self.pending_pairings, self.team.name)
 
         self._accumulate_stats(detail, opponent)
         self._apply_post_series_effects(player_won)
@@ -562,8 +643,6 @@ class CampaignManager:
             result         = "win" if player_won else "loss",
             wins_before    = wins_before,
             losses_before  = losses_before,
-            maps_won       = detail.team_maps_won,
-            maps_lost      = detail.opponent_maps_won,
         )
         self.state.history.append(entry)
         self.state.total_series += 1
@@ -598,6 +677,9 @@ class CampaignManager:
                                  self.team.name, player_won, opponent.name)
             if current_stage == "playoffs_final" and player_won:
                 self.playoff_bracket["champion"] = self.team.name
+
+        # ── Reveal the next round's pairings (if still in a Swiss stage) ──
+        self._refresh_pending_pairings()
 
         stage_mvp = None
         if stage_changed:
@@ -730,9 +812,10 @@ class CampaignManager:
 
     def get_bracket_state(self) -> dict:
         return {
-            "npc_teams":       [t.to_dict() for t in self.npc_teams],
-            "playoff_bracket": self.playoff_bracket,
-            "player_name":     self.team.name,
+            "npc_teams":        [t.to_dict() for t in self.npc_teams],
+            "playoff_bracket":  self.playoff_bracket,
+            "player_name":      self.team.name,
+            "pending_pairings": self.pending_pairings,
         }
 
     def to_dict(self) -> dict:
@@ -744,8 +827,10 @@ class CampaignManager:
             "era_id":              self.era_id,
             "used_team_names":     self._used_team_names,
             "npc_teams":           [t.to_dict() for t in self.npc_teams],
+            "npc_team_data":       self._npc_team_data,
             "playoff_bracket":     self.playoff_bracket,
             "bracket_initialized": self._bracket_initialized,
+            "pending_pairings":    self.pending_pairings,
         }
 
     def load_from_dict(self, data: dict) -> None:
@@ -756,5 +841,7 @@ class CampaignManager:
         self.era_id               = data.get("era_id")
         self._used_team_names     = data.get("used_team_names", [])
         self.npc_teams            = [NpcTeam.from_dict(d) for d in data.get("npc_teams", [])]
+        self._npc_team_data       = data.get("npc_team_data", {})
         self.playoff_bracket      = data.get("playoff_bracket", {})
         self._bracket_initialized = data.get("bracket_initialized", False)
+        self.pending_pairings     = data.get("pending_pairings", [])

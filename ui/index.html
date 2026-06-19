@@ -500,6 +500,48 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   font-family:var(--font-display); font-size:.95rem; font-weight:800;
   text-transform:uppercase; letter-spacing:.14em; color:var(--text2);
 }
+
+/* ── Foldable stage wrapper ── */
+.stage-fold {
+  margin-bottom:4px;
+}
+.stage-fold-header {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px;
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
+  cursor:pointer; user-select:none;
+  transition:background .12s, border-color .12s;
+}
+.stage-fold-header:hover { background:var(--bg3); border-color:var(--border2); }
+.stage-fold.open .stage-fold-header {
+  border-bottom-left-radius:0; border-bottom-right-radius:0;
+  border-bottom-color:transparent;
+}
+.stage-fold-chevron {
+  font-size:.7rem; color:var(--text3); flex-shrink:0; margin-left:auto;
+  transition:transform .2s;
+}
+.stage-fold.open .stage-fold-chevron { transform:rotate(180deg); }
+.stage-fold-title {
+  font-family:var(--font-display); font-size:.95rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--text2);
+}
+.stage-fold.open  .stage-fold-title { color:var(--text); }
+.stage-fold-body {
+  display:none;
+  padding:20px 16px 14px;
+  border:1px solid var(--border); border-top:none;
+  border-bottom-left-radius:var(--r); border-bottom-right-radius:var(--r);
+  background:var(--bg);
+}
+.stage-fold.open .stage-fold-body { display:block; }
+/* current stage always visually prominent */
+.stage-fold.current .stage-fold-header {
+  border-color:rgba(232,160,32,.45);
+  background:rgba(232,160,32,.04);
+}
+.stage-fold.current .stage-fold-title { color:var(--orange); }
+.stage-fold.current .stage-fold-body  { border-color:rgba(232,160,32,.3); }
 .br-pill {
   font-family:var(--font-display); font-size:.72rem; font-weight:700;
   text-transform:uppercase; letter-spacing:.08em; padding:4px 11px;
@@ -570,92 +612,36 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .bkr-vs   { color:var(--text3); font-size:.66rem; }
 
 /* ── Swiss round column: stacked buckets ── */
-/* ── HLTV-style Swiss: columns by score state ── */
-.sw-grid {
-  display:flex; align-items:flex-start; gap:0;
-  overflow-x:auto; padding-bottom:8px; min-width:max-content;
-}
-.sw-col {
-  display:flex; flex-direction:column; gap:8px;
-  min-width:165px; max-width:165px; padding:0 5px;
-}
-.sw-col-head {
-  font-family:var(--font-display); font-size:.78rem; font-weight:900;
-  text-transform:uppercase; letter-spacing:.1em; color:var(--text3);
-  text-align:center; padding:6px 0 10px; border-bottom:1px solid var(--border);
-  margin-bottom:2px;
-}
-.sw-col-head.swh-now    { color:var(--orange); }
-.sw-col-head.swh-adv    { color:var(--green); }
-.sw-col-head.swh-elim   { color:var(--red); }
-.sw-card {
+.bk-round-col { display:flex; flex-direction:column; gap:18px; min-width:190px; padding:0 6px; }
+.bk-bucket {
   background:var(--bg2); border:1px solid var(--border); border-radius:var(--r);
-  overflow:hidden; position:relative;
+  overflow:hidden;
 }
-.sw-card.swc-current {
-  border-color:rgba(232,160,32,.7);
-  box-shadow:0 0 10px rgba(232,160,32,.2);
-  animation:bkpulse 1.8s ease-in-out infinite;
+.bk-bucket-head {
+  font-family:var(--font-display); font-size:.72rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--text2);
+  background:var(--bg3); padding:7px 12px; border-bottom:1px solid var(--border);
 }
-.sw-card.swc-pending { opacity:.5; border-style:dashed; }
-.sw-card-top {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:5px 9px 4px; border-bottom:1px solid var(--border2);
+.bk-bucket-head.bbh-now { color:var(--orange); }
+.bk-bucket-row {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:7px 12px; border-bottom:1px solid var(--border2); font-size:.82rem;
 }
-.sw-card-round { font-size:.6rem; color:var(--text3); font-family:var(--font-display); letter-spacing:.06em; text-transform:uppercase; }
-.sw-card-score {
-  font-family:var(--font-display); font-size:1.1rem; font-weight:900;
-  color:var(--text); letter-spacing:.04em; text-align:center; flex:1;
+.bk-bucket-row:last-child { border-bottom:none; }
+.bk-bucket-row.bbr-you { background:rgba(232,160,32,.07); }
+.bk-bucket-team {
+  font-family:var(--font-display); font-weight:700; text-transform:uppercase;
+  color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;
 }
-.sw-card-score.scs-pending { color:var(--text3); font-size:.78rem; font-weight:600; }
-.sw-card-format {
-  font-size:.6rem; color:var(--text3); font-family:var(--font-display);
-  letter-spacing:.06em; text-transform:uppercase;
+.bk-bucket-team.bbt-you  { color:var(--orange); }
+.bk-bucket-team.bbt-win  { color:var(--green); }
+.bk-bucket-team.bbt-loss { color:var(--red); opacity:.7; }
+.bk-bucket-score {
+  font-family:var(--font-display); font-weight:800; font-size:.8rem; color:var(--text2);
+  flex-shrink:0; min-width:32px; text-align:center;
 }
-.sw-card-teams { display:flex; flex-direction:column; }
-.sw-card-team {
-  display:flex; align-items:center; gap:5px; padding:7px 9px;
-  border-bottom:1px solid var(--border2); font-family:var(--font-display);
-  font-size:.79rem; font-weight:800; text-transform:uppercase;
-  color:var(--text); overflow:hidden;
-}
-.sw-card-team:last-child { border-bottom:none; }
-.sw-card-team.sct-winner { background:rgba(40,200,80,.07); }
-.sw-card-team.sct-loser  { opacity:.42; }
-.sw-card-team.sct-you    { color:var(--orange) !important; }
-.sw-team-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.sw-team-q { color:var(--text3); font-size:.7rem; }
-.sw-arrow-group {
-  display:flex; flex-direction:column; justify-content:center; align-items:center;
-  gap:4px; width:20px; flex-shrink:0; align-self:stretch; padding-top:50px;
-}
-.sw-arrow { font-size:.75rem; line-height:1; }
-.sw-arrow.swa-win  { color:var(--green); }
-.sw-arrow.swa-loss { color:var(--red); }
-.sw-final-col {
-  display:flex; flex-direction:column; gap:6px;
-  min-width:138px; max-width:138px; padding:0 5px;
-}
-.sw-final-head {
-  font-family:var(--font-display); font-size:.72rem; font-weight:900;
-  text-transform:uppercase; letter-spacing:.12em; text-align:center;
-  padding:6px 0 10px; border-bottom:1px solid var(--border); margin-bottom:2px;
-}
-.sw-final-head.sfh-adv  { color:var(--green); }
-.sw-final-head.sfh-elim { color:var(--red); }
-.sw-chip {
-  font-family:var(--font-display); font-size:.74rem; font-weight:800;
-  text-transform:uppercase; padding:6px 10px; border-radius:4px;
-  background:var(--bg3); color:var(--text2); text-align:center;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.sw-chip.scp-you  { background:rgba(232,160,32,.2); color:var(--orange); }
-.sw-chip.scp-adv  { background:rgba(40,200,80,.1);  color:var(--green); }
-.sw-chip.scp-elim { background:rgba(224,48,48,.08); color:var(--red); opacity:.7; }
-.sw-chip.scp-empty { opacity:.35; font-style:italic; font-weight:400; font-family:var(--font-body); text-transform:none; font-size:.72rem; }
-
-/* kept for backwards compat with playoff renderer */
-.bk-round-sep { width:1px; background:var(--border); flex-shrink:0; align-self:stretch; margin:0 2px; }
+.bk-bucket-vs { color:var(--text3); font-size:.74rem; flex-shrink:0; }
+.bk-bucket-pending { color:var(--text3); font-style:italic; font-size:.78rem; font-family:var(--font-body); }
 
 /* ── Advanced / Eliminated summary strip ── */
 .bk-result-strip {
@@ -1303,8 +1289,9 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-team-name { font-size:.78rem; }
   .bk-connector { width:18px; padding-top:34px; }
   .bk-connector-line { height:60px; }
-  .sw-col { min-width:148px; max-width:148px; }
-  .sw-card-team { font-size:.76rem; padding:6px 8px; }
+  .bk-round-col { min-width:168px; gap:14px; }
+  .bk-bucket-team { font-size:.78rem; }
+  .bk-bucket-row  { padding:6px 10px; }
 
 }
 
@@ -1346,9 +1333,10 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-col-head  { font-size:.66rem; }
   .bk-connector { width:14px; padding-top:30px; }
   .bk-connector-line { height:50px; }
-  .sw-col { min-width:130px; max-width:130px; }
-  .sw-card-team { font-size:.7rem; padding:5px 7px; }
-  .sw-col-head  { font-size:.68rem; }
+  .bk-round-col { min-width:148px; gap:12px; padding:0 4px; }
+  .bk-bucket-team   { font-size:.7rem; }
+  .bk-bucket-row    { padding:6px 8px; }
+  .bk-bucket-head   { font-size:.66rem; padding:6px 8px; }
   .bk-result-strip  { padding:8px 10px; }
   .bk-result-label  { font-size:.68rem; padding:4px 9px; }
   .bk-result-chip   { font-size:.66rem; padding:3px 7px; }
@@ -2273,11 +2261,12 @@ function renderBracket(){
   const {campaign, team} = G;
   if(!campaign || !team) return;
 
-  const history    = campaign.history || [];
-  const stg        = campaign.stage;
-  const bracket    = G.bracket || {};
-  const npcTeams   = bracket.npc_teams || [];
-  const playerName = team.name;
+  const history         = campaign.history || [];
+  const stg             = campaign.stage;
+  const bracket         = G.bracket || {};
+  const npcTeams        = bracket.npc_teams || [];
+  const pendingPairings = bracket.pending_pairings || [];
+  const playerName      = team.name;
 
   const s1h = history.filter(h=>h.stage==="stage1");
   const s2h = history.filter(h=>h.stage==="stage2");
@@ -2285,25 +2274,69 @@ function renderBracket(){
   const stageOrder = ["stage1","stage2","playoffs_qf","playoffs_sf","playoffs_final","finished_win","finished_loss"];
   const stgIdx = stageOrder.indexOf(stg);
 
+  const s1Current = stg === "stage1";
+  const s1Done    = stgIdx > 0;
+  const s2Current = stg === "stage2";
+  const s2Done    = stgIdx > 1;
+  const poStarted = stgIdx >= 2;
+  const poCurrent = stgIdx >= 2 && stgIdx <= 4;
+
+  const s1Wins = campaign.stage1?.wins ?? 0;
+  const s1Loss = campaign.stage1?.losses ?? 0;
+  const s2Wins = campaign.stage2?.wins ?? 0;
+  const s2Loss = campaign.stage2?.losses ?? 0;
+
+  function stagePill(wins, losses, isCurrent, isDone, wasElim){
+    if(!isDone && !isCurrent) return `<span class="br-pill brp-locked">Bloqueado</span>`;
+    if(isDone && !wasElim)    return `<span class="br-pill brp-done">✓ Avançou ${wins}–${losses}</span>`;
+    if(isDone && wasElim)     return `<span class="br-pill brp-elim">✗ Eliminado ${wins}–${losses}</span>`;
+    return `<span class="br-pill brp-current">${wins}W – ${losses}L</span>`;
+  }
+
+  function playoffPill(){
+    if(!poStarted) return `<span class="br-pill brp-locked">Bloqueado</span>`;
+    if(stg==="finished_win")  return `<span class="br-pill brp-done">🏆 Campeão!</span>`;
+    if(stg==="finished_loss" && stgIdx>=2) return `<span class="br-pill brp-elim">Eliminado</span>`;
+    return `<span class="br-pill brp-current">Em curso</span>`;
+  }
+
+  function foldSection(id, title, pill, isOpen, isCurrent, bodyHtml){
+    const openCls    = isOpen    ? " open"    : "";
+    const currentCls = isCurrent ? " current" : "";
+    return `
+    <div class="stage-fold${openCls}${currentCls}" id="fold-${id}" style="margin-bottom:8px;">
+      <div class="stage-fold-header" onclick="toggleStageFold('${id}')">
+        <div class="stage-fold-title">${title}</div>
+        ${pill}
+        <div class="stage-fold-chevron">▼</div>
+      </div>
+      <div class="stage-fold-body">${bodyHtml}</div>
+    </div>`;
+  }
+
+  const s1Body = renderSwissBracket("Stage 1", s1h, campaign.stage1, npcTeams, pendingPairings, "s1",
+    s1Current, s1Done, false, playerName);
+  const s2Body = renderSwissBracket("Stage 2", s2h, campaign.stage2, npcTeams, pendingPairings, "s2",
+    s2Current, s2Done, stgIdx<1, playerName);
+  const poBody = renderPlayoffBracket(bracket, stg, playerName, history);
+
+  const s1Elim = s1Done && s1Wins < 3;
+  const s2Elim = s2Done && s2Wins < 3;
+
   let html = "";
+  html += foldSection("s1", "Stage 1",
+    stagePill(s1Wins, s1Loss, s1Current, s1Done, s1Elim),
+    s1Current || !s1Done, s1Current, s1Body);
 
-  // ── Stage 1: full Swiss bracket (all 16 teams, grouped by record) ──
-  html += renderSwissBracket("Stage 1", s1h, campaign.stage1, npcTeams, "s1",
-    stg==="stage1", stgIdx>0, false, playerName);
+  html += foldSection("s2", "Stage 2",
+    stagePill(s2Wins, s2Loss, s2Current, s2Done, s2Elim),
+    s2Current, s2Current, s2Body);
 
-  html += `<div class="bracket-divider"></div>`;
+  html += foldSection("po", "Playoffs",
+    playoffPill(),
+    poCurrent, poCurrent, poBody);
 
-  // ── Stage 2 ──
-  html += renderSwissBracket("Stage 2", s2h, campaign.stage2, npcTeams, "s2",
-    stg==="stage2", stgIdx>1, stgIdx<1, playerName);
-
-  html += `<div class="bracket-divider"></div>`;
-
-  // ── Playoffs ──
-  html += renderPlayoffBracket(bracket, stg, playerName, history);
-
-  // Legend
-  html += `<div class="bk-legend" style="margin-top:16px;">
+  html += `<div class="bk-legend" style="margin-top:14px;">
     <div class="bk-leg-item"><div class="bk-leg-dot bkl-win"></div>Vitória</div>
     <div class="bk-leg-item"><div class="bk-leg-dot bkl-loss"></div>Derrota</div>
     <div class="bk-leg-item"><div class="bk-leg-dot bkl-you"></div>Seu time</div>
@@ -2313,7 +2346,11 @@ function renderBracket(){
   wrap.innerHTML = html;
 }
 
-// ── Generic match-card builder (shared by Swiss + Playoffs) ──────────────────
+function toggleStageFold(id){
+  const el = document.getElementById("fold-" + id);
+  if(el) el.classList.toggle("open");
+}
+
 function bkMatchCard(aName, bName, winnerName, isCurrent, playerName){
   if(!aName && !bName){
     return `<div class="bk-match bkm-empty">
@@ -2355,8 +2392,8 @@ function bkAssembleColumns(columns){
   return out;
 }
 
-// ── HLTV-style Swiss bracket ─────────────────────────────────────────────────
-function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, stageKey,
+// ── Swiss stage rendered as a round-by-round bracket (player's own path) ─────
+function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, pendingPairings, stageKey,
                             isCurrent, isDone, isLocked, playerName){
   const wins   = playerRecord?.wins   ?? 0;
   const losses = playerRecord?.losses ?? 0;
@@ -2372,22 +2409,18 @@ function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, stageK
     pill = `<span class="br-pill brp-current">${wins}W – ${losses}L</span>`;
 
   if(isLocked){
-    return `
-    <div class="br-section">
-      <div class="br-section-title">${title}</div>
-      <div style="flex:1"></div>${pill}
-    </div>
-    <div style="color:var(--text3);font-size:.85rem;margin-bottom:18px;opacity:.5;padding:10px 0">
+    return `<div style="color:var(--text3);font-size:.85rem;opacity:.5;padding:10px 0">
       Fase ainda não iniciada.
     </div>`;
   }
 
-  // ── Gather all match data ──────────────────────────────────────────────────
-  const allTeamHist = [];
+  // ── Gather every team's match history for this stage into one list ──────
+  // Each entry: {round, wb, lb, teamA, teamB, winner} — one per actual match
+  // We rebuild matches by pairing each team's recorded result with its opponent's.
+  const allTeamHist = []; // [{name, hist: [...]}]
   allTeamHist.push({ name: playerName, hist: playerHistory.map(h => ({
     wins_before: h.wins_before ?? 0, losses_before: h.losses_before ?? 0,
-    opponent: h.opponent_name || h.opponent, result: h.result,
-    maps_won: h.maps_won, maps_lost: h.maps_lost,
+    opponent: h.opponent_name || h.opponent, result: h.result
   })) });
   for(const t of npcTeams){
     const hist = stageKey === "s1" ? (t.s1_history||[]) : (t.s2_history||[]);
@@ -2395,36 +2428,127 @@ function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, stageK
     allTeamHist.push({ name: t.name, hist });
   }
 
-  // Build match map keyed by score-state (wb-lb) → array of match objects
-  // Each match: { a, b, winner, isCurrent, format }
+  // Build matches per round bucket: key = `${round}|${wb}-${lb}`
+  // Dedup: each match appears twice (once per side) — keep only one canonical entry
   const seen = new Set();
-  // scoreMatches: map "W-L" → [{a, b, winner, format}]
-  const scoreMatches = {};
+  const roundBuckets = [{}, {}, {}, {}, {}]; // index = round 0..4, value = {bucketKey: [matches]}
 
   for(const {name, hist} of allTeamHist){
     for(const h of hist){
-      const wb = h.wins_before || 0;
-      const lb = h.losses_before || 0;
-      const key = `${wb}-${lb}`;
-      const pairKey = key + "|" + [name, h.opponent].sort().join("~");
+      const ri = Math.min((h.wins_before||0)+(h.losses_before||0), 4);
+      const bucketKey = `${h.wins_before||0}-${h.losses_before||0}`;
+      // canonical pair key (order-independent) to dedupe the two sides of the same match
+      const pairKey = ri + "|" + [name, h.opponent].sort().join("~");
       if(seen.has(pairKey)) continue;
       seen.add(pairKey);
 
       const won = h.result === "win";
-      const winner = won ? name : h.opponent;
-      const loser  = won ? h.opponent : name;
-      // format: R1 = BO1, R5 (deciding) = BO3, else BO1 (adjust as needed)
-      const round = wb + lb;
-      const format = (round === 0 || round === 4 || (wb === 2 && lb === 2) || (wb === 0 && lb === 2) || (wb === 2 && lb === 0)) ? "BO3" : "BO1";
-      const mw = h.maps_won  != null ? h.maps_won  : (won ? (format==="BO1"?1:2) : 0);
-      const ml = h.maps_lost != null ? h.maps_lost : (won ? 0 : (format==="BO1"?1:2));
+      const teamA = won ? name : h.opponent;
+      const teamB = won ? h.opponent : name;
 
-      if(!scoreMatches[key]) scoreMatches[key] = [];
-      scoreMatches[key].push({ a: winner, b: loser, winner, format, mw, ml });
+      if(!roundBuckets[ri][bucketKey]) roundBuckets[ri][bucketKey] = [];
+      roundBuckets[ri][bucketKey].push({ a: teamA, b: teamB, winner: teamA });
     }
   }
 
-  // Track who ends up where (advanced/eliminated)
+  const ROUND_LABELS = ["Rodada 1","Rodada 2","Rodada 3","Rodada 4","Rodada 5"];
+  const currentRound = isCurrent ? Math.min(wins+losses, 4) : -1;
+
+  // Sort buckets within a round by record (most wins first, e.g. "2-0" before "1-1" before "0-2")
+  function sortBucketKeys(keys){
+    return keys.sort((a,b)=>{
+      const [aw,al] = a.split("-").map(Number);
+      const [bw,bl] = b.split("-").map(Number);
+      if(bw !== aw) return bw - aw;
+      return al - bl;
+    });
+  }
+
+  let colsHtml = "";
+  for(let ri = 0; ri < 5; ri++){
+    const buckets = roundBuckets[ri];
+    const bucketKeys = sortBucketKeys(Object.keys(buckets));
+
+    // Build pending-pairs lookup for this round index (unresolved upcoming matchups)
+    // pendingPairings covers ALL teams in the upcoming round — group by record bucket
+    const pendingBuckets = {}; // bucketKey -> [{a, b}]
+    if(isCurrent && ri === currentRound){
+      for(const p of pendingPairings){
+        const [pw, pl] = (p.record instanceof Array)
+          ? p.record
+          : [p.record?.[0]??wins, p.record?.[1]??losses];
+        const bk = `${pw}-${pl}`;
+        if(!pendingBuckets[bk]) pendingBuckets[bk] = [];
+        pendingBuckets[bk].push(p);
+      }
+    }
+
+    // Merge: played buckets (from history) + pending buckets (from pendingPairings)
+    const allBucketKeys = sortBucketKeys([...new Set([...bucketKeys, ...Object.keys(pendingBuckets)])]);
+
+    let bucketsHtml = "";
+    if(allBucketKeys.length === 0 && ri === currentRound){
+      // Edge case: bracket just initialised, no data yet — show player's pending slot
+      bucketsHtml += `<div class="bk-bucket">
+        <div class="bk-bucket-head bbh-now">${wins}–${losses}</div>
+        <div class="bk-bucket-row bbr-you">
+          <div class="bk-bucket-team bbt-you">${truncateTeam(playerName,14)}</div>
+          <div class="bk-bucket-vs">vs</div>
+          <div class="bk-bucket-pending">a definir</div>
+        </div>
+      </div>`;
+    } else {
+      for(const bk of allBucketKeys){
+        const matches   = buckets[bk] || [];   // already played
+        const pending   = pendingBuckets[bk] || [];  // upcoming this round
+        const isNowBucket = isCurrent && ri === currentRound;
+
+        // Rows for already-played matches
+        let rowsHtml = matches.map(m=>{
+          const aYou = m.a === playerName, bYou = m.b === playerName;
+          const aCls = aYou ? "bbt-you" : "bbt-win";
+          const bCls = bYou ? "bbt-you" : "bbt-loss";
+          return `<div class="bk-bucket-row ${aYou||bYou?"bbr-you":""}">
+            <div class="bk-bucket-team ${aCls}">${truncateTeam(m.a,14)}</div>
+            <div class="bk-bucket-score">W</div>
+            <div class="bk-bucket-team ${bCls}" style="text-align:right">${truncateTeam(m.b,14)}</div>
+          </div>`;
+        }).join("");
+
+        // Rows for pending (upcoming) matches in this round
+        // Only show if this is the current round being played
+        if(isNowBucket && pending.length > 0){
+          // Filter out pairs already shown as played (dedup by name pair)
+          const playedPairs = new Set(matches.map(m=>[m.a,m.b].sort().join("~")));
+          for(const p of pending){
+            const pairKey = [p.a, p.b].sort().join("~");
+            if(playedPairs.has(pairKey)) continue;
+            const aYou = p.a === playerName, bYou = p.b === playerName;
+            rowsHtml += `<div class="bk-bucket-row ${aYou||bYou?"bbr-you":""}">
+              <div class="bk-bucket-team ${aYou?"bbt-you":""}">${truncateTeam(p.a,14)}</div>
+              <div class="bk-bucket-vs">vs</div>
+              <div class="bk-bucket-team ${bYou?"bbt-you":""}" style="text-align:right">${truncateTeam(p.b,14)}</div>
+            </div>`;
+          }
+        }
+
+        if(!rowsHtml) continue;
+
+        bucketsHtml += `<div class="bk-bucket">
+          <div class="bk-bucket-head ${isNowBucket&&bk===`${wins}-${losses}`?"bbh-now":""}">${bk}</div>
+          ${rowsHtml}
+        </div>`;
+      }
+    }
+
+    colsHtml += `<div class="bk-round-col">
+      <div class="bk-col-head ${ri===currentRound?"bkh-now":""}">${ROUND_LABELS[ri]}</div>
+      ${bucketsHtml}
+    </div>`;
+    if(ri < 4) colsHtml += `<div class="bk-round-sep"></div>`;
+  }
+
+  // ── Advanced / Eliminated summary ──
   const advanced = [], eliminated = [];
   for(const {name} of allTeamHist){
     const isPlayer = name === playerName;
@@ -2439,149 +2563,39 @@ function renderSwissBracket(title, playerHistory, playerRecord, npcTeams, stageK
       done = stageKey==="s1" ? t.s1_done   : t.s2_done;
       adv  = stageKey==="s1" ? t.advanced_s1 : t.advanced_s2;
     }
-    if(done && adv)       advanced.push(name);
+    if(done && adv) advanced.push(name);
     else if(done && !adv) eliminated.push(name);
   }
 
-  // ── Build HLTV-style Swiss layout ─────────────────────────────────────────
-  // Column structure mirrors the image:
-  // Col 0-0 → arrows → Col 1-0 & 0-1 → arrows → Col 2-0, 1-1, 0-2
-  //   → arrows → Col 2-1, 1-2 → arrows → ADVANCING & ELIMINATED
-  //
-  // We render columns left to right, with arrow groups between them.
-
-  // Format: BO3 for deciders (wb+lb==4 or elim/adv-deciding rounds), BO1 otherwise
-  function getFormat(wb, lb){
-    const r = wb+lb;
-    if(r === 0) return "BO1";
-    if(wb === 2 && lb === 2) return "BO3"; // 2-2 → deciding match
-    if(wb === 2 || lb === 2) return "BO3"; // 2-x or x-2 advancing/elim match
-    return "BO1";
+  function chip(name){
+    const you = name === playerName;
+    return `<span class="bk-result-chip ${you?"brc-you":""}">${truncateTeam(name,16)}</span>`;
   }
 
-  function swCard(wb, lb, isCur){
-    const key = `${wb}-${lb}`;
-    const matches = scoreMatches[key] || [];
-    const isNow = isCur && `${wins}-${losses}` === key;
-    let cards = "";
-
-    for(const m of matches){
-      const aYou = m.a === playerName;
-      const bYou = m.b === playerName;
-      const aCls = aYou ? " sct-you sct-winner" : " sct-winner";
-      const bCls = bYou ? " sct-you sct-loser"  : " sct-loser";
-      const scoreTxt = `${m.mw ?? 0}:${m.ml ?? 0}`;
-      const fmt = getFormat(wb, lb);
-      const cls = aYou||bYou ? " swc-you" : "";
-      cards += `<div class="sw-card${cls}">
-        <div class="sw-card-top">
-          <span class="sw-card-round">${wb}–${lb}</span>
-          <span class="sw-card-score">${scoreTxt}</span>
-          <span class="sw-card-format">${fmt}</span>
-        </div>
-        <div class="sw-card-teams">
-          <div class="sw-card-team${aCls}"><span class="sw-team-name">${truncateTeam(m.a,15)}</span></div>
-          <div class="sw-card-team${bCls}"><span class="sw-team-name">${truncateTeam(m.b,15)}</span></div>
-        </div>
+  let summaryHtml = "";
+  if(advanced.length || eliminated.length){
+    summaryHtml = `<div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">`;
+    if(advanced.length){
+      summaryHtml += `<div class="bk-result-strip brs-adv">
+        <div class="bk-result-label">Avançaram</div>
+        <div class="bk-result-teams">${advanced.map(chip).join("")}</div>
       </div>`;
     }
-
-    // Player's pending match in this bucket
-    if(isNow && !matches.some(m=>m.a===playerName||m.b===playerName)){
-      const fmt = getFormat(wb, lb);
-      cards += `<div class="sw-card swc-current">
-        <div class="sw-card-top">
-          <span class="sw-card-round">${wb}–${lb}</span>
-          <span class="sw-card-score scs-pending">vs</span>
-          <span class="sw-card-format">${fmt}</span>
-        </div>
-        <div class="sw-card-teams">
-          <div class="sw-card-team sct-you"><span class="sw-team-name">${truncateTeam(playerName,15)}</span></div>
-          <div class="sw-card-team"><span class="sw-team-name sw-team-q">?</span></div>
-        </div>
+    if(eliminated.length){
+      summaryHtml += `<div class="bk-result-strip brs-elim">
+        <div class="bk-result-label">Eliminados</div>
+        <div class="bk-result-teams">${eliminated.map(chip).join("")}</div>
       </div>`;
     }
-
-    // If nothing — show a placeholder card
-    if(!cards){
-      const fmt = getFormat(wb, lb);
-      cards = `<div class="sw-card swc-pending">
-        <div class="sw-card-top">
-          <span class="sw-card-round">${wb}–${lb}</span>
-          <span class="sw-card-score scs-pending">?:?</span>
-          <span class="sw-card-format">${fmt}</span>
-        </div>
-        <div class="sw-card-teams">
-          <div class="sw-card-team"><span class="sw-team-name sw-team-q">?</span></div>
-          <div class="sw-card-team"><span class="sw-team-name sw-team-q">?</span></div>
-        </div>
-      </div>`;
-    }
-    return cards;
+    summaryHtml += `</div>`;
   }
-
-  function col(label, records, isCur, headCls=""){
-    let inner = "";
-    for(const [wb,lb] of records){
-      inner += swCard(wb, lb, isCur);
-    }
-    return `<div class="sw-col">
-      <div class="sw-col-head ${headCls}">${label}</div>
-      ${inner}
-    </div>`;
-  }
-
-  function arrows(winArrow, lossArrow){
-    return `<div class="sw-arrow-group">
-      ${winArrow  ? `<span class="sw-arrow swa-win">»</span>`  : ""}
-      ${lossArrow ? `<span class="sw-arrow swa-loss">»</span>` : ""}
-    </div>`;
-  }
-
-  function finalCol(label, teams, headCls){
-    const chips = teams.length
-      ? teams.map(n=>{
-          const you = n===playerName;
-          return `<div class="sw-chip ${you?"scp-you":(headCls.includes("adv")?"scp-adv":"scp-elim")}">${truncateTeam(n,16)}</div>`;
-        }).join("")
-      : `<div class="sw-chip scp-empty">a definir</div>`;
-    return `<div class="sw-final-col">
-      <div class="sw-final-head ${headCls}">${label}</div>
-      ${chips}
-    </div>`;
-  }
-
-  const nowStage = isCurrent;
-
-  let grid = "";
-  // Col 1: 0-0
-  grid += col("0 – 0", [[0,0]], nowStage);
-  grid += arrows(true, true);
-  // Col 2: 1-0 / 0-1
-  grid += col("1 – 0 / 0 – 1", [[1,0],[0,1]], nowStage);
-  grid += arrows(true, true);
-  // Col 3: 2-0 / 1-1 / 0-2
-  grid += col("2 – 0 / 1 – 1 / 0 – 2", [[2,0],[1,1],[0,2]], nowStage);
-  grid += arrows(true, true);
-  // Col 4: 2-1 / 1-2
-  grid += col("2 – 1 / 1 – 2", [[2,1],[1,2]], nowStage);
-  grid += arrows(true, true);
-  // Final cols: ADVANCING + ELIMINATED
-  grid += finalCol("Advancing", advanced, "sfh-adv");
-  grid += `<div style="width:12px;flex-shrink:0"></div>`;
-  grid += finalCol("Eliminated", eliminated, "sfh-elim");
 
   return `
-  <div class="br-section">
-    <div class="br-section-title">${title}</div>
-    <div style="flex:1"></div>
-    ${pill}
-  </div>
   <div class="bk-wrap">
-    <div class="sw-grid">${grid}</div>
-  </div>`;
+    <div class="bk-grid">${colsHtml}</div>
+  </div>
+  ${summaryHtml}`;
 }
-
 
 function renderPlayoffBracket(bracket, stg, playerName, history){
   const stageOrder = ["stage1","stage2","playoffs_qf","playoffs_sf","playoffs_final","finished_win","finished_loss"];
@@ -2641,11 +2655,6 @@ function renderPlayoffBracket(bracket, stg, playerName, history){
   ];
 
   return `
-  <div class="br-section">
-    <div class="br-section-title">Playoffs</div>
-    <div style="flex:1"></div>
-    ${pill}
-  </div>
   <div class="bk-wrap${!playoffStarted?" bk-wrap-locked":""}">
     <div class="bk-grid">${bkAssembleColumns(columns)}</div>
   </div>`;
