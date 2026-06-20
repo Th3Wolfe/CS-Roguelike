@@ -11,6 +11,8 @@ class Team:
     players: list  # list[Player], 5 players
     synergy: float = 0.0  # -10 to +10
     team_buffs: list = field(default_factory=list)  # list[Buff]
+    full_maps: list  = field(default_factory=list)   # 3 maps: full proficiency
+    half_maps: list  = field(default_factory=list)   # 2 maps: half proficiency
 
     def clamp_synergy(self) -> None:
         """Clamp synergy to valid range."""
@@ -47,21 +49,25 @@ class Team:
     def to_dict(self) -> dict:
         """Serialize team to dict."""
         return {
-            "name": self.name,
-            "synergy": self.synergy,
-            "players": [p.to_dict() for p in self.players],
+            "name":       self.name,
+            "synergy":    self.synergy,
+            "players":    [p.to_dict() for p in self.players],
             "team_buffs": [b.to_dict() for b in self.team_buffs],
+            "full_maps":  self.full_maps,
+            "half_maps":  self.half_maps,
         }
 
     @staticmethod
     def from_dict(data: dict) -> "Team":
         """Deserialize team from dict."""
         from models.player import Player
-        players = [Player.from_dict(p) for p in data["players"]]
+        players    = [Player.from_dict(p) for p in data["players"]]
         team_buffs = [Buff.from_dict(b) for b in data.get("team_buffs", [])]
         return Team(
             name=data["name"],
             players=players,
             synergy=data.get("synergy", 0.0),
             team_buffs=team_buffs,
+            full_maps=data.get("full_maps", []),
+            half_maps=data.get("half_maps", []),
         )

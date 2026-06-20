@@ -646,7 +646,7 @@ class CampaignManager:
 
     # ── core play loop ───────────────────────────────────────────────────────
 
-    def play_series(self) -> dict:
+    def play_series(self, veto_maps: list | None = None) -> dict:
         self._init_bracket()
 
         current_stage_pre = self.state.stage.value
@@ -660,7 +660,7 @@ class CampaignManager:
         if opponent.name not in self._used_team_names:
             self._used_team_names.append(opponent.name)
 
-        detail: SeriesDetail = resolve_series(self.team, opponent)
+        detail: SeriesDetail = resolve_series(self.team, opponent, veto_maps=veto_maps)
         description = describe_result(detail, opponent.name)
 
         current_stage = self.state.stage.value

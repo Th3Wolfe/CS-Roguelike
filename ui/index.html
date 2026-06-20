@@ -501,6 +501,67 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   text-transform:uppercase; letter-spacing:.14em; color:var(--text2);
 }
 
+/* ── Map pool selection screen ── */
+.mp-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px;
+}
+.mp-card {
+  background:var(--bg2); border:2px solid var(--border); border-radius:var(--r);
+  padding:18px 16px; cursor:pointer; text-align:center;
+  transition:border-color .12s, background .12s, transform .1s;
+  user-select:none;
+}
+.mp-card:hover { border-color:var(--text2); transform:translateY(-2px); }
+.mp-card.mp-full  { border-color:var(--green);  background:rgba(40,200,80,.07); }
+.mp-card.mp-half  { border-color:var(--orange); background:rgba(232,160,32,.07); }
+.mp-card.mp-none  { border-color:var(--red);    background:rgba(224,48,48,.06); opacity:.7; pointer-events:none; }
+.mp-card-name { font-family:var(--font-display); font-size:1.05rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--text); margin-bottom:4px; }
+.mp-card-bias { font-size:.75rem; color:var(--text3); margin-bottom:10px; }
+.mp-card-tier { font-family:var(--font-display); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:3px 10px; border-radius:10px; display:inline-block; }
+.mp-full .mp-card-tier { background:rgba(40,200,80,.2); color:var(--green); }
+.mp-half .mp-card-tier { background:rgba(232,160,32,.2); color:var(--orange); }
+.mp-leg-item { display:flex; align-items:center; gap:7px; font-size:.8rem; color:var(--text2); }
+.mp-leg-dot  { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+/* ── Veto screen ── */
+.veto-map-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px;
+}
+.veto-map-card {
+  background:var(--bg2); border:2px solid var(--border); border-radius:var(--r);
+  padding:14px 10px; text-align:center; cursor:pointer;
+  transition:border-color .12s, background .12s, transform .1s, opacity .15s;
+  user-select:none; position:relative;
+}
+.veto-map-card:hover:not(.vmc-banned):not(.vmc-picked-player):not(.vmc-picked-opp):not(.vmc-decider):not(.vmc-disabled) {
+  border-color:var(--orange); transform:translateY(-2px);
+}
+.vmc-disabled { opacity:.6; cursor:default; pointer-events:none; }
+.vmc-banned   { opacity:.25; cursor:default; pointer-events:none; }
+.vmc-picked-player { border-color:var(--green); background:rgba(40,200,80,.08); cursor:default; pointer-events:none; }
+.vmc-picked-opp    { border-color:var(--red);   background:rgba(224,48,48,.07); cursor:default; pointer-events:none; }
+.vmc-decider       { border-color:var(--orange); background:rgba(232,160,32,.07); cursor:default; pointer-events:none; }
+.vmc-name { font-family:var(--font-display); font-size:.88rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:var(--text); }
+.vmc-prof { font-family:var(--font-display); font-size:.6rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-top:4px; padding:2px 6px; border-radius:3px; display:inline-block; }
+.vmc-prof-full { background:rgba(40,200,80,.2);  color:var(--green); }
+.vmc-prof-half { background:rgba(232,160,32,.15); color:var(--orange); }
+.vmc-prof-none { background:rgba(224,48,48,.15);  color:var(--red); }
+.vmc-status { position:absolute; top:5px; right:7px; font-family:var(--font-display); font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:1px 5px; border-radius:2px; }
+.vmc-banned .vmc-status        { background:rgba(255,255,255,.1); color:var(--text3); }
+.vmc-picked-player .vmc-status { background:rgba(40,200,80,.2);  color:var(--green); }
+.vmc-picked-opp    .vmc-status { background:rgba(224,48,48,.2);  color:var(--red); }
+.vmc-decider       .vmc-status { background:rgba(232,160,32,.2); color:var(--orange); }
+.veto-log-item { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--bg2); border-radius:var(--r); font-size:.85rem; border:1px solid var(--border); }
+.vli-actor  { font-family:var(--font-display); font-weight:700; text-transform:uppercase; font-size:.72rem; min-width:70px; }
+.vli-action { font-size:.8rem; padding:2px 8px; border-radius:3px; font-family:var(--font-display); font-weight:700; text-transform:uppercase; }
+.vla-ban    { background:rgba(224,48,48,.15);  color:var(--red); }
+.vla-pick   { background:rgba(40,200,80,.15);  color:var(--green); }
+.vla-side   { background:rgba(232,160,32,.15); color:var(--orange); }
+.vli-map    { color:var(--text); font-weight:600; }
+.veto-pick-summary { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:12px 16px; min-width:150px; }
+.vps-map  { font-family:var(--font-display); font-size:.92rem; font-weight:800; text-transform:uppercase; color:var(--text); }
+.vps-meta { font-size:.78rem; color:var(--text2); margin-top:3px; }
+
 /* ── Foldable stage wrapper ── */
 .stage-fold {
   margin-bottom:4px;
@@ -1436,6 +1497,68 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   </div>
 </div>
 
+<!-- ═══════════════════════════  MAP POOL  ═══════════════════════════ -->
+<div id="screen-maps" class="screen" style="flex-direction:column;background:var(--bg);">
+  <div class="top-bar" style="background:var(--bg2);border-bottom:2px solid var(--orange);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0;">
+    <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;">Pool de Mapas</div>
+    <div style="flex:1"></div>
+    <div id="maps-sel-status" style="font-family:var(--font-display);font-size:.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;"></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;">
+    <div style="margin-bottom:24px;">
+      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Escolha sua proficiência</div>
+      <div style="font-size:.95rem;color:var(--text2);line-height:1.7;max-width:680px;">
+        Selecione <b style="color:var(--green)">3 mapas com proficiência total</b> (bônus de desempenho) e
+        <b style="color:var(--orange)">2 com meia proficiência</b> (neutro).
+        Os 2 restantes terão <b style="color:var(--red)">proficiência nula</b> e penalidade.
+      </div>
+    </div>
+    <div class="mp-legend" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+      <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--green)"></div><span>Full (+8% win rate)</span></div>
+      <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--orange)"></div><span>Half (neutro)</span></div>
+      <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--red)"></div><span>Nula (−10% win rate)</span></div>
+    </div>
+    <div id="mp-grid" class="mp-grid"></div>
+    <div style="margin-top:32px;display:flex;justify-content:flex-end;">
+      <button class="btn btn-orange btn-lg" id="btn-confirm-maps" disabled onclick="confirmMapPool()">
+        Confirmar e Iniciar Major →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════  VETO  ═══════════════════════════ -->
+<div id="screen-veto" class="screen" style="flex-direction:column;background:var(--bg);">
+  <div class="top-bar" style="background:var(--bg2);border-bottom:2px solid var(--orange);padding:0 24px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0;">
+    <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:.1em;">Pick/Ban de Mapas</div>
+    <div style="flex:1"></div>
+    <div id="veto-vs-label" style="font-family:var(--font-display);font-size:.85rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;"></div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;margin:0 auto;width:100%;">
+    <!-- Coin flip result -->
+    <div id="veto-coin" style="margin-bottom:20px;padding:12px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);font-size:.9rem;color:var(--text2);"></div>
+    <!-- Veto sequence log -->
+    <div id="veto-log" style="margin-bottom:20px;display:flex;flex-direction:column;gap:6px;"></div>
+    <!-- Map grid -->
+    <div style="margin-bottom:20px;">
+      <div id="veto-instruction" style="font-family:var(--font-display);font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:14px;min-height:1.5em;"></div>
+      <div id="veto-map-grid" class="veto-map-grid"></div>
+    </div>
+    <!-- Side choice (appears when needed) -->
+    <div id="veto-side-panel" style="display:none;margin-bottom:20px;padding:18px 20px;background:var(--bg2);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);">
+      <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:12px;">
+        Escolha seu lado em <span id="veto-side-map" style="color:var(--text)"></span>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-orange" onclick="vetoChooseSide('ct')">🛡️ CT</button>
+        <button class="btn btn-ghost" onclick="vetoChooseSide('t')">💣 T</button>
+      </div>
+    </div>
+    <!-- Final picks display -->
+    <div id="veto-picks" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;"></div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════  GAME  ═══════════════════════════ -->
 <div id="screen-game" class="screen">
   <div class="game-topbar">
@@ -2059,26 +2182,81 @@ function unpickSlot(slotIdx){
 }
 
 
+// After draft: go to map pool selection
 async function confirmDraft(){
   const teamName=document.getElementById("team-name-inp").value.trim()||null;
-  // Sort picks by slot order and format for backend
   const sortedPicks=G.draft.picks
     .sort((a,b)=>a.slotIdx-b.slotIdx)
     .map(pk=>({...pk.player, role:["IGL","AWPer","Entry Fragger","Support","Lurker"][pk.slotIdx]}));
+  G._pendingDraftData = { team_name:teamName, player_picks:sortedPicks };
 
-  const r=await api("/new_game","POST",{
-    team_name:teamName,
-    player_picks:sortedPicks,
-    events_enabled:false,
-    era_id:G.draft.eraId,
+  // Fetch map pool and show selection screen
+  const r = await api("/map_pool","GET");
+  if(!r.ok){ toast("Erro ao carregar mapas","err"); return; }
+  G._mapPool    = r.maps;
+  G._mapCtBias  = r.ct_bias;
+  G._mapSelFull = [];
+  G._mapSelHalf = [];
+  showScreen("maps");
+  renderMapPoolScreen();
+}
+
+function renderMapPoolScreen(){
+  const grid = document.getElementById("mp-grid");
+  const maps = G._mapPool || [];
+  const full = G._mapSelFull || [];
+  const half = G._mapSelHalf || [];
+
+  grid.innerHTML = maps.map(m=>{
+    const isFull = full.includes(m);
+    const isHalf = half.includes(m);
+    const isNone = !isFull && !isHalf && full.length>=3 && half.length>=2;
+    const cls    = isFull?"mp-full" : isHalf?"mp-half" : isNone?"mp-none" : "";
+    const tier   = isFull?"✓ Full" : isHalf?"◑ Half" : isNone?"✗ Nula" : "Clique para selecionar";
+    const bias   = G._mapCtBias?.[m];
+    const biasLbl = bias ? (bias>0.52?"CT-sided":bias<0.48?"T-sided":"Balanced") : "";
+    return `<div class="mp-card ${cls}" onclick="toggleMapSel('${m}')">
+      <div class="mp-card-name">${m}</div>
+      <div class="mp-card-bias">${biasLbl}</div>
+      <span class="mp-card-tier">${tier}</span>
+    </div>`;
+  }).join("");
+
+  const status = `${full.length}/3 Full · ${half.length}/2 Half`;
+  document.getElementById("maps-sel-status").textContent = status;
+  document.getElementById("btn-confirm-maps").disabled = !(full.length===3 && half.length===2);
+}
+
+function toggleMapSel(map){
+  const full = G._mapSelFull;
+  const half = G._mapSelHalf;
+  if(full.includes(map)){
+    G._mapSelFull = full.filter(m=>m!==map);
+  } else if(half.includes(map)){
+    G._mapSelHalf = half.filter(m=>m!==map);
+  } else if(full.length < 3){
+    G._mapSelFull = [...full, map];
+  } else if(half.length < 2){
+    G._mapSelHalf = [...half, map];
+  }
+  renderMapPoolScreen();
+}
+
+async function confirmMapPool(){
+  const d = G._pendingDraftData;
+  const r = await api("/new_game","POST",{
+    ...d,
+    events_enabled: false,
+    era_id: G.draft.eraId,
+    full_maps: G._mapSelFull,
+    half_maps: G._mapSelHalf,
   });
-  if(!r.ok){toast("Erro: "+r.error,"err");return;}
+  if(!r.ok){ toast("Erro: "+r.error,"err"); return; }
   G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code;
   G.bracket=r.bracket||null;
   G._prevStage=r.campaign.stage;
   G._lastTeamScore=r.team_score??null;
-  G._lastPlayerStats=null;
-  G._lastStageMvp=null;
+  G._lastPlayerStats=null; G._lastStageMvp=null;
   document.getElementById("game-main").innerHTML=`
     <div class="game-main-inner">
     <div class="campaign-card">
@@ -2103,6 +2281,180 @@ async function confirmDraft(){
   showScreen("game"); updateGameUI();
   toast("Major iniciado! Boa sorte 🏆","ok");
 }
+
+// ═══════════════════════════════════════════
+// VETO SCREEN
+// ═══════════════════════════════════════════
+let _vetoState = null;
+let _vetoOppName = "";
+
+async function startVeto(){
+  const r = await api("/start_veto","POST");
+  if(!r.ok){ toast("Erro ao iniciar veto: "+r.error,"err"); return; }
+  _vetoState  = r.veto;
+  _vetoOppName = r.opponent_name;
+  showScreen("veto");
+  document.getElementById("veto-vs-label").textContent =
+    `${G.team?.name||"Você"} vs ${_vetoOppName}`;
+  document.getElementById("veto-coin").innerHTML =
+    r.coin_flip_won
+    ? `🪙 <b>Você ganhou o cara-ou-coroa</b> — você vai primeiro no veto.`
+    : `🪙 <b>${_vetoOppName} ganhou o cara-ou-coroa</b> — eles vão primeiro.`;
+  // Process any auto-events that already happened (opp going first)
+  if(r.auto_events?.length){
+    renderVetoAutoEvents(r.auto_events, r.veto);
+  }
+  renderVetoScreen(_vetoState);
+}
+
+function renderVetoAutoEvents(events, vetoState){
+  for(const ev of events){
+    appendVetoLog(ev.actor, ev.action, ev.map, vetoState);
+  }
+}
+
+function appendVetoLog(actor, action, map, vetoState){
+  const log = document.getElementById("veto-log");
+  const actorLbl = actor==="player" ? (G.team?.name||"Você") : _vetoOppName;
+  const actionCls = action==="ban" ? "vla-ban" : action==="pick" ? "vla-pick" : "vla-side";
+  const actionLbl = action==="ban" ? "BANIU" : action==="pick" ? "ESCOLHEU" : "LADO";
+  const item = document.createElement("div");
+  item.className = "veto-log-item";
+  item.innerHTML = `<span class="vli-actor">${actorLbl}</span>
+    <span class="vli-action ${actionCls}">${actionLbl}</span>
+    <span class="vli-map">${map}</span>`;
+  log.appendChild(item);
+  log.scrollTop = log.scrollHeight;
+}
+
+function renderVetoScreen(veto){
+  _vetoState = veto;
+  const maps   = G._mapPool || [];
+  const bans   = new Set(veto.bans || []);
+  const picks  = veto.picks || [];
+  const full   = G.team?.full_maps || [];
+  const half   = G.team?.half_maps || [];
+
+  const pickedMap  = {};  // map -> {picker, team_side}
+  for(const p of picks) pickedMap[p.map] = p;
+
+  // Instruction
+  const instrEl = document.getElementById("veto-instruction");
+  if(veto.done){
+    instrEl.textContent = "Veto concluído!";
+  } else if(veto.needs_side_choice && veto.pending_side_for==="player"){
+    instrEl.textContent = `Escolha seu lado em ${veto.pending_pick_map}`;
+    document.getElementById("veto-side-map").textContent = veto.pending_pick_map;
+    document.getElementById("veto-side-panel").style.display = "block";
+  } else {
+    document.getElementById("veto-side-panel").style.display = "none";
+    const actor  = veto.current_actor;
+    const action = veto.current_action;
+    if(actor==="player"){
+      instrEl.textContent = action==="ban"
+        ? "🚫 Sua vez — escolha um mapa para BANIR"
+        : "✅ Sua vez — escolha um mapa para JOGAR";
+    } else if(actor==="opponent"){
+      instrEl.textContent = `⏳ ${_vetoOppName} está escolhendo…`;
+    } else {
+      instrEl.textContent = "Aguardando…";
+    }
+  }
+
+  // Map grid
+  const grid = document.getElementById("veto-map-grid");
+  const isPlayerTurn = !veto.needs_side_choice &&
+    veto.current_actor==="player" && !veto.done;
+
+  grid.innerHTML = (G._mapPool||[]).map(m=>{
+    const isBanned  = bans.has(m);
+    const pick      = pickedMap[m];
+    const isPPlayer = pick && pick.picker==="player";
+    const isPOpp    = pick && pick.picker==="opponent";
+    const isDecider = pick && pick.picker==="decider";
+    const profCls   = full.includes(m) ? "vmc-prof-full"
+                    : half.includes(m) ? "vmc-prof-half" : "vmc-prof-none";
+    const profLbl   = full.includes(m) ? "Full" : half.includes(m) ? "Half" : "Nula";
+
+    let cardCls = "veto-map-card";
+    let statusTxt = "";
+    if(isBanned)      { cardCls += " vmc-banned";       statusTxt = "BANIDO"; }
+    else if(isPPlayer){ cardCls += " vmc-picked-player"; statusTxt = "SEU PICK"; }
+    else if(isPOpp)   { cardCls += " vmc-picked-opp";   statusTxt = "PICK DEL"; }
+    else if(isDecider){ cardCls += " vmc-decider";       statusTxt = "DECIDER"; }
+    else if(!isPlayerTurn){ cardCls += " vmc-disabled"; }
+
+    const sideInfo = pick
+      ? `<div style="font-size:.68rem;color:var(--text3);margin-top:3px">Time: ${pick.team_side?.toUpperCase()||"?"}</div>`
+      : "";
+
+    return `<div class="${cardCls}" onclick="vetoMapClick('${m}')">
+      ${statusTxt ? `<span class="vmc-status">${statusTxt}</span>` : ""}
+      <div class="vmc-name">${m}</div>
+      <span class="vmc-prof ${profCls}">${profLbl}</span>
+      ${sideInfo}
+    </div>`;
+  }).join("");
+
+  // Picks summary
+  const picksEl = document.getElementById("veto-picks");
+  picksEl.innerHTML = picks.map(p=>`
+    <div class="veto-pick-summary">
+      <div class="vps-map">${p.map}</div>
+      <div class="vps-meta">
+        ${p.picker==="player"?"Seu pick":p.picker==="opponent"?`Pick de ${_vetoOppName}`:"Decider"}
+        · Time: ${p.team_side?.toUpperCase()||"?"}
+      </div>
+    </div>`).join("");
+
+  // If done, show continue button
+  if(veto.done){
+    document.getElementById("veto-side-panel").style.display = "none";
+    if(!document.getElementById("btn-veto-continue")){
+      const btn = document.createElement("button");
+      btn.id = "btn-veto-continue";
+      btn.className = "btn btn-orange btn-lg";
+      btn.style.marginTop = "24px";
+      btn.textContent = "▶ Jogar Série";
+      btn.onclick = vetoFinishAndPlay;
+      document.querySelector("#screen-veto > div:last-child").appendChild(btn);
+    }
+  }
+}
+
+async function vetoMapClick(map){
+  if(!_vetoState || _vetoState.needs_side_choice || _vetoState.done) return;
+  if(_vetoState.current_actor !== "player") return;
+  const action = _vetoState.current_action;
+  const r = await api("/veto_action","POST",{ action, value: map });
+  if(!r.ok){ toast(r.error,"err"); return; }
+  appendVetoLog("player", action, map, r.veto);
+  for(const ev of r.events||[]){
+    appendVetoLog(ev.actor, ev.action, ev.map, r.veto);
+  }
+  renderVetoScreen(r.veto);
+}
+
+async function vetoChooseSide(side){
+  const r = await api("/veto_action","POST",{ action:"side", value: side });
+  if(!r.ok){ toast(r.error,"err"); return; }
+  const map = _vetoState.pending_pick_map;
+  appendVetoLog("player","side",`${map} → ${side.toUpperCase()}`, r.veto);
+  for(const ev of r.events||[]){
+    appendVetoLog(ev.actor, ev.action, ev.map, r.veto);
+  }
+  renderVetoScreen(r.veto);
+}
+
+async function vetoFinishAndPlay(){
+  // Clear veto screen and play the series
+  const btn = document.getElementById("btn-veto-continue");
+  if(btn) btn.disabled = true;
+  showScreen("game");
+  await playSeries();
+}
+
+
 
 // ═══════════════════════════════════════════
 // GAME UI
@@ -2680,7 +3032,14 @@ async function handleNext(){
   if(evR.ok&&evR.events.length){
     await showEvents(evR.events);
   }
-  await playSeries();
+  // Clear old veto log and start veto screen
+  document.getElementById("veto-log").innerHTML="";
+  document.getElementById("veto-picks").innerHTML="";
+  const existingBtn=document.getElementById("btn-veto-continue");
+  if(existingBtn) existingBtn.remove();
+  _vetoState=null;
+  await startVeto();
+  // playSeries() is called from vetoFinishAndPlay() after veto completes
   document.getElementById("btn-next").disabled=false;
 }
 

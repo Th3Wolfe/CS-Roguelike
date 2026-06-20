@@ -29,7 +29,9 @@ def get_session_state():
         _states[sid] = {
             "team": None,
             "campaign": None,
-            "pending_events": []
+            "pending_events": [],
+            "veto": None,          # active VetoState
+            "veto_maps": None,     # resolved veto result waiting for play_series
         }
 
     return _states[sid]
@@ -98,8 +100,13 @@ def new_game():
     player_picks   = data.get("player_picks")
     events_enabled = data.get("events_enabled", False)
     era_id         = data.get("era_id", "2023")
+    full_maps      = data.get("full_maps", [])   # 3 full-proficiency maps
+    half_maps      = data.get("half_maps", [])   # 2 half-proficiency maps
 
     team     = generate_team(team_name, player_picks)
+    team.full_maps = full_maps
+    team.half_maps = half_maps
+
     campaign = CampaignManager(team, events_enabled=events_enabled, era_id=era_id)
     set_game(team, campaign)
     code = generate_share_code(team)
@@ -107,6 +114,113 @@ def new_game():
                     "team_score": round(team.team_score(), 2),
                     "share_code": code,
                     "bracket": campaign.get_bracket_state()})
+
+
+@app.route("/api/map_pool", methods=["GET"])
+def map_pool():
+    """Return the CS2 active duty map pool."""
+    from models.map_config import CS2_MAP_POOL, MAP_CT_BIAS
+    return jsonify({"ok": True, "maps": CS2_MAP_POOL, "ct_bias": MAP_CT_BIAS})
+
+
+@app.route("/api/set_map_proficiency", methods=["POST"])
+def set_map_proficiency():
+    """Set team's full/half proficiency maps (called after draft, before first series)."""
+    team, campaign = get_game()
+    if not team:
+        return jsonify({"ok": False, "error": "Sem jogo"}), 404
+    data      = request.get_json(silent=True) or {}
+    full_maps = data.get("full_maps", [])
+    half_maps = data.get("half_maps", [])
+    from models.map_config import CS2_MAP_POOL
+    # Validate
+    if len(full_maps) != 3 or len(half_maps) != 2:
+        return jsonify({"ok": False, "error": "Escolha exatamente 3 mapas completos e 2 meios"}), 400
+    all_chosen = set(full_maps) | set(half_maps)
+    if len(all_chosen) != 5 or not all_chosen.issubset(set(CS2_MAP_POOL)):
+        return jsonify({"ok": False, "error": "Mapas inválidos"}), 400
+    team.full_maps = full_maps
+    team.half_maps = half_maps
+    return jsonify({"ok": True, "full_maps": full_maps, "half_maps": half_maps})
+
+
+@app.route("/api/start_veto", methods=["POST"])
+def start_veto():
+    """Start a map veto for the next series."""
+    team, campaign = get_game()
+    if not team:
+        return jsonify({"ok": False, "error": "Sem jogo"}), 404
+
+    from systems.veto_engine import VetoState
+    # Get the pre-paired opponent from the bracket/pending pairings
+    opponent = campaign._get_paired_opponent(campaign.state.stage.value) \
+               if campaign.state.stage.value in ("stage1","stage2") \
+               else campaign._get_playoff_opponent(campaign.state.stage.value)
+
+    state = get_session_state()
+    veto = VetoState(
+        player_full_maps=team.full_maps,
+        player_half_maps=team.half_maps,
+        opponent_name=opponent.name,
+        opponent_strength=opponent.strength,
+    )
+    # Auto-advance if opponent goes first
+    init_result = veto._maybe_advance_opponent() if not veto.player_goes_first else {"events": [], "state": veto.to_dict()}
+
+    state["veto"]      = veto
+    state["veto_maps"] = None
+    return jsonify({
+        "ok":             True,
+        "veto":           veto.to_dict(),
+        "opponent_name":  opponent.name,
+        "auto_events":    init_result.get("events", []),
+        "coin_flip_won":  veto.player_goes_first,
+    })
+
+
+@app.route("/api/veto_action", methods=["POST"])
+def veto_action():
+    """Process a player veto action: ban, pick, or side choice."""
+    team, campaign = get_game()
+    state = get_session_state()
+    veto = state.get("veto")
+    if not veto:
+        return jsonify({"ok": False, "error": "Nenhum veto ativo"}), 400
+
+    data   = request.get_json(silent=True) or {}
+    action = data.get("action")  # "ban" | "pick" | "side"
+    value  = data.get("value")   # map name or "ct"/"t"
+
+    try:
+        if action == "ban":
+            result = veto.player_ban(value)
+        elif action == "pick":
+            result = veto.player_pick(value)
+        elif action == "side":
+            result = veto.player_choose_side(value)
+        else:
+            return jsonify({"ok": False, "error": f"Ação desconhecida: {action}"}), 400
+    except (AssertionError, ValueError) as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+
+    # If pending_side_for == "opponent", auto-resolve it
+    if veto.needs_side_choice() and veto.pending_side_for == "opponent":
+        opp_result = veto.opponent_choose_side()
+        result.setdefault("events", []).extend(opp_result.get("events", []))
+
+    # If veto is done, store the maps for play_series
+    if veto.done:
+        state["veto_maps"] = veto.build_veto_maps()
+
+    return jsonify({
+        "ok":    True,
+        "veto":  veto.to_dict(),
+        "events": result.get("events", []),
+        "done":  veto.done,
+        "veto_maps": state.get("veto_maps"),
+    })
+
+
 
 
 @app.route("/api/state", methods=["GET"])
@@ -159,7 +273,12 @@ def play_series():
     if not team:     return jsonify({"ok": False, "error": "Sem jogo"}), 404
     if campaign.state.is_finished():
         return jsonify({"ok": False, "error": "Campanha finalizada"}), 400
-    result = campaign.play_series()
+
+    state     = get_session_state()
+    veto_maps = state.pop("veto_maps", None)   # consume the veto result
+    state["veto"] = None                        # clear active veto
+
+    result = campaign.play_series(veto_maps=veto_maps)
     return jsonify({
         "ok": True,
         "result": {

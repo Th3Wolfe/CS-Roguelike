@@ -1,15 +1,16 @@
 from __future__ import annotations
-"""Match resolution — CS2 MR12 format (first to 13, OT at MR3 blocks)."""
+"""Match resolution — CS2 MR12 format with real side bias and map proficiency."""
 import random
 import math
 from dataclasses import dataclass, field
 from models.team import Team
 from models.opponent import Opponent
+from models.map_config import (
+    CS2_MAP_POOL, MAP_CT_BIAS, PROF_MODIFIER, PROF_NONE,
+    get_proficiency,
+)
 
-CS_MAPS = [
-    "Mirage", "Inferno", "Dust2", "Overpass", "Nuke",
-    "Ancient", "Anubis", "Vertigo", "Train",
-]
+CS_MAPS = CS2_MAP_POOL  # backward-compat alias
 
 ROUNDS_TO_WIN      = 13
 OT_ROUNDS_WIN      = 4
@@ -54,11 +55,30 @@ class PlayerMatchStats:
 
 @dataclass
 class MapResult:
-    map_name:       str
-    team_score:     int
-    opponent_score: int
-    winner:         str   # "team" | "opponent"
-    went_ot:        bool  = False
+    map_name:        str
+    team_score:      int
+    opponent_score:  int
+    winner:          str    # "team" | "opponent"
+    went_ot:         bool   = False
+    team_start_side: str    = "ct"  # team's side in first half
+    team_half1:      int    = 0
+    opp_half1:       int    = 0
+    team_half2:      int    = 0
+    opp_half2:       int    = 0
+
+    def to_dict(self) -> dict:
+        return {
+            "map_name":        self.map_name,
+            "team_score":      self.team_score,
+            "opponent_score":  self.opponent_score,
+            "winner":          self.winner,
+            "went_ot":         self.went_ot,
+            "team_start_side": self.team_start_side,
+            "team_half1":      self.team_half1,
+            "opp_half1":       self.opp_half1,
+            "team_half2":      self.team_half2,
+            "opp_half2":       self.opp_half2,
+        }
 
 
 @dataclass
@@ -102,31 +122,95 @@ def score_to_win_probability(team_score: float, opp_score: float) -> float:
     return max(0.04, min(0.96, raw))
 
 
-def _simulate_map(ts: float, os_: float) -> MapResult:
-    """Simulate a single CS2 map using MR12 rules."""
-    noise = random.gauss(0, 0.7)
-    p = max(0.12, min(0.88, 1.0 / (1.0 + math.exp(-(ts - os_ + noise) * 0.55))))
+def _simulate_map(ts: float, os_: float,
+                  map_name: str = "",
+                  team_proficiency: str = "half",
+                  team_start_side: str = "ct") -> MapResult:
+    """
+    Simulate a CS2 map with MR12 rules, real CT/T side bias and map proficiency.
 
-    t_r = o_r = 0
+    Half 1: team plays `team_start_side`, opponent plays the other side.
+    Half 2: sides swap.
+    CT bias from MAP_CT_BIAS adjusts per-round win probability each half.
+    Proficiency modifier adjusts team's overall strength on this map.
+    """
+    from models.map_config import MAP_CT_BIAS, PROF_MODIFIER
+    ct_bias = MAP_CT_BIAS.get(map_name, 0.50)
 
-    # Regulation — stop immediately at 12-12
-    while t_r < ROUNDS_TO_WIN and o_r < ROUNDS_TO_WIN:
-        if random.random() < p:
+    # Base win probability from team strength difference
+    noise = random.gauss(0, 0.6)
+    base_p = max(0.10, min(0.90, 1.0 / (1.0 + math.exp(-(ts - os_ + noise) * 0.55))))
+
+    # Proficiency modifier shifts win probability
+    prof_mod = PROF_MODIFIER.get(team_proficiency, 0.0)
+    base_p = max(0.08, min(0.92, base_p + prof_mod))
+
+    def side_p(team_side: str) -> float:
+        """Win prob for team on this side, factoring map CT/T bias."""
+        if team_side == "ct":
+            # Team is CT: ct_bias > 0.5 favours them, < 0.5 hurts them
+            side_adj = (ct_bias - 0.5) * 1.4
+        else:
+            # Team is T: T-sided map (low ct_bias) favours them
+            side_adj = (0.5 - ct_bias) * 1.4
+        return max(0.08, min(0.92, base_p + side_adj))
+
+    def play_half(team_side: str, max_rounds: int = 12) -> tuple[int, int]:
+        """Play up to max_rounds for this half. Returns (team_rounds, opp_rounds)."""
+        p = side_p(team_side)
+        t = o = 0
+        while t + o < max_rounds:
+            if random.random() < p:
+                t += 1
+            else:
+                o += 1
+        return t, o
+
+    # Half 1: play all 12 rounds
+    opp_start = "t" if team_start_side == "ct" else "ct"
+    h1_t, h1_o = play_half(team_start_side)
+
+    t_r = h1_t
+    o_r = h1_o
+
+    # Half 2: sides swap. Play round-by-round, stopping as soon as either
+    # team reaches ROUNDS_TO_WIN (13) in total.
+    p_h2 = side_p(opp_start)
+    h2_t = h2_o = 0
+    while h2_t + h2_o < 12:
+        if t_r >= ROUNDS_TO_WIN or o_r >= ROUNDS_TO_WIN:
+            break
+        if random.random() < p_h2:
             t_r += 1
+            h2_t += 1
         else:
             o_r += 1
-        if t_r == 12 and o_r == 12:
-            break
+            h2_o += 1
 
     went_ot = False
-
-    # Overtime — repeat MR3 blocks until total scores differ
     if t_r == 12 and o_r == 12:
         went_ot = True
+        # OT: MR3 blocks — each block has 3 rounds CT + 3 rounds T.
+        # Stop as soon as either team reaches OT_ROUNDS_WIN (4) in the block.
+        # If tied after 6 rounds (3-3), play another block with sides swapped.
+        ot_side = team_start_side
         while True:
             ot_t = ot_o = 0
-            while ot_t < OT_ROUNDS_WIN and ot_o < OT_ROUNDS_WIN:
-                if random.random() < p:
+            # First half of OT block (3 rounds, team on ot_side)
+            p1 = side_p(ot_side)
+            for _ in range(OT_ROUNDS_PER_SIDE):
+                if ot_t >= OT_ROUNDS_WIN or ot_o >= OT_ROUNDS_WIN:
+                    break
+                if random.random() < p1:
+                    ot_t += 1
+                else:
+                    ot_o += 1
+            # Second half of OT block (3 rounds, sides swap)
+            p2 = side_p("t" if ot_side == "ct" else "ct")
+            for _ in range(OT_ROUNDS_PER_SIDE):
+                if ot_t >= OT_ROUNDS_WIN or ot_o >= OT_ROUNDS_WIN:
+                    break
+                if random.random() < p2:
                     ot_t += 1
                 else:
                     ot_o += 1
@@ -134,10 +218,16 @@ def _simulate_map(ts: float, os_: float) -> MapResult:
             o_r += ot_o
             if t_r != o_r:
                 break
+            # 3-3 tie → next OT block with sides swapped
+            ot_side = "t" if ot_side == "ct" else "ct"
 
     winner = "team" if t_r > o_r else "opponent"
-    return MapResult(map_name="", team_score=t_r, opponent_score=o_r,
-                     winner=winner, went_ot=went_ot)
+    return MapResult(
+        map_name=map_name, team_score=t_r, opponent_score=o_r,
+        winner=winner, went_ot=went_ot, team_start_side=team_start_side,
+        team_half1=h1_t, opp_half1=h1_o,
+        team_half2=h2_t, opp_half2=h2_o,
+    )
 
 
 def _simulate_player_stats(
@@ -339,20 +429,41 @@ def _simulate_opponent_stats_real(opp_players: List[dict], maps: List[MapResult]
     return result
 
 
-def resolve_series(team: Team, opponent: Opponent) -> SeriesDetail:
-    """Resolve a BO3 series with CS2 MR12 rules, including player kill stats."""
+def resolve_series(team: Team, opponent: Opponent,
+                   veto_maps: list | None = None) -> SeriesDetail:
+    """
+    Resolve a BO3 series with CS2 MR12 rules.
+
+    veto_maps: list of dicts from the map veto phase, each containing:
+        {"map": str, "proficiency": str, "team_side": str}
+    If None (legacy / NPC-only matches), picks 3 random maps with half proficiency.
+    """
     ts  = round(team.team_score(), 2)
     os_ = round(opponent.total_score(), 2)
     prob = score_to_win_probability(ts, os_)
-
-    maps_pool = random.sample(CS_MAPS, 3)
     detail = SeriesDetail(team_strength=ts, opponent_strength=os_, win_probability=prob)
 
-    for map_name in maps_pool:
+    # Build the map list to play
+    if veto_maps:
+        maps_to_play = veto_maps
+    else:
+        # Fallback: random 3 maps, neutral proficiency, random sides
+        sample = random.sample(CS_MAPS, 3)
+        maps_to_play = [
+            {"map": m, "proficiency": "half",
+             "team_side": random.choice(["ct", "t"])}
+            for m in sample
+        ]
+
+    for entry in maps_to_play:
         if detail.team_maps_won == 2 or detail.opponent_maps_won == 2:
             break
-        result = _simulate_map(ts, os_)
-        result.map_name = map_name
+        result = _simulate_map(
+            ts, os_,
+            map_name=entry["map"],
+            team_proficiency=entry.get("proficiency", "half"),
+            team_start_side=entry.get("team_side", "ct"),
+        )
         detail.maps.append(result)
         if result.winner == "team":
             detail.team_maps_won += 1
