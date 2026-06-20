@@ -298,73 +298,77 @@ def _enforce_swiss_capacity(npc_teams: list, stage: str, player_advanced: bool) 
 
 def _build_playoffs(qualifiers: list) -> dict:
     """
-    Build and simulate a full 8-team single-elim bracket.
+    Build a full 8-team single-elim bracket.
     qualifiers: list of {name, strength, is_player} sorted seed 1..8.
-    Player's matches are left with winner=None for real-game resolution.
-    Returns bracket dict: {qf:[...], sf:[...], final:{...}, champion: name|None}
+
+    Only QF matches are fully set here. SF and Final are left empty —
+    they get filled in by _cascade_bracket as QF results come in.
+    Player matches get winner=None so the real game can resolve them.
     """
     # Seed matchups: 1v8, 2v7, 3v6, 4v5
     seeds = [(0,7),(1,6),(2,5),(3,4)]
     bracket = {"qf": [], "sf": [], "final": None, "champion": None}
 
-    def make_match(a, b):
-        """Simulate or mark as player match."""
-        if a["is_player"] or b["is_player"]:
-            return {"a": a["name"], "b": b["name"],
-                    "winner": None, "loser": None, "is_player_match": True,
-                    "a_str": a["strength"], "b_str": b["strength"]}
-        won = _sim_bo3(a["strength"], b["strength"])
-        w, l = (a, b) if won else (b, a)
-        return {"a": a["name"], "b": b["name"],
-                "winner": w["name"], "loser": l["name"], "is_player_match": False,
-                "a_str": a["strength"], "b_str": b["strength"]}
-
-    # QF
-    qf_winners = []
+    qf_winners = []  # provisional QF winners (for building SF skeleton)
     for (ai, bi) in seeds:
-        m = make_match(qualifiers[ai], qualifiers[bi])
-        bracket["qf"].append(m)
-        if m["is_player_match"]:
-            # Player's winner TBD — put player as provisional SF entrant
-            player_q = next(q for q in [qualifiers[ai], qualifiers[bi]] if q["is_player"])
-            qf_winners.append({"name": player_q["name"], "strength": player_q["strength"],
-                                "is_player": True})
+        a, b = qualifiers[ai], qualifiers[bi]
+        if a["is_player"] or b["is_player"]:
+            bracket["qf"].append({
+                "a": a["name"], "b": b["name"],
+                "winner": None, "loser": None, "is_player_match": True,
+                "a_str": a["strength"], "b_str": b["strength"]
+            })
+            # QF winner unknown until player plays — cascade will fill this in
+            qf_winners.append(None)
         else:
-            w = next(q for q in [qualifiers[ai], qualifiers[bi]] if q["name"] == m["winner"])
-            qf_winners.append({**w, "is_player": False})
+            won = _sim_bo3(a["strength"], b["strength"])
+            w, l = (a, b) if won else (b, a)
+            bracket["qf"].append({
+                "a": a["name"], "b": b["name"],
+                "winner": w["name"], "loser": l["name"], "is_player_match": False,
+                "a_str": a["strength"], "b_str": b["strength"]
+            })
+            qf_winners.append({"name": w["name"], "strength": w["strength"], "is_player": False})
 
-    # SF: QF1w vs QF2w, QF3w vs QF4w
-    sf_winners = []
+    # Build SF skeleton: pair QF1w vs QF2w, QF3w vs QF4w
+    # Only simulate a SF match if BOTH QF winners are already known NPC teams
     for i in range(0, 4, 2):
-        m = make_match(qf_winners[i], qf_winners[i+1])
-        bracket["sf"].append(m)
-        if m["is_player_match"]:
-            player_q = next(q for q in [qf_winners[i], qf_winners[i+1]] if q["is_player"])
-            sf_winners.append({"name": player_q["name"], "strength": player_q["strength"],
-                                "is_player": True})
+        wa, wb = qf_winners[i], qf_winners[i+1]
+        if wa is not None and wb is not None:
+            # Both QFs resolved (both NPC matches) — simulate immediately
+            won = _sim_bo3(wa["strength"], wb["strength"])
+            w, l = (wa, wb) if won else (wb, wa)
+            bracket["sf"].append({
+                "a": wa["name"], "b": wb["name"],
+                "winner": w["name"], "loser": l["name"], "is_player_match": False,
+                "a_str": wa["strength"], "b_str": wb["strength"]
+            })
         else:
-            w = next(q for q in [qf_winners[i], qf_winners[i+1]] if q["name"] == m["winner"])
-            sf_winners.append({**w, "is_player": False})
+            # At least one QF involves the player — this SF is a player match (TBD)
+            bracket["sf"].append({
+                "a": wa["name"] if wa else "?", "b": wb["name"] if wb else "?",
+                "winner": None, "loser": None, "is_player_match": True,
+                "a_str": wa["strength"] if wa else 5.0,
+                "b_str": wb["strength"] if wb else 5.0
+            })
 
-    # Final
-    m = make_match(sf_winners[0], sf_winners[1])
-    bracket["final"] = m
-    if not m["is_player_match"]:
-        bracket["champion"] = m["winner"]
-
+    # Cascade to build Final if both SFs are already resolved
+    _cascade_bracket(bracket, "")
     return bracket
 
 
 def _resolve_player_slot(bracket: dict, stage_key: str,
                          player_name: str, player_won: bool, opp_name: str) -> None:
-    """Fill in the player's result in the bracket and cascade NPC-simulated matches."""
+    """Fill in the player's result in the bracket and cascade downstream."""
     key_map = {"playoffs_qf": "qf", "playoffs_sf": "sf", "playoffs_final": "final"}
     key = key_map.get(stage_key)
     if not key:
         return
 
     target = bracket.get(key)
-    matches = [target] if isinstance(target, dict) else (target or [])
+    if target is None:
+        return
+    matches = [target] if isinstance(target, dict) else target
 
     player_match = next((m for m in matches if m.get("is_player_match")), None)
     if not player_match:
@@ -376,76 +380,132 @@ def _resolve_player_slot(bracket: dict, stage_key: str,
     player_match["loser"]  = loser
     player_match["is_player_match"] = False
 
-    if key == "finals":
+    if key == "final":
         if player_won:
             bracket["champion"] = player_name
         return
 
-    # Cascade: re-derive SF from QF results, Final from SF results
     _cascade_bracket(bracket, player_name)
 
 
-def _cascade_bracket(bracket: dict, player_name: str) -> None:
-    """After any QF or SF result fills in, recalculate downstream matches."""
+def _cascade_bracket(bracket: dict, player_name: str = "") -> None:
+    """
+    After any QF result changes, recompute what we can in SF and Final.
+    Key rule: NEVER auto-simulate a match that the player will play
+    (is_player_match=True). Only fill NPC-vs-NPC matches where both
+    participants are confirmed NPC winners.
+    """
     qf = bracket.get("qf", [])
-    sf = bracket.get("sf", [])
 
-    # Build actual QF winners (skip unresolved)
+    # Determine each QF winner (None if unresolved / player match pending)
     qf_winners = []
     for m in qf:
-        if m["winner"]:
-            is_p = m["winner"] == player_name
+        if m.get("winner"):
             qf_winners.append({"name": m["winner"],
                                 "strength": m["a_str"] if m["a"] == m["winner"] else m["b_str"],
-                                "is_player": is_p})
+                                "is_player": False})
         else:
-            return  # QF not fully resolved yet, can't cascade
+            qf_winners.append(None)  # unresolved (player match or not yet played)
 
-    # Re-simulate SF with actual QF results
-    new_sf = []
-    sf_winners = []
-    for i, (ai, bi) in enumerate([(0,1),(2,3)]):
-        a, b = qf_winners[ai], qf_winners[bi]
-        existing = sf[i] if i < len(sf) else None
-        # If existing SF match already has a real result, keep it
-        if existing and existing.get("winner") and not existing.get("is_player_match"):
-            new_sf.append(existing)
-            w = a if a["name"] == existing["winner"] else b
-            sf_winners.append(w)
-        elif a["is_player"] or b["is_player"]:
-            m = {"a": a["name"], "b": b["name"], "winner": None, "loser": None,
-                 "is_player_match": True, "a_str": a["strength"], "b_str": b["strength"]}
-            new_sf.append(m)
-            player_q = a if a["is_player"] else b
-            sf_winners.append({"name": player_q["name"], "strength": player_q["strength"],
-                                "is_player": True})
+    # Rebuild SF
+    new_sf = list(bracket.get("sf", []))
+    while len(new_sf) < 2:
+        new_sf.append({"a": "?", "b": "?", "winner": None, "loser": None,
+                        "is_player_match": False, "a_str": 5.0, "b_str": 5.0})
+
+    sf_winners = [None, None]
+
+    for sf_idx, (qi_a, qi_b) in enumerate([(0, 1), (2, 3)]):
+        wa = qf_winners[qi_a]
+        wb = qf_winners[qi_b]
+        existing = new_sf[sf_idx]
+
+        # If SF already has a resolved, non-player result → keep it
+        if existing.get("winner") and not existing.get("is_player_match"):
+            sf_winners[sf_idx] = {
+                "name": existing["winner"],
+                "strength": existing["a_str"] if existing["a"] == existing["winner"] else existing["b_str"]
+            }
+            continue
+
+        # If this SF is the player's match → keep is_player_match, update names if known
+        if existing.get("is_player_match"):
+            update = {}
+            if wa: update["a"] = wa["name"]; update["a_str"] = wa["strength"]
+            if wb: update["b"] = wb["name"]; update["b_str"] = wb["strength"]
+            new_sf[sf_idx] = {**existing, **update}
+            sf_winners[sf_idx] = None  # unknown until player plays
+            continue
+
+        # Both QFs resolved AND neither involves the player → simulate SF now
+        if wa is not None and wb is not None:
+            won = _sim_bo3(wa["strength"], wb["strength"])
+            w, l = (wa, wb) if won else (wb, wa)
+            new_sf[sf_idx] = {
+                "a": wa["name"], "b": wb["name"],
+                "winner": w["name"], "loser": l["name"], "is_player_match": False,
+                "a_str": wa["strength"], "b_str": wb["strength"]
+            }
+            sf_winners[sf_idx] = {"name": w["name"], "strength": w["strength"]}
         else:
-            won = _sim_bo3(a["strength"], b["strength"])
-            w, l = (a, b) if won else (b, a)
-            m = {"a": a["name"], "b": b["name"], "winner": w["name"], "loser": l["name"],
-                 "is_player_match": False, "a_str": a["strength"], "b_str": b["strength"]}
-            new_sf.append(m)
-            sf_winners.append({**w})
+            # One or both QFs not yet resolved — SF stays unknown
+            new_sf[sf_idx] = {
+                **existing,
+                "a": wa["name"] if wa else existing.get("a", "?"),
+                "b": wb["name"] if wb else existing.get("b", "?"),
+            }
+            sf_winners[sf_idx] = None
+
     bracket["sf"] = new_sf
 
-    if len(sf_winners) < 2:
+    # ── Rebuild Final ──────────────────────────────────────────────────────
+    fw0, fw1 = sf_winners[0], sf_winners[1]
+    existing_f = bracket.get("final") or {}
+
+    # If Final already has a resolved non-player result → keep it
+    if existing_f.get("winner") and not existing_f.get("is_player_match"):
         return
 
-    # Re-simulate Final
-    a, b = sf_winners[0], sf_winners[1]
-    existing_f = bracket.get("final")
-    if existing_f and existing_f.get("winner") and not existing_f.get("is_player_match"):
-        return  # Final already has a real result
-    if a["is_player"] or b["is_player"]:
-        bracket["final"] = {"a": a["name"], "b": b["name"], "winner": None, "loser": None,
-                             "is_player_match": True, "a_str": a["strength"], "b_str": b["strength"]}
-    else:
-        won = _sim_bo3(a["strength"], b["strength"])
-        w, l = (a, b) if won else (b, a)
-        bracket["final"] = {"a": a["name"], "b": b["name"], "winner": w["name"],
-                             "loser": l["name"], "is_player_match": False,
-                             "a_str": a["strength"], "b_str": b["strength"]}
-        bracket["champion"] = w["name"]
+    # Either SF still pending
+    if fw0 is None or fw1 is None:
+        sf_data = bracket.get("sf", [{}, {}])
+        pending_is_player = any(
+            m.get("is_player_match") and not m.get("winner")
+            for m in sf_data
+        )
+        bracket["final"] = {
+            **existing_f,
+            "a": fw0["name"] if fw0 else existing_f.get("a", "?"),
+            "b": fw1["name"] if fw1 else existing_f.get("b", "?"),
+            "a_str": fw0["strength"] if fw0 else existing_f.get("a_str", 5.0),
+            "b_str": fw1["strength"] if fw1 else existing_f.get("b_str", 5.0),
+            "is_player_match": pending_is_player or existing_f.get("is_player_match", False),
+        }
+        return
+
+    # Both SF winners known — check if the player is one of them
+    player_in_final = bool(player_name) and (fw0["name"] == player_name or fw1["name"] == player_name)
+
+    if existing_f.get("is_player_match") or player_in_final:
+        bracket["final"] = {
+            **existing_f,
+            "a": fw0["name"], "b": fw1["name"],
+            "a_str": fw0["strength"], "b_str": fw1["strength"],
+            "winner": existing_f.get("winner"),
+            "loser":  existing_f.get("loser"),
+            "is_player_match": not bool(existing_f.get("winner")),
+        }
+        return
+
+    # Pure NPC Final — simulate
+    won = _sim_bo3(fw0["strength"], fw1["strength"])
+    w, l = (fw0, fw1) if won else (fw1, fw0)
+    bracket["final"] = {
+        "a": fw0["name"], "b": fw1["name"],
+        "winner": w["name"], "loser": l["name"], "is_player_match": False,
+        "a_str": fw0["strength"], "b_str": fw1["strength"]
+    }
+    bracket["champion"] = w["name"]
 
 
 # ── CampaignManager ───────────────────────────────────────────────────────────
@@ -517,12 +577,7 @@ class CampaignManager:
             self.npc_teams, stage, self.team.name, pw, pl)
 
     def _get_paired_opponent(self, stage: str) -> "Opponent":
-        """
-        Resolve the player's already-revealed pairing for this round into a
-        real Opponent (with real team data when available), instead of
-        picking a random unrelated team. Falls back to a random Swiss
-        opponent only if no pairing was found (shouldn't normally happen).
-        """
+        """Swiss stages: use the pre-revealed pending pairing."""
         pairing = next(
             (p for p in self.pending_pairings
              if p["a"] == self.team.name or p["b"] == self.team.name),
@@ -536,16 +591,42 @@ class CampaignManager:
             npc = next((t for t in self.npc_teams if t.name == opp_name), None)
             if npc:
                 data = self._npc_team_data.get(opp_name, {})
-                synergy = round(random.uniform(0.5, 3.0), 2)
                 return Opponent(
                     name=npc.name,
                     strength=npc.strength,
-                    synergy=synergy,
+                    synergy=round(random.uniform(0.5, 3.0), 2),
                     players=data.get("players", []),
                 )
 
-        # Fallback: shouldn't normally trigger (pairing always exists once
-        # the bracket is initialised), but guards against edge cases.
+        return generate_opponent(
+            stage, self.state.total_series,
+            era_id=self.era_id, used_team_names=self._used_team_names)
+
+    def _get_playoff_opponent(self, stage: str) -> "Opponent":
+        """Playoffs: read opponent from the bracket's is_player_match slot."""
+        key_map = {"playoffs_qf": "qf", "playoffs_sf": "sf", "playoffs_final": "final"}
+        key = key_map.get(stage)
+        pb = self.playoff_bracket
+        opp_name = None
+        if key:
+            target = pb.get(key)
+            matches = [target] if isinstance(target, dict) else (target or [])
+            pm = next((m for m in matches if m.get("is_player_match")), None)
+            if pm:
+                opp_name = pm["b"] if pm["a"] == self.team.name else pm["a"]
+
+        if opp_name and opp_name not in ("?", ""):
+            npc = next((t for t in self.npc_teams if t.name == opp_name), None)
+            if npc:
+                data = self._npc_team_data.get(opp_name, {})
+                return Opponent(
+                    name=npc.name, strength=npc.strength,
+                    synergy=round(random.uniform(0.5, 3.0), 2),
+                    players=data.get("players", []),
+                )
+            return Opponent(name=opp_name, strength=6.0,
+                            synergy=round(random.uniform(0.5, 2.0), 2), players=[])
+
         return generate_opponent(
             stage, self.state.total_series,
             era_id=self.era_id, used_team_names=self._used_team_names)
@@ -573,9 +654,8 @@ class CampaignManager:
         if current_stage_pre in ("stage1", "stage2"):
             opponent = self._get_paired_opponent(current_stage_pre)
         else:
-            opponent = generate_opponent(
-                self.state.stage.value, self.state.total_series,
-                era_id=self.era_id, used_team_names=self._used_team_names)
+            # Playoffs: pick opponent from the bracket's player_match slot
+            opponent = self._get_playoff_opponent(current_stage_pre)
 
         if opponent.name not in self._used_team_names:
             self._used_team_names.append(opponent.name)
