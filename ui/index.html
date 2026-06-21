@@ -2291,16 +2291,33 @@ let _vetoOppName = "";
 async function startVeto(){
   const r = await api("/start_veto","POST");
   if(!r.ok){ toast("Erro ao iniciar veto: "+r.error,"err"); return; }
-  _vetoState  = r.veto;
+  _vetoState   = r.veto;
   _vetoOppName = r.opponent_name;
   showScreen("veto");
   document.getElementById("veto-vs-label").textContent =
     `${G.team?.name||"Você"} vs ${_vetoOppName}`;
-  document.getElementById("veto-coin").innerHTML =
-    r.coin_flip_won
-    ? `🪙 <b>Você ganhou o cara-ou-coroa</b> — você vai primeiro no veto.`
-    : `🪙 <b>${_vetoOppName} ganhou o cara-ou-coroa</b> — eles vão primeiro.`;
-  // Process any auto-events that already happened (opp going first)
+
+  // Coin flip + opponent scouting info
+  const prof    = r.opp_profile || {};
+  const sideLbl = prof.side_pref === "ct" ? "prefere começar CT"
+                : prof.side_pref === "t"  ? "prefere começar T"
+                : "não tem preferência de lado";
+  const preferred = (prof.preferred||[]).join(", ") || "?";
+  const disliked  = (prof.disliked||[]).join(", ")  || "?";
+
+  document.getElementById("veto-coin").innerHTML = `
+    <div style="margin-bottom:8px;">
+      ${r.coin_flip_won
+        ? `🪙 <b>Você ganhou o cara-ou-coroa</b> — você vai primeiro no veto.`
+        : `🪙 <b>${_vetoOppName} ganhou o cara-ou-coroa</b> — eles vão primeiro.`}
+    </div>
+    <div style="font-size:.8rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+      <b style="color:var(--text2)">🔍 Scout de ${_vetoOppName}:</b>
+      mapas favoritos <span style="color:var(--green)">${preferred}</span> ·
+      evita <span style="color:var(--red)">${disliked}</span> ·
+      ${sideLbl}
+    </div>`;
+
   if(r.auto_events?.length){
     renderVetoAutoEvents(r.auto_events, r.veto);
   }

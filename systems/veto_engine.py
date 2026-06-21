@@ -9,19 +9,13 @@ Bo3 sequence (7 maps):
   Step 5: Team B bans
   Step 6: Decider (1 remaining) → coin flip for side
 
-Who goes first (Team A) is determined by a coin flip stored in the state.
-Player = Team A or B depending on coin flip result.
+Who goes first is determined by a coin flip stored in the state.
 """
 from __future__ import annotations
 import random
-from models.map_config import (
-    CS2_MAP_POOL, MAP_CT_BIAS,
-    get_proficiency, PROF_FULL, PROF_HALF, PROF_NONE,
-)
+from models.map_config import CS2_MAP_POOL, MAP_CT_BIAS, get_proficiency
 
-# Veto step definitions: (actor, action)
-# actor: "player" or "opponent"
-# action: "ban" or "pick"
+
 def _build_sequence(player_goes_first: bool) -> list[tuple[str, str]]:
     if player_goes_first:
         return [
@@ -45,49 +39,181 @@ def _build_sequence(player_goes_first: bool) -> list[tuple[str, str]]:
         ]
 
 
+def generate_opponent_map_profile(opp_name: str, opp_strength: float) -> dict:
+    """
+    Generate a realistic, varied map preference profile for an opponent.
+
+    Each opponent gets:
+    - `preferred`: 2-3 maps they love (will pick/protect)
+    - `disliked`:  2-3 maps they hate (will ban early)
+    - `side_pref`: "ct", "t", or "any" — which side they prefer to start
+
+    The profile is seeded from the opponent's name so it's consistent
+    across the same campaign (same opponent always has the same style),
+    but different from every other opponent.
+    """
+    rng = random.Random(hash(opp_name) & 0xFFFFFFFF)
+    pool = list(CS2_MAP_POOL)
+    rng.shuffle(pool)
+
+    # 2-3 preferred maps
+    n_pref = rng.randint(2, 3)
+    preferred = pool[:n_pref]
+
+    # 2-3 disliked maps (non-overlapping with preferred)
+    remaining = pool[n_pref:]
+    rng.shuffle(remaining)
+    n_dis = rng.randint(2, 3)
+    disliked = remaining[:n_dis]
+
+    # Side preference: stronger teams lean CT (higher skill → exploit CT positions)
+    if opp_strength >= 6.5:
+        side_pref = rng.choice(["ct", "ct", "any"])
+    elif opp_strength <= 4.5:
+        side_pref = rng.choice(["t", "t", "any"])
+    else:
+        side_pref = rng.choice(["ct", "t", "any"])
+
+    return {
+        "preferred": preferred,
+        "disliked":  disliked,
+        "side_pref": side_pref,
+    }
+
+
 class VetoState:
-    def __init__(self, player_full_maps: list[str], player_half_maps: list[str],
-                 opponent_name: str, opponent_strength: float):
+    def __init__(self,
+                 player_full_maps: list[str],
+                 player_half_maps: list[str],
+                 opponent_name: str,
+                 opponent_strength: float,
+                 opponent_profile: dict | None = None):
         self.player_full_maps  = player_full_maps
         self.player_half_maps  = player_half_maps
         self.opponent_name     = opponent_name
         self.opponent_strength = opponent_strength
 
-        # Coin flip — True means player goes first
+        # Opponent's own map profile (persistent, based on team identity)
+        self.opp_profile = opponent_profile or generate_opponent_map_profile(
+            opponent_name, opponent_strength)
+
+        # Coin flip
         self.player_goes_first = random.choice([True, False])
         self.sequence = _build_sequence(self.player_goes_first)
 
         self.remaining_maps: list[str] = list(CS2_MAP_POOL)
-        self.bans:  list[str] = []   # maps that were banned
-        self.picks: list[dict] = []  # [{map, picker, team_side, opp_side}]
-        self.step:  int = 0          # current step index (0..6)
+        self.bans:  list[str] = []
+        self.picks: list[dict] = []
+        self.step:  int = 0
         self.done:  bool = False
 
-        # After pick, the opponent of the picker chooses side → pending side pick
-        # This is tracked separately: "player_side" or "opponent_side" or None
-        self.pending_side_for: str | None = None   # who must choose side next
-        self.pending_pick_map: str | None = None   # the map just picked
+        self.pending_side_for: str | None = None
+        self.pending_pick_map: str | None = None
 
-        # Opponent's "preferred" maps (simple heuristic: strength-adjusted bias)
-        self._opp_preferred = self._rank_maps_for_opponent()
+    # ── Opponent AI ──────────────────────────────────────────────────────────
 
-    def _rank_maps_for_opponent(self) -> list[str]:
-        """Rank maps by how well-suited they are for the opponent."""
-        # Opponent prefers maps where CT bias is extreme (they can adapt either side)
-        # and avoids maps the player is full-proficient on
-        scored = []
-        for m in CS2_MAP_POOL:
-            bias = MAP_CT_BIAS.get(m, 0.5)
-            extremeness = abs(bias - 0.5)
-            player_prof_penalty = 0.3 if m in self.player_full_maps else 0.0
-            scored.append((m, extremeness - player_prof_penalty + random.uniform(0, 0.1)))
-        scored.sort(key=lambda x: -x[1])
-        return [m for m, _ in scored]
+    def _opponent_ban(self) -> str:
+        """
+        Opponent ban logic — balanced between:
+        1. Removing player's best maps (anti-player)
+        2. Protecting their own preferred maps (self-interest)
+        3. Removing their own disliked maps (comfort)
+
+        Each consideration has a weighted chance, with some randomness
+        so the same opponent doesn't always act identically.
+        """
+        avail = self.remaining_maps
+
+        # Score each map as a ban candidate
+        ban_scores: dict[str, float] = {}
+        for m in avail:
+            score = 0.0
+            # Anti-player: ban maps where player has full proficiency
+            if m in self.player_full_maps:
+                score += 3.0
+            elif m in self.player_half_maps:
+                score += 1.2
+
+            # Self-interest: protect own preferred maps (avoid banning them)
+            if m in self.opp_profile["preferred"]:
+                score -= 4.0  # strongly avoid banning own favorites
+
+            # Comfort: remove own disliked maps
+            if m in self.opp_profile["disliked"]:
+                score += 2.0
+
+            # Slight noise so identical situations still vary
+            score += random.gauss(0, 0.4)
+            ban_scores[m] = score
+
+        best = max(ban_scores, key=ban_scores.__getitem__)
+        self.bans.append(best)
+        self.remaining_maps.remove(best)
+        return best
+
+    def _opponent_pick(self) -> str:
+        """
+        Opponent pick logic — they want their own best maps,
+        secondarily maps where player has no proficiency.
+        """
+        avail = self.remaining_maps
+
+        pick_scores: dict[str, float] = {}
+        for m in avail:
+            score = 0.0
+            # Primary: pick own preferred maps
+            if m in self.opp_profile["preferred"]:
+                score += 4.0
+            # Secondary: avoid player's full maps
+            if m in self.player_full_maps:
+                score -= 2.5
+            elif m in self.player_half_maps:
+                score -= 0.8
+            # Avoid their own disliked maps
+            if m in self.opp_profile["disliked"]:
+                score -= 2.0
+            # Side-preference bonus: prefer maps that suit their style
+            ct_bias = MAP_CT_BIAS.get(m, 0.5)
+            if self.opp_profile["side_pref"] == "ct" and ct_bias > 0.51:
+                score += 1.5
+            elif self.opp_profile["side_pref"] == "t" and ct_bias < 0.49:
+                score += 1.5
+
+            score += random.gauss(0, 0.3)
+            pick_scores[m] = score
+
+        best = max(pick_scores, key=pick_scores.__getitem__)
+        self.pending_pick_map = best
+        self.remaining_maps.remove(best)
+        return best
+
+    def opponent_choose_side(self) -> dict:
+        """Opponent chooses side for a map the player picked."""
+        m = self.pending_pick_map
+        ct_bias = MAP_CT_BIAS.get(m, 0.5)
+        side_pref = self.opp_profile["side_pref"]
+
+        if side_pref == "ct":
+            # Prefers CT — take it if even mildly CT-sided or balanced
+            opp_side = "ct" if ct_bias >= 0.48 else "t"
+        elif side_pref == "t":
+            opp_side = "t" if ct_bias <= 0.52 else "ct"
+        else:
+            # No preference — take whichever side is statistically better for them
+            opp_side = "ct" if ct_bias > 0.50 else "t"
+
+        team_side = "t" if opp_side == "ct" else "ct"
+        self.picks.append({
+            "map": m, "picker": "player",
+            "team_side": team_side, "opp_side": opp_side,
+        })
+        self.pending_side_for = None
+        self.pending_pick_map = None
+        return self._maybe_advance_opponent()
 
     # ── Action methods ───────────────────────────────────────────────────────
 
     def current_actor(self) -> str:
-        """Returns 'player', 'opponent', or 'decider'."""
         if self.done or self.step >= len(self.sequence):
             return "done"
         return self.sequence[self.step][0]
@@ -113,12 +239,11 @@ class VetoState:
         assert map_name in self.remaining_maps
         self.remaining_maps.remove(map_name)
         self.pending_pick_map = map_name
-        self.pending_side_for = "opponent"   # opponent of picker chooses side
+        self.pending_side_for = "opponent"
         self.step += 1
         return {"waiting_side": True, "map": map_name, "side_chooser": "opponent"}
 
     def player_choose_side(self, side: str) -> dict:
-        """Player chooses side for a map the opponent picked."""
         assert self.pending_side_for == "player"
         assert side in ("ct", "t")
         m = self.pending_pick_map
@@ -131,30 +256,14 @@ class VetoState:
         self.pending_pick_map = None
         return self._maybe_advance_opponent()
 
-    def opponent_choose_side(self) -> dict:
-        """Opponent auto-chooses side for a map the player picked."""
-        m = self.pending_pick_map
-        ct_bias = MAP_CT_BIAS.get(m, 0.5)
-        # Opponent picks side that favours them on this map
-        opp_side = "ct" if ct_bias > 0.50 else "t"
-        team_side = "t" if opp_side == "ct" else "ct"
-        self.picks.append({
-            "map": m, "picker": "player",
-            "team_side": team_side, "opp_side": opp_side,
-        })
-        self.pending_side_for = None
-        self.pending_pick_map = None
-        return self._maybe_advance_opponent()
-
     def _maybe_advance_opponent(self) -> dict:
-        """Auto-execute opponent steps until it's the player's turn or veto ends."""
         events = []
         while not self.done and not self.needs_side_choice():
-            actor = self.current_actor()
+            actor  = self.current_actor()
             action = self.current_action()
 
             if actor == "player":
-                break  # player must act
+                break
 
             if actor == "decider":
                 self._finalize_decider()
@@ -169,59 +278,26 @@ class VetoState:
                     m = self._opponent_pick()
                     events.append({"actor": "opponent", "action": "pick", "map": m})
                     self.step += 1
-                    # Now player must choose side
                     self.pending_side_for = "player"
                     break
 
         return {"events": events, "state": self.to_dict()}
 
-    def _opponent_ban(self) -> str:
-        """Opponent bans: remove player's best full-proficiency map, or random."""
-        for m in self.player_full_maps:
-            if m in self.remaining_maps:
-                self.bans.append(m)
-                self.remaining_maps.remove(m)
-                return m
-        # No player full-maps left, ban random from remaining half maps or any
-        for m in self.player_half_maps:
-            if m in self.remaining_maps:
-                self.bans.append(m)
-                self.remaining_maps.remove(m)
-                return m
-        m = random.choice(self.remaining_maps)
-        self.bans.append(m)
-        self.remaining_maps.remove(m)
-        return m
-
-    def _opponent_pick(self) -> str:
-        """Opponent picks: prefer maps where the player has no proficiency."""
-        for m in self._opp_preferred:
-            if m in self.remaining_maps and m not in self.player_full_maps:
-                self.pending_pick_map = m
-                self.remaining_maps.remove(m)
-                return m
-        m = self.remaining_maps[0]
-        self.pending_pick_map = m
-        self.remaining_maps.remove(m)
-        return m
-
     def _finalize_decider(self) -> None:
         assert len(self.remaining_maps) == 1
         m = self.remaining_maps[0]
         self.remaining_maps.remove(m)
-        ct_bias = MAP_CT_BIAS.get(m, 0.5)
         team_side = random.choice(["ct", "t"])
-        opp_side = "t" if team_side == "ct" else "ct"
+        opp_side  = "t" if team_side == "ct" else "ct"
         self.picks.append({
             "map": m, "picker": "decider",
             "team_side": team_side, "opp_side": opp_side,
         })
         self.done = True
 
-    # ── Finalize: build veto_maps for resolve_series ─────────────────────────
+    # ── Finalize ─────────────────────────────────────────────────────────────
 
     def build_veto_maps(self) -> list[dict]:
-        """Returns the list of maps to play, with proficiency and team side."""
         result = []
         for pick in self.picks:
             prof = get_proficiency(pick["map"], self.player_full_maps, self.player_half_maps)
@@ -248,7 +324,8 @@ class VetoState:
             "needs_side_choice": self.needs_side_choice(),
             "pending_side_for":  self.pending_side_for,
             "pending_pick_map":  self.pending_pick_map,
-            "sequence":          [{"actor": a, "action": b} for a,b in self.sequence],
+            "sequence":          [{"actor": a, "action": b} for a, b in self.sequence],
+            "opp_profile":       self.opp_profile,
         }
 
     @staticmethod
@@ -259,8 +336,9 @@ class VetoState:
         v.player_half_maps  = player_half
         v.opponent_name     = opp_name
         v.opponent_strength = opp_str
+        v.opp_profile       = d.get("opp_profile") or generate_opponent_map_profile(opp_name, opp_str)
         v.player_goes_first = d["player_goes_first"]
-        v.sequence = [(s["actor"], s["action"]) for s in d["sequence"]]
+        v.sequence          = [(s["actor"], s["action"]) for s in d["sequence"]]
         v.remaining_maps    = d["remaining_maps"]
         v.bans              = d["bans"]
         v.picks             = d["picks"]
@@ -268,5 +346,4 @@ class VetoState:
         v.done              = d["done"]
         v.pending_side_for  = d.get("pending_side_for")
         v.pending_pick_map  = d.get("pending_pick_map")
-        v._opp_preferred    = v._rank_maps_for_opponent()
         return v

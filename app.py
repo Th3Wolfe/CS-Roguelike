@@ -157,12 +157,17 @@ def start_veto():
                if campaign.state.stage.value in ("stage1","stage2") \
                else campaign._get_playoff_opponent(campaign.state.stage.value)
 
+    # Look up the opponent's persistent map profile from their NpcTeam entry
+    opp_npc = next((t for t in campaign.npc_teams if t.name == opponent.name), None)
+    opp_profile = opp_npc.get_or_create_map_profile() if opp_npc else None
+
     state = get_session_state()
     veto = VetoState(
         player_full_maps=team.full_maps,
         player_half_maps=team.half_maps,
         opponent_name=opponent.name,
         opponent_strength=opponent.strength,
+        opponent_profile=opp_profile,
     )
     # Auto-advance if opponent goes first
     init_result = veto._maybe_advance_opponent() if not veto.player_goes_first else {"events": [], "state": veto.to_dict()}
@@ -175,6 +180,7 @@ def start_veto():
         "opponent_name":  opponent.name,
         "auto_events":    init_result.get("events", []),
         "coin_flip_won":  veto.player_goes_first,
+        "opp_profile":    opp_profile,   # expose to UI so player can see opponent tendencies
     })
 
 

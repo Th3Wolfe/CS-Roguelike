@@ -34,19 +34,29 @@ class NpcTeam:
         self.strength = strength
         # Swiss S1
         self.s1_wins = 0; self.s1_losses = 0; self.s1_done = False
-        self.s1_history: list = []   # [{wins_before, losses_before, opponent, result}]
+        self.s1_history: list = []
         self.advanced_s1 = False
         # Swiss S2
         self.s2_wins = 0; self.s2_losses = 0; self.s2_done = False
         self.s2_history: list = []
         self.advanced_s2 = False
+        # Map personality (generated once, persisted)
+        self.map_profile: dict | None = None
+
+    def get_or_create_map_profile(self) -> dict:
+        if self.map_profile is None:
+            from systems.veto_engine import generate_opponent_map_profile
+            self.map_profile = generate_opponent_map_profile(self.name, self.strength)
+        return self.map_profile
 
     def to_dict(self) -> dict:
-        return {k: getattr(self, k) for k in (
+        d = {k: getattr(self, k) for k in (
             "name","strength",
             "s1_wins","s1_losses","s1_done","s1_history","advanced_s1",
             "s2_wins","s2_losses","s2_done","s2_history","advanced_s2",
         )}
+        d["map_profile"] = self.map_profile
+        return d
 
     @staticmethod
     def from_dict(d: dict) -> "NpcTeam":
@@ -54,6 +64,7 @@ class NpcTeam:
         for k in ("s1_wins","s1_losses","s1_done","s1_history","advanced_s1",
                   "s2_wins","s2_losses","s2_done","s2_history","advanced_s2"):
             if k in d: setattr(t, k, d[k])
+        t.map_profile = d.get("map_profile")
         return t
 
 
