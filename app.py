@@ -100,7 +100,7 @@ def draft_candidates():
 @app.route("/api/new_game", methods=["POST"])
 def new_game():
     data           = request.get_json(silent=True) or {}
-    team_name      = data.get("team_name","").strip() or None
+    team_name      = (data.get("team_name") or "").strip() or None
     player_picks   = data.get("player_picks")
     events_enabled = data.get("events_enabled", False)
     era_id         = data.get("era_id", "2023")

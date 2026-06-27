@@ -160,6 +160,20 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 }
 .draft-layout { flex:1; overflow:hidden; display:grid; grid-template-columns:320px 1fr; }
 
+/* Nome do time: barra fixa logo abaixo do top-bar — sempre visível,
+   tanto no desktop quanto no mobile, já que o campo é obrigatório. */
+.draft-name-bar {
+  display:flex; align-items:center; gap:12px;
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  padding:12px 19px; flex-shrink:0;
+}
+.draft-name-lbl {
+  font-family:var(--font-display); font-size:.78rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--text2);
+  white-space:nowrap; flex-shrink:0;
+}
+.draft-name-bar .team-name-inp { width:auto; flex:1; max-width:340px; }
+
 /* left sidebar */
 .draft-left {
   background:var(--bg2); border-right:1px solid var(--border);
@@ -1170,7 +1184,7 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     display:flex;
     flex-direction:column;
     overflow:auto;
-    height:calc(100vh - 52px); /* deixa a topbar visível */
+    height:calc(100vh - 52px - 54px); /* topbar + barra do nome do time */
   }
 
   /* Top-bar do draft fica preso */
@@ -1180,7 +1194,25 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     z-index:200;
   }
 
-  /* Slots: sticky no topo dentro do scroll */
+  /* Nome do time: fica fixo no topo, abaixo do top-bar — é obrigatório
+     para avançar, então precisa estar visível desde o primeiro instante. */
+  .draft-name-bar {
+    position:sticky;
+    top:52px;
+    z-index:190;
+    padding:9px 14px;
+    gap:8px;
+  }
+  .draft-name-lbl { font-size:.7rem; }
+  .draft-name-bar .team-name-inp { max-width:none; padding:8px 12px; font-size:.92rem; }
+
+  /* Sorteio/pool primeiro — é o que precisa de atenção ao abrir a tela.
+     Os slots (vazios até o time ser sorteado) vêm depois e ficam sticky
+     assim que o usuário rola para baixo, guiando o draft de jogadores. */
+  .draft-right { order:-1; }
+  .draft-left  { order:1; }
+
+  /* Slots: sticky no topo dentro do scroll (agora abaixo do sorteio) */
   .draft-left {
     position:sticky;
     top:0;
@@ -1193,9 +1225,6 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     gap:8px;
   }
 
-  /* Esconde o input de nome e reshuffle bar em telas pequenas
-     — mantém só os slots e o botão confirmar */
-  .draft-left > div:first-child { display:none; }  /* nome do time — move para depois */
   .reshuffle-bar { padding:8px 10px; }
 
   /* Slots em grade 2×3 para caber sem scroll */
@@ -1451,6 +1480,10 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .stm-title      { font-size:1.3rem; }
   .mm-team-name   { font-size:.82rem; }
 
+  /* Nome do time: empilha label sobre o input em telas muito estreitas */
+  .draft-name-bar { flex-wrap:wrap; row-gap:4px; }
+  .draft-name-bar .team-name-inp { flex-basis:100%; }
+
   /* Pool: 1 coluna em telas muito estreitas */
   .pool-grid { grid-template-columns:1fr; }
 
@@ -1552,14 +1585,13 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
       <button class="btn btn-ghost btn-sm" onclick="showScreen('era')">← Era</button>
     </div>
   </div>
+  <div class="draft-name-bar">
+    <label for="team-name-inp" class="draft-name-lbl">🏷️ Nome do Time</label>
+    <input type="text" id="team-name-inp" class="team-name-inp" placeholder="Ex: FURIA, NaVi..." maxlength="28" oninput="_refreshConfirmDraftBtn()">
+  </div>
   <div class="draft-layout">
     <!-- left: team slots -->
     <div class="draft-left">
-      <div>
-        <div style="font-family:var(--font-display);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--text2);margin-bottom:6px;">Nome do Time</div>
-        <input type="text" id="team-name-inp" class="team-name-inp" placeholder="Ex: FURIA, NaVi..." maxlength="28">
-      </div>
-
       <!-- Re-sort controls -->
       <div class="reshuffle-bar">
         <span id="reshuffle-team-name" style="font-family:var(--font-display);font-size:.8rem;font-weight:800;color:var(--orange);"></span>
@@ -1976,6 +2008,7 @@ async function goDraft(){
   document.getElementById("reshuffle-team-name").textContent="";
   document.getElementById("reshuffle-count").textContent="";
   document.getElementById("btn-confirm").disabled=true;
+  document.getElementById("team-name-inp").value="";
   document.getElementById("draft-right").innerHTML=`<div class="draft-loading">Carregando time…</div>`;
   await drawNewTeam();
 }
@@ -2223,7 +2256,12 @@ function renderDraftLeft(){
     </div>`;
   }).join("");
 
-  document.getElementById("btn-confirm").disabled=G.draft.picks.length<5;
+  _refreshConfirmDraftBtn();
+}
+
+function _refreshConfirmDraftBtn(){
+  const named = document.getElementById("team-name-inp").value.trim().length>0;
+  document.getElementById("btn-confirm").disabled = !(G.draft.picks.length===5 && named);
 }
 
 function _guessTeamCountry(pool) {
@@ -2330,6 +2368,7 @@ function unpickSlot(slotIdx){
 // After draft: go to map pool selection
 async function confirmDraft(){
   const teamName=document.getElementById("team-name-inp").value.trim()||null;
+  if(!teamName){ toast("Dê um nome ao seu time antes de continuar","err"); return; }
   const sortedPicks=G.draft.picks
     .sort((a,b)=>a.slotIdx-b.slotIdx)
     .map(pk=>({...pk.player, role:["IGL","AWPer","Entry Fragger","Support","Lurker"][pk.slotIdx]}));
