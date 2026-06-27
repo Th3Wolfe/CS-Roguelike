@@ -97,11 +97,16 @@ class SeriesDetail:
         return {
             "maps": [
                 {
-                    "map_name":       m.map_name,
-                    "team_score":     m.team_score,
-                    "opponent_score": m.opponent_score,
-                    "winner":         m.winner,
-                    "went_ot":        m.went_ot,
+                    "map_name":        m.map_name,
+                    "team_score":      m.team_score,
+                    "opponent_score":  m.opponent_score,
+                    "winner":          m.winner,
+                    "went_ot":         m.went_ot,
+                    "team_start_side": m.team_start_side,
+                    "team_half1":      m.team_half1,
+                    "opp_half1":       m.opp_half1,
+                    "team_half2":      m.team_half2,
+                    "opp_half2":       m.opp_half2,
                 }
                 for m in self.maps
             ],
@@ -125,7 +130,11 @@ def score_to_win_probability(team_score: float, opp_score: float) -> float:
 def _simulate_map(ts: float, os_: float,
                   map_name: str = "",
                   team_proficiency: str = "half",
-                  team_start_side: str = "ct") -> MapResult:
+                  team_start_side: str = "ct",
+                  team_tactic_h1: str | None = None,
+                  team_tactic_h2: str | None = None,
+                  enemy_tactic_h1: str | None = None,
+                  enemy_tactic_h2: str | None = None) -> MapResult:
     """
     Simulate a CS2 map with MR12 rules, real CT/T side bias and map proficiency.
 
@@ -135,6 +144,7 @@ def _simulate_map(ts: float, os_: float,
     Proficiency modifier adjusts team's overall strength on this map.
     """
     from models.map_config import MAP_CT_BIAS, PROF_MODIFIER
+    from systems.tactics import get_tactic_modifier
     ct_bias = MAP_CT_BIAS.get(map_name, 0.50)
 
     # Base win probability from team strength difference
@@ -145,19 +155,31 @@ def _simulate_map(ts: float, os_: float,
     prof_mod = PROF_MODIFIER.get(team_proficiency, 0.0)
     base_p = max(0.08, min(0.92, base_p + prof_mod))
 
-    def side_p(team_side: str) -> float:
-        """Win prob for team on this side, factoring map CT/T bias."""
+    # Tactic modifiers per half
+    # H1: team starts on team_start_side
+    # H2: team switches to the other side
+    team_side_h1 = team_start_side
+    team_side_h2 = "t" if team_start_side == "ct" else "ct"
+
+    tac_mod_h1 = 0.0
+    tac_mod_h2 = 0.0
+
+    if team_tactic_h1 and enemy_tactic_h1:
+        tac_mod_h1 = get_tactic_modifier(team_side_h1, team_tactic_h1, enemy_tactic_h1)
+    if team_tactic_h2 and enemy_tactic_h2:
+        tac_mod_h2 = get_tactic_modifier(team_side_h2, team_tactic_h2, enemy_tactic_h2)
+
+    def side_p(team_side: str, tac_mod: float = 0.0) -> float:
+        """Win prob for team on this side, factoring map CT/T bias and tactic."""
         if team_side == "ct":
-            # Team is CT: ct_bias > 0.5 favours them, < 0.5 hurts them
             side_adj = (ct_bias - 0.5) * 1.4
         else:
-            # Team is T: T-sided map (low ct_bias) favours them
             side_adj = (0.5 - ct_bias) * 1.4
-        return max(0.08, min(0.92, base_p + side_adj))
+        return max(0.08, min(0.92, base_p + side_adj + tac_mod))
 
-    def play_half(team_side: str, max_rounds: int = 12) -> tuple[int, int]:
+    def play_half(team_side: str, max_rounds: int = 12, tac_mod: float = 0.0) -> tuple[int, int]:
         """Play up to max_rounds for this half. Returns (team_rounds, opp_rounds)."""
-        p = side_p(team_side)
+        p = side_p(team_side, tac_mod)
         t = o = 0
         while t + o < max_rounds:
             if random.random() < p:
@@ -168,14 +190,14 @@ def _simulate_map(ts: float, os_: float,
 
     # Half 1: play all 12 rounds
     opp_start = "t" if team_start_side == "ct" else "ct"
-    h1_t, h1_o = play_half(team_start_side)
+    h1_t, h1_o = play_half(team_start_side, tac_mod=tac_mod_h1)
 
     t_r = h1_t
     o_r = h1_o
 
     # Half 2: sides swap. Play round-by-round, stopping as soon as either
     # team reaches ROUNDS_TO_WIN (13) in total.
-    p_h2 = side_p(opp_start)
+    p_h2 = side_p(opp_start, tac_mod_h2)
     h2_t = h2_o = 0
     while h2_t + h2_o < 12:
         if t_r >= ROUNDS_TO_WIN or o_r >= ROUNDS_TO_WIN:
@@ -430,7 +452,8 @@ def _simulate_opponent_stats_real(opp_players: List[dict], maps: List[MapResult]
 
 
 def resolve_series(team: Team, opponent: Opponent,
-                   veto_maps: list | None = None) -> SeriesDetail:
+                   veto_maps: list | None = None,
+                   tactics: dict | None = None) -> SeriesDetail:
     """
     Resolve a BO3 series with CS2 MR12 rules.
 
@@ -458,11 +481,18 @@ def resolve_series(team: Team, opponent: Opponent,
     for entry in maps_to_play:
         if detail.team_maps_won == 2 or detail.opponent_maps_won == 2:
             break
+        # Tactics for this map (indexed by map position)
+        map_idx = len(detail.maps)
+        map_tactics = (tactics or {}).get(map_idx, {})
         result = _simulate_map(
             ts, os_,
             map_name=entry["map"],
             team_proficiency=entry.get("proficiency", "half"),
             team_start_side=entry.get("team_side", "ct"),
+            team_tactic_h1=map_tactics.get("team_h1"),
+            team_tactic_h2=map_tactics.get("team_h2"),
+            enemy_tactic_h1=map_tactics.get("enemy_h1"),
+            enemy_tactic_h2=map_tactics.get("enemy_h2"),
         )
         detail.maps.append(result)
         if result.winner == "team":

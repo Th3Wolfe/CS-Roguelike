@@ -884,8 +884,68 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   font-family:var(--font-display); font-size:.9rem; font-weight:700;
   color:var(--text2); letter-spacing:.1em;
 }
+.mm-controls {
+  display:flex; align-items:center; justify-content:center; gap:10px; margin-top:10px; flex-wrap:wrap;
+}
+.speed-ctrl {
+  display:flex; align-items:center; gap:6px;
+  background:var(--bg3); border:1px solid var(--border2); border-radius:4px;
+  padding:3px 8px; font-size:.78rem; color:var(--text2);
+}
+.spd-btn {
+  background:transparent; border:none; color:var(--orange); cursor:pointer;
+  font-size:1rem; font-weight:700; line-height:1; padding:0 4px;
+}
+.spd-btn:hover { color:#fff; }
+#btn-pause-match { font-size:.78rem; padding:4px 10px; }
+#btn-pause-match:disabled { opacity:.35; cursor:not-allowed; }
+.mm-half-banner {
+  text-align:center; font-family:var(--font-display); font-size:.82rem; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase;
+  background:var(--bg4); border:1px solid var(--border); border-radius:4px;
+  padding:6px 12px; margin-bottom:10px; color:var(--orange);
+}
 
-/* series map tracker */
+/* Tactic overlay */
+#tactic-overlay, #pause-overlay, #enemy-pause-overlay {
+  position:fixed; inset:0; background:rgba(6,10,15,.97); z-index:1100;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.tactic-modal, .pause-modal {
+  background:var(--bg2); border:2px solid var(--orange); border-radius:var(--r);
+  width:600px; max-width:96vw; padding:24px;
+}
+.tactic-header { text-align:center; margin-bottom:18px; }
+#tac-title { font-family:var(--font-display); font-size:1.15rem; font-weight:900; text-transform:uppercase; letter-spacing:.1em; }
+.tac-sub { color:var(--text2); font-size:.82rem; margin-top:4px; }
+.tac-options { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+.tac-card {
+  background:var(--bg3); border:2px solid var(--border); border-radius:var(--r);
+  padding:13px 16px; cursor:pointer; transition:border-color .15s, background .15s;
+}
+.tac-card:hover { border-color:var(--orange); }
+.tac-card.selected { border-color:var(--orange); background:rgba(232,160,32,.08); }
+.tac-card-label { font-weight:700; font-size:.95rem; }
+.tac-card-desc { font-size:.78rem; color:var(--text2); margin-top:3px; }
+.pause-title {
+  font-family:var(--font-display); font-size:1.1rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.1em; text-align:center; margin-bottom:14px;
+  color:var(--orange);
+}
+.pause-body { margin-bottom:16px; }
+.pause-actions { display:flex; gap:10px; justify-content:flex-end; }
+#pause-tac-side { font-size:.82rem; color:var(--text2); margin-bottom:10px; text-align:center; }
+.enemy-pause-txt {
+  text-align:center; font-size:.92rem; color:var(--text); font-style:italic;
+  background:var(--bg3); border-radius:var(--r); padding:16px;
+}
+#auto-pause-bar {
+  position:fixed; bottom:0; left:0; right:0; background:var(--bg2);
+  border-top:1px solid var(--border); padding:8px 16px; z-index:1050; text-align:center;
+}
+.auto-pause-lbl { font-size:.78rem; color:var(--text2); cursor:pointer; user-select:none; }
+.auto-pause-lbl input { margin-right:6px; accent-color:var(--orange); }
+
 .series-maps { display:flex; justify-content:center; gap:8px; margin-bottom:18px; }
 .sm-dot {
   width:36px; height:36px; border-radius:50%;
@@ -934,6 +994,10 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
 .score-colon { font-family:var(--font-display); font-size:1.8rem; color:var(--text3); }
 /* round visualiser */
 .round-vis { display:flex; flex-wrap:wrap; gap:3px; }
+.round-vis-wrap { display:flex; align-items:flex-start; gap:6px; margin-top:6px; }
+.round-vis-half { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
+.rv-half-label  { font-size:.6rem; font-weight:700; letter-spacing:.08em; color:var(--text2); text-align:center; }
+.rv-half-sep    { width:1px; background:var(--border); align-self:stretch; margin:0 2px; }
 .rv-dot { width:11px; height:11px; border-radius:2px; background:var(--bg5); transition:background .1s; }
 .rv-dot.t  { background:var(--orange); }
 .rv-dot.ct { background:var(--blue); }
@@ -1664,7 +1728,16 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
         <div class="mm-vs">VS</div>
         <div class="mm-team-name right" id="mv-opp">–</div>
       </div>
+      <div class="mm-controls">
+        <div class="speed-ctrl" title="Velocidade da simulação">
+          <button class="spd-btn" onclick="changeSpeed(-1)" title="Mais devagar">–</button>
+          <span id="spd-label">▶ Normal</span>
+          <button class="spd-btn" onclick="changeSpeed(1)" title="Mais rápido">+</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-pause-match" onclick="playerPauseMatch()" title="Pause Técnico (1x por mapa)">⏸ Pause</button>
+      </div>
     </div>
+    <div class="mm-half-banner" id="mm-half-banner" style="display:none;"></div>
     <div class="series-maps" id="series-maps">
       <div class="sm-dot" id="dot-0">1</div>
       <div class="sm-dot" id="dot-1">2</div>
@@ -1691,6 +1764,55 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     </div>
   </div>
 </div>
+
+<!-- TACTIC SELECT OVERLAY (before match / half switch) -->
+<div id="tactic-overlay" style="display:none;">
+  <div class="tactic-modal">
+    <div class="tactic-header">
+      <div id="tac-title">🎯 Escolha sua Tática</div>
+      <div id="tac-subtitle" class="tac-sub"></div>
+    </div>
+    <div id="tac-options" class="tac-options"></div>
+    <button class="btn btn-orange" id="btn-confirm-tactic" onclick="confirmTactic()" disabled>Confirmar Tática</button>
+  </div>
+</div>
+
+<!-- PAUSE SCREEN (player pause) -->
+<div id="pause-overlay" style="display:none;">
+  <div class="pause-modal">
+    <div class="pause-title">⏸ PAUSE TÉCNICO</div>
+    <div class="pause-body">
+      <div id="pause-tac-side"></div>
+      <div id="pause-tac-options" class="tac-options"></div>
+    </div>
+    <div class="pause-actions">
+      <button class="btn btn-ghost" onclick="cancelPause()">Manter tática atual</button>
+      <button class="btn btn-orange" id="btn-confirm-pause-tactic" onclick="confirmPauseTactic()" disabled>Trocar Tática →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENEMY PAUSE SCREEN -->
+<div id="enemy-pause-overlay" style="display:none;">
+  <div class="pause-modal">
+    <div class="pause-title">⏸ PAUSE DO ADVERSÁRIO</div>
+    <div class="pause-body">
+      <div id="enemy-pause-line" class="enemy-pause-txt"></div>
+    </div>
+    <div class="pause-actions">
+      <button class="btn btn-orange" onclick="closeEnemyPause()">Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTO-PAUSE SPEED TOGGLE -->
+<div id="auto-pause-bar" style="display:none;">
+  <label class="auto-pause-lbl">
+    <input type="checkbox" id="chk-auto-pause" onchange="toggleAutoPause(this.checked)">
+    Pausar automaticamente na troca de lado (CT↔T)
+  </label>
+</div>
+
 
 <!-- EVENT OVERLAY (preserved, currently disabled) -->
 <div id="event-overlay">
@@ -3082,45 +3204,273 @@ async function applyEv(ei,ci){
   else{if(_evResolve){_evResolve();_evResolve=null;}}
 }
 
-async function playSeries(){
-  G._prevStage=G.campaign?.stage;  // snapshot before series resolves
-  const r=await api("/play_series","POST");
-  if(!r.ok){toast(r.error||"Erro","err");return;}
-  G.team=r.team; G.campaign=r.campaign; G.shareCode=r.share_code;
-  G.bracket=r.bracket||G.bracket;
-  G._lastTeamScore=r.team_score;  // real post-series score from backend
-  await animSeries(r.result, r.team.name);
-  updateGameUI();
-  const res=r.result;
-  const rc=document.getElementById("result-card");
-  document.getElementById("rc-text").textContent=res.description;
-  rc.classList.remove("neon-win","neon-loss");
-  rc.classList.add("show");
-  setTimeout(()=>rc.classList.add(res.won?"neon-win":"neon-loss"),50);
+// ═══════════════════════════════════════════
+// TACTICS & MATCH STATE
+// ═══════════════════════════════════════════
+const SPEED_LEVELS = [
+  { label:"🐢 Muito Lento", delay: 1800, mapDelay: 2500 },
+  { label:"🚶 Lento",       delay:  800, mapDelay: 1500 },
+  { label:"▶ Normal",       delay:  300, mapDelay:  900 },
+  { label:"⚡ Rápido",      delay:   80, mapDelay:  400 },
+  { label:"🚀 Turbo",       delay:   12, mapDelay:  150 },
+];
+let _simSpeed = 0;          // index into SPEED_LEVELS
+let _simPaused = false;
+let _simPauseResolve = null;
+let _autoPauseOnSide = false;
+
+let _tacState = {
+  // Maps: 0,1,2 → {team_h1, team_h2, enemy_h1, enemy_h2}
+  tactics: {},
+  // Enemy tactic pool from backend
+  enemyTactics: {},
+  // Pending choice info
+  pendingMapIdx: null,
+  pendingHalf: null,  // 'h1' or 'h2'
+  pendingSide: null,  // 'ct' or 't'
+  pendingResolve: null,
+  selectedTactic: null,
+  // Pause state
+  playerPauseUsed: false,   // per map
+  enemyPauseUsed: false,    // per map
+  enemyPauseLine: "",
+  stage: "stage1",
+  ctTactics: {},
+  tTactics: {},
+};
+
+function changeSpeed(dir) {
+  _simSpeed = Math.max(0, Math.min(SPEED_LEVELS.length-1, _simSpeed + dir));
+  document.getElementById("spd-label").textContent = SPEED_LEVELS[_simSpeed].label;
 }
 
-// ═══════════════════════════════════════════
-// MATCH ANIMATION
-// ═══════════════════════════════════════════
-async function animSeries(result, teamName){
-  const oppName=result.opponent_name;
-  document.getElementById("mv-team").textContent=teamName;
-  document.getElementById("mv-opp").textContent=oppName;
-  for(let i=0;i<3;i++){const d=document.getElementById(`dot-${i}`);d.className="sm-dot";d.textContent=i+1;}
-  document.getElementById("maps-area").innerHTML="";
-  document.getElementById("match-summary").classList.remove("show");
-  document.getElementById("pst-section").style.display="none";
-  document.getElementById("match-overlay").classList.add("show");
+function toggleAutoPause(v) {
+  _autoPauseOnSide = v;
+}
 
-  const detail=result.series_detail;
-  let tw=0,ow=0;
-  for(let mi=0;mi<detail.maps.length;mi++){
+// Pause simulation (internal)
+function _pauseSim() {
+  _simPaused = true;
+  return new Promise(res => { _simPauseResolve = res; });
+}
+function _resumeSim() {
+  _simPaused = false;
+  if(_simPauseResolve) { _simPauseResolve(); _simPauseResolve = null; }
+}
+
+async function playerPauseMatch() {
+  if(_tacState.playerPauseUsed) return;
+  _tacState.playerPauseUsed = true;
+  document.getElementById("btn-pause-match").disabled = true;
+  // Pause simulation then show pause screen
+  const pausePromise = _pauseSim();
+  await showPauseScreen();
+  _resumeSim();
+}
+
+function showPauseScreen() {
+  const mapIdx = _tacState.pendingMapIdx ?? 0;
+  const currentHalf = _tacState.pendingHalf;
+  // Figure out current side
+  const side = _tacState.pendingSide || "ct";
+  const tactics = side === "ct" ? _tacState.ctTactics : _tacState.tTactics;
+  const currentTac = _tacState.tactics[mapIdx]?.[currentHalf === "h1" ? "team_h1" : "team_h2"];
+
+  document.getElementById("pause-tac-side").textContent =
+    `Lado atual: ${side.toUpperCase()} — Tática em uso: ${tactics[currentTac]?.label || "–"}`;
+
+  const optsEl = document.getElementById("pause-tac-options");
+  optsEl.innerHTML = Object.entries(tactics).map(([k,v]) =>
+    `<div class="tac-card${k===_tacState._pauseSelected?' selected':''}" onclick="selectPauseTactic('${k}',this)">
+      <div class="tac-card-label">${v.label}</div>
+      <div class="tac-card-desc">${v.desc}</div>
+    </div>`
+  ).join("");
+  document.getElementById("btn-confirm-pause-tactic").disabled = true;
+  _tacState._pauseSelected = null;
+
+  document.getElementById("pause-overlay").style.display = "flex";
+  return new Promise(res => { _tacState._pauseResolve = res; });
+}
+
+function selectPauseTactic(key, el) {
+  document.querySelectorAll("#pause-tac-options .tac-card").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+  _tacState._pauseSelected = key;
+  document.getElementById("btn-confirm-pause-tactic").disabled = false;
+}
+
+function confirmPauseTactic() {
+  const mapIdx = _tacState.pendingMapIdx ?? 0;
+  const half = _tacState.pendingHalf === "h1" ? "team_h1" : "team_h2";
+  if(!_tacState.tactics[mapIdx]) _tacState.tactics[mapIdx] = {};
+  if(_tacState._pauseSelected) {
+    _tacState.tactics[mapIdx][half] = _tacState._pauseSelected;
+  }
+  document.getElementById("pause-overlay").style.display = "none";
+  if(_tacState._pauseResolve) { _tacState._pauseResolve(); _tacState._pauseResolve = null; }
+}
+
+function cancelPause() {
+  document.getElementById("pause-overlay").style.display = "none";
+  if(_tacState._pauseResolve) { _tacState._pauseResolve(); _tacState._pauseResolve = null; }
+}
+
+function closeEnemyPause() {
+  document.getElementById("enemy-pause-overlay").style.display = "none";
+  if(_tacState._enemyPauseResolve) { _tacState._enemyPauseResolve(); _tacState._enemyPauseResolve = null; }
+}
+
+async function showEnemyPause() {
+  document.getElementById("enemy-pause-line").textContent = _tacState.enemyPauseLine;
+  document.getElementById("enemy-pause-overlay").style.display = "flex";
+  return new Promise(res => { _tacState._enemyPauseResolve = res; });
+}
+
+// Show tactic select screen before a half
+async function chooseTactic(mapIdx, half, side, ctTactics, tTactics) {
+  const tactics = side === "ct" ? ctTactics : tTactics;
+  const sideLabel = side.toUpperCase();
+  const halfLabel = half === "h1" ? "1º Half" : "2º Half";
+
+  document.getElementById("tac-title").textContent = `🎯 Tática — ${halfLabel} (${sideLabel})`;
+  document.getElementById("tac-subtitle").textContent =
+    `Escolha como seu time vai jogar este half como ${sideLabel}`;
+
+  const optsEl = document.getElementById("tac-options");
+  optsEl.innerHTML = Object.entries(tactics).map(([k,v]) =>
+    `<div class="tac-card" onclick="selectTactic('${k}',this)">
+      <div class="tac-card-label">${v.label}</div>
+      <div class="tac-card-desc">${v.desc}</div>
+    </div>`
+  ).join("");
+  document.getElementById("btn-confirm-tactic").disabled = true;
+  _tacState.selectedTactic = null;
+  _tacState.pendingMapIdx = mapIdx;
+  _tacState.pendingHalf = half;
+  _tacState.pendingSide = side;
+
+  document.getElementById("tactic-overlay").style.display = "flex";
+  return new Promise(res => { _tacState.pendingResolve = res; });
+}
+
+function selectTactic(key, el) {
+  document.querySelectorAll("#tac-options .tac-card").forEach(c=>c.classList.remove("selected"));
+  el.classList.add("selected");
+  _tacState.selectedTactic = key;
+  document.getElementById("btn-confirm-tactic").disabled = false;
+}
+
+function confirmTactic() {
+  const k = _tacState.selectedTactic;
+  if(!k) return;
+  const mapIdx = _tacState.pendingMapIdx;
+  const half = _tacState.pendingHalf;
+  if(!_tacState.tactics[mapIdx]) _tacState.tactics[mapIdx] = {};
+  const field = half === "h1" ? "team_h1" : "team_h2";
+  _tacState.tactics[mapIdx][field] = k;
+  document.getElementById("tactic-overlay").style.display = "none";
+  if(_tacState.pendingResolve) { _tacState.pendingResolve(k); _tacState.pendingResolve = null; }
+}
+
+async function playSeries(){
+  // 1. Fetch tactics info (enemy tactics + available tactics)
+  const tacR = await api("/tactics_info", "GET");
+  if(!tacR.ok) { toast("Erro ao carregar táticas","err"); return; }
+
+  _tacState.ctTactics    = tacR.ct_tactics;
+  _tacState.tTactics     = tacR.t_tactics;
+  _tacState.enemyTactics = tacR.enemy_tactics || {};
+  _tacState.enemyPauseLine = tacR.enemy_pause_line || "O adversário pausou.";
+  _tacState.stage        = tacR.stage || "stage1";
+  _tacState.tactics      = {};
+  _tacState.vetoMaps     = tacR.veto_maps || [];
+
+  G._prevStage = G.campaign?.stage;
+
+  // Match overlay opens INSIDE animSeriesCollect, AFTER tactics are chosen
+  await animSeriesCollect();
+}
+
+async function animSeriesCollect() {
+  const teamName = G.team?.name || "Seu Time";
+  const numMaps  = _tacState.vetoMaps.length || 3;
+
+  // Pre-fill enemy tactics and default H2 = H1 for all maps (backend needs complete tactics)
+  for(let mi = 0; mi < numMaps; mi++) {
+    const vMap = _tacState.vetoMaps[mi];
+    const side  = vMap ? vMap.team_side : "ct";
+    const eTac  = _tacState.enemyTactics[String(mi)] || _tacState.enemyTactics[mi] || {};
+    if(!_tacState.tactics[mi]) _tacState.tactics[mi] = {};
+    const defaultCT = Object.keys(_tacState.ctTactics)[0];
+    const defaultT  = Object.keys(_tacState.tTactics)[0];
+    _tacState.tactics[mi].enemy_h1  = eTac.h1 || (side==="ct" ? defaultT : defaultCT);
+    _tacState.tactics[mi].enemy_h2  = eTac.h2 || (side==="ct" ? defaultCT : defaultT);
+    // team tactics will be filled by chooseTactic calls below; default for now
+    _tacState.tactics[mi].team_h1   = side==="ct" ? defaultCT : defaultT;
+    _tacState.tactics[mi].team_h2   = side==="ct" ? defaultT  : defaultCT;
+  }
+
+  // ── 1. Ask tactic for MAP 0 / H1 only — before anything else ──────────
+  const vMap0  = _tacState.vetoMaps[0];
+  const side0  = vMap0 ? vMap0.team_side : "ct";
+  _tacState.pendingMapIdx = 0;
+  _tacState.pendingHalf   = "h1";
+  _tacState.pendingSide   = side0;
+  await chooseTactic(0, "h1", side0, _tacState.ctTactics, _tacState.tTactics);
+
+  // ── 2. Open match overlay and call backend ─────────────────────────────
+  document.getElementById("match-overlay").classList.add("show");
+  document.getElementById("auto-pause-bar").style.display = "block";
+  document.getElementById("spd-label").textContent = SPEED_LEVELS[_simSpeed].label;
+
+  const r = await api("/play_series", "POST", { tactics: _tacState.tactics });
+  if(!r.ok){ toast(r.error||"Erro","err"); document.getElementById("match-overlay").classList.remove("show"); return; }
+  G.team = r.team; G.campaign = r.campaign; G.shareCode = r.share_code;
+  G.bracket = r.bracket || G.bracket;
+  G._lastTeamScore = r.team_score;
+
+  const detail      = r.result.series_detail;
+  const realOppName = r.result.opponent_name;
+
+  // ── 3. Setup overlay header ────────────────────────────────────────────
+  document.getElementById("mv-team").textContent = teamName;
+  document.getElementById("mv-opp").textContent  = realOppName;
+  for(let i=0;i<3;i++){const d=document.getElementById(`dot-${i}`);d.className="sm-dot";d.textContent=i+1;}
+  document.getElementById("maps-area").innerHTML = "";
+  document.getElementById("match-summary").classList.remove("show");
+  document.getElementById("pst-section").style.display = "none";
+
+  // ── 4. Animate map by map ──────────────────────────────────────────────
+  let tw=0, ow=0;
+  for(let mi=0; mi<detail.maps.length; mi++){
     if(tw===2||ow===2) break;
-    const map=detail.maps[mi];
-    const card=document.createElement("div");
-    card.className="map-score-card"; card.id=`mc${mi}`;
-    const ot=map.went_ot;
-    card.innerHTML=`
+    const map      = detail.maps[mi];
+    const teamSide = map.team_start_side || "ct";
+    const oppSide  = teamSide === "ct" ? "t" : "ct";
+    const banner   = document.getElementById("mm-half-banner");
+
+    // Reset per-map pause flags
+    _tacState.playerPauseUsed = false;
+    _tacState.enemyPauseUsed  = false;
+    document.getElementById("btn-pause-match").disabled = false;
+    _tacState.pendingMapIdx = mi;
+    _tacState.pendingSide   = teamSide;
+    _tacState.pendingHalf   = "h1";
+
+    // For maps after the first, ask H1 tactic NOW (inside the overlay)
+    if(mi > 0) {
+      banner.textContent = `🗺 Mapa ${mi+1}: ${map.map_name} — Escolha sua tática (${teamSide.toUpperCase()})`;
+      banner.style.display = "block";
+      await chooseTactic(mi, "h1", teamSide, _tacState.ctTactics, _tacState.tTactics);
+      banner.style.display = "none";
+    }
+
+    // Build card
+    const card = document.createElement("div");
+    card.className = "map-score-card"; card.id = `mc${mi}`;
+    const ot = map.went_ot;
+    card.innerHTML = `
       <div class="msc-head">
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="msc-map">${map.map_name}</span>
@@ -3135,85 +3485,146 @@ async function animSeries(result, teamName){
           <div class="score-colon">:</div>
           <div class="score-dig o" id="so${mi}">0</div>
         </div>
-        <div class="msc-team-lbl">${oppName}</div>
+        <div class="msc-team-lbl">${realOppName}</div>
       </div>
-      <div class="round-vis" id="rv${mi}"></div>`;
+      <div class="round-vis-wrap">
+        <div class="round-vis-half">
+          <div class="rv-half-label">${teamSide.toUpperCase()}</div>
+          <div class="round-vis" id="rv${mi}h1"></div>
+        </div>
+        <div class="rv-half-sep"></div>
+        <div class="round-vis-half">
+          <div class="rv-half-label">${oppSide.toUpperCase()}</div>
+          <div class="round-vis" id="rv${mi}h2"></div>
+        </div>
+      </div>`;
     document.getElementById("maps-area").appendChild(card);
-    await sleep(200); card.classList.add("vis"); await sleep(350);
+    await sleep(150); card.classList.add("vis"); await sleep(250);
 
-    await animMap(mi, map.team_score, map.opponent_score);
+    // H1 animation
+    banner.textContent = `${map.map_name} — 1º Half (${teamSide.toUpperCase()})`;
+    banner.style.display = "block";
+    await animHalfReal(`${mi}h1`, map.team_half1, map.opp_half1, teamSide, 0, 0);
 
-    const won=map.winner==="team";
-    if(won){tw++;document.getElementById(`dot-${mi}`).className="sm-dot tw";document.getElementById(`dot-${mi}`).textContent="✓";}
-    else   {ow++;document.getElementById(`dot-${mi}`).className="sm-dot ow";document.getElementById(`dot-${mi}`).textContent="✗";}
-    const badge=document.getElementById(`mrb${mi}`);
-    badge.textContent=won?"VITÓRIA":"DERROTA";
-    badge.className=`msc-result-badge ${won?"w":"l"}`;
-    await sleep(800);
+    // ── Half switch ──────────────────────────────────────────────────────
+    await maybeEnemyPause(mi);
+
+    banner.textContent = `↔ Troca de lado — ${map.map_name} 2º Half (${oppSide.toUpperCase()})`;
+    await sleep(_autoPauseOnSide ? 1500 : 800);
+
+    // Ask H2 tactic (inside overlay, match visible behind)
+    _tacState.pendingHalf = "h2";
+    _tacState.pendingSide = oppSide;
+    banner.textContent = `${map.map_name} — 2º Half (${oppSide.toUpperCase()})`;
+    await chooseTactic(mi, "h2", oppSide, _tacState.ctTactics, _tacState.tTactics);
+
+    // H2 animation
+    await animHalfReal(`${mi}h2`, map.team_half2, map.opp_half2, oppSide, map.team_half1, map.opp_half1);
+    banner.style.display = "none";
+
+    // Map result badge
+    const won = map.winner === "team";
+    if(won){tw++; document.getElementById(`dot-${mi}`).className="sm-dot tw"; document.getElementById(`dot-${mi}`).textContent="✓";}
+    else   {ow++; document.getElementById(`dot-${mi}`).className="sm-dot ow"; document.getElementById(`dot-${mi}`).textContent="✗";}
+    const badge = document.getElementById(`mrb${mi}`);
+    badge.textContent = won ? "VITÓRIA" : "DERROTA";
+    badge.className   = `msc-result-badge ${won?"w":"l"}`;
+    await sleep(500);
   }
 
-  // player stats table
+  // ── 6. Player stats ────────────────────────────────────────────────────
   if(detail.player_stats && detail.player_stats.length){
-    const tbody=document.getElementById("pst-body");
-    tbody.innerHTML=detail.player_stats
+    const tbody = document.getElementById("pst-body");
+    tbody.innerHTML = detail.player_stats
       .sort((a,b)=>b.kd-a.kd)
       .map(p=>{
-        const kdClass=p.kd>=1?"pst-kd-pos":"pst-kd-neg";
+        const kdClass = p.kd>=1?"pst-kd-pos":"pst-kd-neg";
         return `<tr>
           <td><div class="pst-nick">${p.nickname}</div><div class="pst-role">${p.role}</div></td>
-          <td>${p.kills}</td>
-          <td>${p.deaths}</td>
+          <td>${p.kills}</td><td>${p.deaths}</td>
           <td class="${kdClass}">${p.kd.toFixed(2)}</td>
           <td>${p.adr.toFixed(1)}</td>
         </tr>`;
       }).join("");
-    document.getElementById("pst-section").style.display="block";
-    // Store stats in G for HUD update
+    document.getElementById("pst-section").style.display = "block";
     G._lastPlayerStats = detail.player_stats;
-    if(result.stage_mvp) G._lastStageMvp = result.stage_mvp;
+    if(r.result.stage_mvp) G._lastStageMvp = r.result.stage_mvp;
   }
 
-  // summary
-  const sumEl=document.getElementById("match-summary");
-  const resEl=document.getElementById("ms-result");
-  resEl.textContent=result.won?"🏆 VITÓRIA":"💀 DERROTA";
-  resEl.className=`ms-result ${result.won?"w":"l"}`;
-  document.getElementById("ms-desc").textContent=result.description;
-  document.getElementById("ms-meta").innerHTML=
-    `Chance: <b>${Math.round(result.win_probability*100)}%</b> &nbsp;·&nbsp; Score: <b>${result.team_score.toFixed(1)}</b> vs <b>${result.opp_score.toFixed(1)}</b>`;
+  // ── 7. Summary ─────────────────────────────────────────────────────────
+  const sumEl = document.getElementById("match-summary");
+  const resEl = document.getElementById("ms-result");
+  resEl.textContent = r.result.won ? "🏆 VITÓRIA" : "💀 DERROTA";
+  resEl.className   = `ms-result ${r.result.won?"w":"l"}`;
+  document.getElementById("ms-desc").textContent = r.result.description;
+  document.getElementById("ms-meta").innerHTML =
+    `Chance: <b>${Math.round(r.result.win_probability*100)}%</b> &nbsp;·&nbsp; Score: <b>${r.result.team_score.toFixed(1)}</b> vs <b>${r.result.opp_score.toFixed(1)}</b>`;
   sumEl.classList.add("show");
+
+  updateGameUI();
+  const rc = document.getElementById("result-card");
+  document.getElementById("rc-text").textContent = r.result.description;
+  rc.classList.remove("neon-win","neon-loss");
+  rc.classList.add("show");
+  setTimeout(()=>rc.classList.add(r.result.won?"neon-win":"neon-loss"),50);
+
+  document.getElementById("auto-pause-bar").style.display = "none";
 }
 
-async function animMap(mi, fT, fO){
-  const tEl=document.getElementById(`st${mi}`);
-  const oEl=document.getElementById(`so${mi}`);
-  const rvEl=document.getElementById(`rv${mi}`);
-  const total=fT+fO;
+// Animate a half with real round counts from the backend result
+// rvId = "0h1" or "0h2"; startT/startO = accumulated score from previous half
+async function animHalfReal(rvId, teamRounds, oppRounds, teamSide, startT=0, startO=0) {
+  const mi   = rvId.replace(/h[12]$/, "");
+  const tEl  = document.getElementById(`st${mi}`);
+  const oEl  = document.getElementById(`so${mi}`);
+  const rvEl = document.getElementById(`rv${rvId}`);
+  const total = teamRounds + oppRounds;
+  if(total === 0) return;
 
-  // build round sequence
-  const seq=[]; let rt=0,ro=0;
-  for(let i=0;i<total;i++){
-    const rem=total-i, pT=(fT-rt)/rem;
-    if(Math.random()<pT){seq.push("t");rt++;}
-    else{seq.push("ct");ro++;}
+  // Build a sequence that respects the exact final counts AND never lets either
+  // side exceed its half total (so the scoreboard never "goes back").
+  // We draw without replacement: teamRounds wins and oppRounds losses, shuffled.
+  const seq = [
+    ...Array(teamRounds).fill("win"),
+    ...Array(oppRounds).fill("loss"),
+  ];
+  // Fisher-Yates shuffle
+  for(let i = seq.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [seq[i], seq[j]] = [seq[j], seq[i]];
   }
 
-  // speed: 40-70ms per round, slower for close maps
-  const delay=Math.max(40,Math.min(70,1800/total));
-  let t=0,o=0;
-  for(let ri=0;ri<seq.length;ri++){
-    const dot=document.createElement("div");
-    dot.className=`rv-dot ${seq[ri]}`; rvEl.appendChild(dot);
-    const el=seq[ri]==="t"?(t++,tEl):(o++,oEl);
-    el.textContent=seq[ri]==="t"?t:o;
-    el.style.transform="scale(1.18)";
-    setTimeout(()=>{el.style.transform="scale(1)";el.style.transition="transform .1s";},100);
-    await sleep(delay);
+  let t = startT, o = startO;
+  tEl.textContent = t; oEl.textContent = o;
+
+  for(let ri=0; ri<seq.length; ri++){
+    // Hard stop: if either side already at 13, don't animate more (OT aside)
+    if(t >= 13 || o >= 13) break;
+
+    if(_simPaused) await new Promise(res=>{ _simPauseResolve=res; });
+    const won = seq[ri]==="win";
+    const dot = document.createElement("div");
+    dot.className = `rv-dot ${won ? teamSide : (teamSide==="ct"?"t":"ct")}`;
+    rvEl.appendChild(dot);
+    if(won){ t++; tEl.textContent=t; tEl.style.transform="scale(1.18)"; setTimeout(()=>{tEl.style.transform="scale(1)";},100); }
+    else   { o++; oEl.textContent=o; oEl.style.transform="scale(1.18)"; setTimeout(()=>{oEl.style.transform="scale(1)";},100); }
+    await sleep(SPEED_LEVELS[_simSpeed].delay);
+  }
+}
+
+async function maybeEnemyPause(mapIdx) {
+  if(_tacState.enemyPauseUsed) return;
+  const chance = _tacState.stage === "stage1" ? 0.10
+               : _tacState.stage === "stage2" ? 0.40 : 0.70;
+  if(Math.random() < chance) {
+    _tacState.enemyPauseUsed = true;
+    await showEnemyPause();
   }
 }
 
 function closeMatch(){
   document.getElementById("match-overlay").classList.remove("show");
+  document.getElementById("auto-pause-bar").style.display = "none";
   const stg=G.campaign?.stage;
   if(stg==="finished_win"||stg==="finished_loss"){
     showStageModal(false, stg==="finished_win");

@@ -12,6 +12,10 @@ from systems.team_factory import (
 from systems.save_system import save_game, load_game, list_saves
 from uuid import uuid4
 from flask import session
+from systems.tactics import (
+    CT_TACTICS, T_TACTICS, enemy_choose_tactic, ENEMY_PAUSE_LINES
+)
+import random as _random
 
 app = Flask(__name__)
 app.secret_key = "cs_roguelike_v4_2025"
@@ -284,7 +288,11 @@ def play_series():
     veto_maps = state.pop("veto_maps", None)   # consume the veto result
     state["veto"] = None                        # clear active veto
 
-    result = campaign.play_series(veto_maps=veto_maps)
+    # Tactics from the request body
+    data = request.get_json(silent=True) or {}
+    tactics = data.get("tactics")  # dict: {map_idx: {team_h1, team_h2, enemy_h1, enemy_h2}}
+
+    result = campaign.play_series(veto_maps=veto_maps, tactics=tactics)
     return jsonify({
         "ok": True,
         "result": {
@@ -305,6 +313,49 @@ def play_series():
         "share_code": generate_share_code(team),
         "bracket":    campaign.get_bracket_state(),
     })
+
+
+@app.route("/api/tactics_info", methods=["GET"])
+def tactics_info():
+    """Return available tactics and AI tactic choices for upcoming series."""
+    _, campaign = get_game()
+    stage = campaign.state.stage.value if campaign else "stage1"
+
+    # Pre-generate enemy tactics for all potential maps (up to 3)
+    # Enemy tactics are revealed after the series is over in the result
+    # But we need to pre-generate them so the simulation uses them consistently
+    state = get_session_state()
+
+    # Generate enemy tactics for this series (3 maps max, 2 halves each)
+    veto_maps = state.get("veto_maps") or []
+    num_maps = max(3, len(veto_maps))
+
+    enemy_tactics = {}
+    for mi in range(num_maps):
+        if veto_maps and mi < len(veto_maps):
+            team_start = veto_maps[mi].get("team_side", "ct")
+        else:
+            team_start = "ct"
+        enemy_side_h1 = "t" if team_start == "ct" else "ct"
+        enemy_side_h2 = team_start
+
+        h1 = enemy_choose_tactic(enemy_side_h1, stage)
+        h2 = enemy_choose_tactic(enemy_side_h2, stage)
+        enemy_tactics[mi] = {"h1": h1, "h2": h2}
+
+    state["pending_enemy_tactics"] = enemy_tactics
+
+    return jsonify({
+        "ok": True,
+        "ct_tactics": CT_TACTICS,
+        "t_tactics":  T_TACTICS,
+        "stage":      stage,
+        "veto_maps":  [{"map": v["map"], "team_side": v.get("team_side","ct")} for v in veto_maps],
+        "enemy_tactics": enemy_tactics,  # pre-generated, sent to client to use in simulation
+        "enemy_pause_line": _random.choice(ENEMY_PAUSE_LINES),
+    })
+
+
 
 
 @app.route("/api/history", methods=["GET"])
