@@ -1194,12 +1194,8 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     z-index:200;
   }
 
-  /* Nome do time: fica fixo no topo, abaixo do top-bar — é obrigatório
-     para avançar, então precisa estar visível desde o primeiro instante. */
+  /* Nome do time: visível e compacto, mas rola com a página normalmente */
   .draft-name-bar {
-    position:sticky;
-    top:52px;
-    z-index:190;
     padding:9px 14px;
     gap:8px;
   }
@@ -1950,7 +1946,17 @@ async function api(path, method="GET", body=null) {
 }
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("screen-"+id).classList.add("active");
+  const next = document.getElementById("screen-"+id);
+  next.classList.add("active");
+
+  // Sempre abre a próxima tela no topo — sem isso, se o usuário tivesse
+  // rolado até o fim da tela anterior, a nova tela já abria scrollada
+  // para baixo (no mobile, onde a página inteira pode rolar).
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  next.scrollTop = 0;
+  next.querySelectorAll("*").forEach(el => { if (el.scrollTop) el.scrollTop = 0; });
 }
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 function flag(cc){return FLAGS[cc]||"🏴";}
