@@ -65,6 +65,8 @@ class MapResult:
     opp_half1:       int    = 0
     team_half2:      int    = 0
     opp_half2:       int    = 0
+    team_ot:         int    = 0
+    opp_ot:          int    = 0
 
     def to_dict(self) -> dict:
         return {
@@ -78,6 +80,8 @@ class MapResult:
             "opp_half1":       self.opp_half1,
             "team_half2":      self.team_half2,
             "opp_half2":       self.opp_half2,
+            "team_ot":         self.team_ot,
+            "opp_ot":          self.opp_ot,
         }
 
 
@@ -107,6 +111,8 @@ class SeriesDetail:
                     "opp_half1":       m.opp_half1,
                     "team_half2":      m.team_half2,
                     "opp_half2":       m.opp_half2,
+                    "team_ot":         m.team_ot,
+                    "opp_ot":          m.opp_ot,
                 }
                 for m in self.maps
             ],
@@ -147,8 +153,12 @@ def _simulate_map(ts: float, os_: float,
     from systems.tactics import get_tactic_modifier
     ct_bias = MAP_CT_BIAS.get(map_name, 0.50)
 
-    # Base win probability from team strength difference
-    noise = random.gauss(0, 0.6)
+    # Base win probability from team strength difference.
+    # Noise scales with the strength gap so a dominant team can still drop a
+    # map occasionally — fixed noise became irrelevant once gaps grew large.
+    gap = abs(ts - os_)
+    noise_std = 0.6 + min(gap * 0.20, 1.0)
+    noise = random.gauss(0, noise_std)
     base_p = max(0.10, min(0.90, 1.0 / (1.0 + math.exp(-(ts - os_ + noise) * 0.55))))
 
     # Proficiency modifier shifts win probability
@@ -196,7 +206,7 @@ def _simulate_map(ts: float, os_: float,
     o_r = h1_o
 
     # Half 2: sides swap. Play round-by-round, stopping as soon as either
-    # team reaches ROUNDS_TO_WIN (13) in total.
+    # team reaches ROUNDS_TO_WIN (13) in total, or a 12-12 tie triggers OT.
     p_h2 = side_p(opp_start, tac_mod_h2)
     h2_t = h2_o = 0
     while h2_t + h2_o < 12:
@@ -208,17 +218,18 @@ def _simulate_map(ts: float, os_: float,
         else:
             o_r += 1
             h2_o += 1
+        # Check for 12-12 tie immediately after each round
+        if t_r == 12 and o_r == 12:
+            break
 
     went_ot = False
+    team_ot = 0
+    opp_ot  = 0
     if t_r == 12 and o_r == 12:
         went_ot = True
-        # OT: MR3 blocks — each block has 3 rounds CT + 3 rounds T.
-        # Stop as soon as either team reaches OT_ROUNDS_WIN (4) in the block.
-        # If tied after 6 rounds (3-3), play another block with sides swapped.
         ot_side = team_start_side
         while True:
             ot_t = ot_o = 0
-            # First half of OT block (3 rounds, team on ot_side)
             p1 = side_p(ot_side)
             for _ in range(OT_ROUNDS_PER_SIDE):
                 if ot_t >= OT_ROUNDS_WIN or ot_o >= OT_ROUNDS_WIN:
@@ -227,7 +238,6 @@ def _simulate_map(ts: float, os_: float,
                     ot_t += 1
                 else:
                     ot_o += 1
-            # Second half of OT block (3 rounds, sides swap)
             p2 = side_p("t" if ot_side == "ct" else "ct")
             for _ in range(OT_ROUNDS_PER_SIDE):
                 if ot_t >= OT_ROUNDS_WIN or ot_o >= OT_ROUNDS_WIN:
@@ -236,11 +246,12 @@ def _simulate_map(ts: float, os_: float,
                     ot_t += 1
                 else:
                     ot_o += 1
-            t_r += ot_t
-            o_r += ot_o
+            t_r     += ot_t
+            o_r     += ot_o
+            team_ot += ot_t
+            opp_ot  += ot_o
             if t_r != o_r:
                 break
-            # 3-3 tie → next OT block with sides swapped
             ot_side = "t" if ot_side == "ct" else "ct"
 
     winner = "team" if t_r > o_r else "opponent"
@@ -249,6 +260,7 @@ def _simulate_map(ts: float, os_: float,
         winner=winner, went_ot=went_ot, team_start_side=team_start_side,
         team_half1=h1_t, opp_half1=h1_o,
         team_half2=h2_t, opp_half2=h2_o,
+        team_ot=team_ot, opp_ot=opp_ot,
     )
 
 

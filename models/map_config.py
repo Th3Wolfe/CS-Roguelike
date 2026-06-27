@@ -33,13 +33,13 @@ MAP_CT_BIAS: dict[str, float] = {
 }
 
 # Proficiency tiers
-PROF_FULL = "full"   # 3 maps chosen by player → +bonus
-PROF_HALF = "half"   # 2 maps chosen            → neutral
+PROF_FULL = "full"   # 2 maps chosen by player → +bonus
+PROF_HALF = "half"   # 3 maps chosen            → neutral
 PROF_NONE = "none"   # remaining 2              → penalty
 
 # Win-rate modifiers applied to per-round win probability
 PROF_MODIFIER: dict[str, float] = {
-    PROF_FULL:  +0.08,   # full: +8pp
+    PROF_FULL:  +0.06,   # full: +6pp (reduced from +8pp — was too cheap a guarantee)
     PROF_HALF:  +0.00,   # half: neutral
     PROF_NONE:  -0.10,   # none: -10pp (unfamiliar map, disorganised executes)
 }

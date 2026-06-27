@@ -671,6 +671,8 @@ class CampaignManager:
         if opponent.name not in self._used_team_names:
             self._used_team_names.append(opponent.name)
 
+        self._apply_difficulty_scaling(opponent, current_stage_pre)
+
         detail: SeriesDetail = resolve_series(self.team, opponent, veto_maps=veto_maps, tactics=tactics)
         description = describe_result(detail, opponent.name)
 
@@ -849,8 +851,30 @@ class CampaignManager:
 
     # ── post-series effects ──────────────────────────────────────────────────
 
+    def _apply_difficulty_scaling(self, opponent: "Opponent", stage: str) -> None:
+        """Elastic difficulty (catch-up) + simulated opponent momentum.
+
+        If the player's team_score is already above what's expected for this
+        stage, nudge the opponent up so the gap can't snowball unchecked.
+        Opponents also get a small bonus that grows with campaign length,
+        mirroring the momentum the player's team gains from buffs/events —
+        previously only the player's side evolved over a campaign.
+        """
+        expected = {
+            "stage1": 6.0, "stage2": 6.4,
+            "playoffs_qf": 7.0, "playoffs_sf": 7.6, "playoffs_final": 8.2,
+        }.get(stage, 6.0)
+        surplus  = max(0.0, self.team.team_score() - expected)
+        catch_up = min(surplus * 0.5, 2.5)
+        momentum = min(self.state.total_series * 0.04, 1.2)
+        opponent.strength = round(opponent.strength + catch_up + momentum, 2)
+
     def _apply_post_series_effects(self, won: bool) -> None:
         self.team.tick_buffs()
+        # Synergy decays toward 0 each series instead of only ever accumulating —
+        # otherwise event bonuses snowball to the cap over a long campaign.
+        self.team.synergy *= 0.90
+        self.team.clamp_synergy()
         for p in self.team.players:
             p.status.morale += 1.5 if won else -1.5
             p.status.form    = max(-5.0, min(5.0, p.status.form + (0.6 if won else -0.6)))

@@ -9,14 +9,14 @@ class Team:
     """Represents the player's team in the Major."""
     name: str
     players: list  # list[Player], 5 players
-    synergy: float = 0.0  # -10 to +10
+    synergy: float = 0.0  # -6 to +6
     team_buffs: list = field(default_factory=list)  # list[Buff]
-    full_maps: list  = field(default_factory=list)   # 3 maps: full proficiency
-    half_maps: list  = field(default_factory=list)   # 2 maps: half proficiency
+    full_maps: list  = field(default_factory=list)   # 2 maps: full proficiency
+    half_maps: list  = field(default_factory=list)   # 3 maps: half proficiency
 
     def clamp_synergy(self) -> None:
-        """Clamp synergy to valid range."""
-        self.synergy = max(-10.0, min(10.0, self.synergy))
+        """Clamp synergy to valid range (reduced from ±10 to ±6 to curb snowball)."""
+        self.synergy = max(-6.0, min(6.0, self.synergy))
 
     def average_score(self) -> float:
         """Calculate the average effective score of all players."""

@@ -42,7 +42,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-html, body { height:100%; overflow:hidden; }
+html, body { height:100%; overflow:hidden; overflow-x:hidden; max-width:100vw; }
 body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:17.5px; }
 
 /* ── screens ── */
@@ -63,6 +63,7 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   padding:9px 18px; border:none; border-radius:var(--r); cursor:pointer;
   transition:filter .12s, transform .08s;
   display:inline-flex; align-items:center; gap:6px;
+  touch-action:manipulation;
 }
 .btn:disabled { opacity:.3; cursor:not-allowed; }
 .btn:not(:disabled):hover  { filter:brightness(1.15); }
@@ -1418,6 +1419,22 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-bucket-team { font-size:.78rem; }
   .bk-bucket-row  { padding:6px 10px; }
 
+  /* ── MAP POOL / VETO SCREENS (inline-styled wrappers) ── */
+  #screen-maps > div:nth-child(2),
+  #screen-veto > div:nth-child(2) {
+    padding:16px !important;
+  }
+  .mp-grid       { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  .mp-card       { padding:13px 10px; }
+  .veto-map-grid { grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:8px; }
+  .veto-map-card { padding:10px 6px; }
+  .vmc-name      { font-size:.76rem; }
+  #veto-side-panel > div:last-child { flex-wrap:wrap; }
+
+  /* ── STATS TABLE: scroll instead of squeeze ── */
+  .pst-section { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .pst-table   { min-width:440px; }
+
 }
 
 /* ═══════════════════════════════════════════════
@@ -1465,6 +1482,12 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
   .bk-result-strip  { padding:8px 10px; }
   .bk-result-label  { font-size:.68rem; padding:4px 9px; }
   .bk-result-chip   { font-size:.66rem; padding:3px 7px; }
+
+  /* ── MAP POOL / VETO — single column on very narrow screens ── */
+  .mp-grid       { grid-template-columns:1fr 1fr; }
+  .veto-map-grid { grid-template-columns:repeat(3,1fr); gap:6px; }
+  .veto-pick-summary { min-width:120px; }
+  .gtb-right .btn { min-width:32px; justify-content:center; }
 
 }
 
@@ -1572,13 +1595,13 @@ body { background:var(--bg); color:var(--text); font-family:var(--font-body); fo
     <div style="margin-bottom:24px;">
       <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Escolha sua proficiência</div>
       <div style="font-size:.95rem;color:var(--text2);line-height:1.7;max-width:680px;">
-        Selecione <b style="color:var(--green)">3 mapas com proficiência total</b> (bônus de desempenho) e
-        <b style="color:var(--orange)">2 com meia proficiência</b> (neutro).
+        Selecione <b style="color:var(--green)">2 mapas com proficiência total</b> (bônus de desempenho) e
+        <b style="color:var(--orange)">3 com meia proficiência</b> (neutro).
         Os 2 restantes terão <b style="color:var(--red)">proficiência nula</b> e penalidade.
       </div>
     </div>
     <div class="mp-legend" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
-      <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--green)"></div><span>Full (+8% win rate)</span></div>
+      <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--green)"></div><span>Full (+6% win rate)</span></div>
       <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--orange)"></div><span>Half (neutro)</span></div>
       <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--red)"></div><span>Nula (−10% win rate)</span></div>
     </div>
@@ -2332,7 +2355,7 @@ function renderMapPoolScreen(){
   grid.innerHTML = maps.map(m=>{
     const isFull = full.includes(m);
     const isHalf = half.includes(m);
-    const isNone = !isFull && !isHalf && full.length>=3 && half.length>=2;
+    const isNone = !isFull && !isHalf && full.length>=2 && half.length>=3;
     const cls    = isFull?"mp-full" : isHalf?"mp-half" : isNone?"mp-none" : "";
     const tier   = isFull?"✓ Full" : isHalf?"◑ Half" : isNone?"✗ Nula" : "Clique para selecionar";
     const bias   = G._mapCtBias?.[m];
@@ -2344,9 +2367,9 @@ function renderMapPoolScreen(){
     </div>`;
   }).join("");
 
-  const status = `${full.length}/3 Full · ${half.length}/2 Half`;
+  const status = `${full.length}/2 Full · ${half.length}/3 Half`;
   document.getElementById("maps-sel-status").textContent = status;
-  document.getElementById("btn-confirm-maps").disabled = !(full.length===3 && half.length===2);
+  document.getElementById("btn-confirm-maps").disabled = !(full.length===2 && half.length===3);
 }
 
 function toggleMapSel(map){
@@ -2356,9 +2379,9 @@ function toggleMapSel(map){
     G._mapSelFull = full.filter(m=>m!==map);
   } else if(half.includes(map)){
     G._mapSelHalf = half.filter(m=>m!==map);
-  } else if(full.length < 3){
+  } else if(full.length < 2){
     G._mapSelFull = [...full, map];
-  } else if(half.length < 2){
+  } else if(half.length < 3){
     G._mapSelHalf = [...half, map];
   }
   renderMapPoolScreen();
@@ -3322,7 +3345,8 @@ function closeEnemyPause() {
 }
 
 async function showEnemyPause() {
-  document.getElementById("enemy-pause-line").textContent = _tacState.enemyPauseLine;
+  const lines = _tacState.enemyPauseLines || ["O adversário pausou."];
+  document.getElementById("enemy-pause-line").textContent = lines[Math.floor(Math.random()*lines.length)];
   document.getElementById("enemy-pause-overlay").style.display = "flex";
   return new Promise(res => { _tacState._enemyPauseResolve = res; });
 }
@@ -3381,7 +3405,7 @@ async function playSeries(){
   _tacState.ctTactics    = tacR.ct_tactics;
   _tacState.tTactics     = tacR.t_tactics;
   _tacState.enemyTactics = tacR.enemy_tactics || {};
-  _tacState.enemyPauseLine = tacR.enemy_pause_line || "O adversário pausou.";
+  _tacState.enemyPauseLines = tacR.enemy_pause_lines || ["O adversário pausou."];
   _tacState.stage        = tacR.stage || "stage1";
   _tacState.tactics      = {};
   _tacState.vetoMaps     = tacR.veto_maps || [];
@@ -3411,15 +3435,15 @@ async function animSeriesCollect() {
     _tacState.tactics[mi].team_h2   = side==="ct" ? defaultT  : defaultCT;
   }
 
-  // ── 1. Ask tactic for MAP 0 / H1 only — before anything else ──────────
-  const vMap0  = _tacState.vetoMaps[0];
-  const side0  = vMap0 ? vMap0.team_side : "ct";
+  // ── 1. Ask H1 tactic for MAP 0 only — before opening the overlay ──────────
+  const vMap0 = _tacState.vetoMaps[0];
+  const side0 = vMap0 ? vMap0.team_side : "ct";
   _tacState.pendingMapIdx = 0;
   _tacState.pendingHalf   = "h1";
   _tacState.pendingSide   = side0;
   await chooseTactic(0, "h1", side0, _tacState.ctTactics, _tacState.tTactics);
 
-  // ── 2. Open match overlay and call backend ─────────────────────────────
+  // ── 2. Open overlay and call backend (maps 1+ use defaults; player can pause to change) ─
   document.getElementById("match-overlay").classList.add("show");
   document.getElementById("auto-pause-bar").style.display = "block";
   document.getElementById("spd-label").textContent = SPEED_LEVELS[_simSpeed].label;
@@ -3457,14 +3481,6 @@ async function animSeriesCollect() {
     _tacState.pendingMapIdx = mi;
     _tacState.pendingSide   = teamSide;
     _tacState.pendingHalf   = "h1";
-
-    // For maps after the first, ask H1 tactic NOW (inside the overlay)
-    if(mi > 0) {
-      banner.textContent = `🗺 Mapa ${mi+1}: ${map.map_name} — Escolha sua tática (${teamSide.toUpperCase()})`;
-      banner.style.display = "block";
-      await chooseTactic(mi, "h1", teamSide, _tacState.ctTactics, _tacState.tTactics);
-      banner.style.display = "none";
-    }
 
     // Build card
     const card = document.createElement("div");
@@ -3510,7 +3526,14 @@ async function animSeriesCollect() {
     await maybeEnemyPause(mi);
 
     banner.textContent = `↔ Troca de lado — ${map.map_name} 2º Half (${oppSide.toUpperCase()})`;
-    await sleep(_autoPauseOnSide ? 1500 : 800);
+    if(_autoPauseOnSide) {
+      // Real pause: freeze until user resumes via pause button or clicks continue
+      _simPaused = true;
+      banner.textContent += " — ⏸ AUTO-PAUSE (clique Continuar para prosseguir)";
+      await new Promise(res => { _simPauseResolve = res; });
+    } else {
+      await sleep(800);
+    }
 
     // Ask H2 tactic (inside overlay, match visible behind)
     _tacState.pendingHalf = "h2";
@@ -3520,6 +3543,14 @@ async function animSeriesCollect() {
 
     // H2 animation
     await animHalfReal(`${mi}h2`, map.team_half2, map.opp_half2, oppSide, map.team_half1, map.opp_half1);
+
+    // OT animation (if map went to overtime)
+    if(map.went_ot && (map.team_ot + map.opp_ot) > 0) {
+      banner.textContent = `${map.map_name} — ⚡ OVERTIME`;
+      banner.style.display = "block";
+      await animHalfReal(`${mi}h2`, map.team_ot, map.opp_ot, teamSide,
+        map.team_half1 + map.team_half2, map.opp_half1 + map.opp_half2);
+    }
     banner.style.display = "none";
 
     // Map result badge
@@ -3574,6 +3605,12 @@ async function animSeriesCollect() {
 // Animate a half with real round counts from the backend result
 // rvId = "0h1" or "0h2"; startT/startO = accumulated score from previous half
 async function animHalfReal(rvId, teamRounds, oppRounds, teamSide, startT=0, startO=0) {
+  // Safety: clear any stale pause state left from tactic/pause overlays
+  if(_simPaused && !document.getElementById("pause-overlay").style.display.includes("flex")
+                && !document.getElementById("enemy-pause-overlay").style.display.includes("flex")) {
+    _simPaused = false;
+    _simPauseResolve = null;
+  }
   const mi   = rvId.replace(/h[12]$/, "");
   const tEl  = document.getElementById(`st${mi}`);
   const oEl  = document.getElementById(`so${mi}`);
@@ -3598,9 +3635,6 @@ async function animHalfReal(rvId, teamRounds, oppRounds, teamSide, startT=0, sta
   tEl.textContent = t; oEl.textContent = o;
 
   for(let ri=0; ri<seq.length; ri++){
-    // Hard stop: if either side already at 13, don't animate more (OT aside)
-    if(t >= 13 || o >= 13) break;
-
     if(_simPaused) await new Promise(res=>{ _simPauseResolve=res; });
     const won = seq[ri]==="win";
     const dot = document.createElement("div");
@@ -3609,6 +3643,8 @@ async function animHalfReal(rvId, teamRounds, oppRounds, teamSide, startT=0, sta
     if(won){ t++; tEl.textContent=t; tEl.style.transform="scale(1.18)"; setTimeout(()=>{tEl.style.transform="scale(1)";},100); }
     else   { o++; oEl.textContent=o; oEl.style.transform="scale(1.18)"; setTimeout(()=>{oEl.style.transform="scale(1)";},100); }
     await sleep(SPEED_LEVELS[_simSpeed].delay);
+    // Stop immediately after the round that decides the half/map
+    if(t >= 13 || o >= 13) break;
   }
 }
 

@@ -104,8 +104,8 @@ def new_game():
     player_picks   = data.get("player_picks")
     events_enabled = data.get("events_enabled", False)
     era_id         = data.get("era_id", "2023")
-    full_maps      = data.get("full_maps", [])   # 3 full-proficiency maps
-    half_maps      = data.get("half_maps", [])   # 2 half-proficiency maps
+    full_maps      = data.get("full_maps", [])   # 2 full-proficiency maps
+    half_maps      = data.get("half_maps", [])   # 3 half-proficiency maps
 
     team     = generate_team(team_name, player_picks)
     team.full_maps = full_maps
@@ -138,8 +138,8 @@ def set_map_proficiency():
     half_maps = data.get("half_maps", [])
     from models.map_config import CS2_MAP_POOL
     # Validate
-    if len(full_maps) != 3 or len(half_maps) != 2:
-        return jsonify({"ok": False, "error": "Escolha exatamente 3 mapas completos e 2 meios"}), 400
+    if len(full_maps) != 2 or len(half_maps) != 3:
+        return jsonify({"ok": False, "error": "Escolha exatamente 2 mapas completos e 3 meios"}), 400
     all_chosen = set(full_maps) | set(half_maps)
     if len(all_chosen) != 5 or not all_chosen.issubset(set(CS2_MAP_POOL)):
         return jsonify({"ok": False, "error": "Mapas inválidos"}), 400
@@ -288,9 +288,10 @@ def play_series():
     veto_maps = state.pop("veto_maps", None)   # consume the veto result
     state["veto"] = None                        # clear active veto
 
-    # Tactics from the request body
+    # Tactics from the request body — JSON keys are always strings, normalize to int
     data = request.get_json(silent=True) or {}
-    tactics = data.get("tactics")  # dict: {map_idx: {team_h1, team_h2, enemy_h1, enemy_h2}}
+    raw_tactics = data.get("tactics") or {}
+    tactics = {int(k): v for k, v in raw_tactics.items()} if raw_tactics else None
 
     result = campaign.play_series(veto_maps=veto_maps, tactics=tactics)
     return jsonify({
@@ -352,7 +353,7 @@ def tactics_info():
         "stage":      stage,
         "veto_maps":  [{"map": v["map"], "team_side": v.get("team_side","ct")} for v in veto_maps],
         "enemy_tactics": enemy_tactics,  # pre-generated, sent to client to use in simulation
-        "enemy_pause_line": _random.choice(ENEMY_PAUSE_LINES),
+        "enemy_pause_lines": ENEMY_PAUSE_LINES,
     })
 
 

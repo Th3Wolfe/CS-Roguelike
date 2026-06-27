@@ -56,12 +56,12 @@ def generate_opponent(stage: str, match_index: int,
     ranges = {
         "stage1":         (4.8, 6.2),
         "stage2":         (5.2, 6.6),
-        "playoffs_qf":    (6.0, 7.1),
-        "playoffs_sf":    (6.4, 7.4),
-        "playoffs_final": (6.8, 7.6),
+        "playoffs_qf":    (6.2, 7.4),
+        "playoffs_sf":    (6.8, 7.9),
+        "playoffs_final": (7.2, 8.4),
     }
     lo, hi = ranges.get(stage, (5.2, 6.5))
-    base_strength = random.uniform(lo, hi) + min(match_index * 0.08, 0.6)
+    base_strength = random.uniform(lo, hi) + min(match_index * 0.10, 0.9)
     synergy = random.uniform(0.5, 3.0)
 
     # Try to use a real team from the era
