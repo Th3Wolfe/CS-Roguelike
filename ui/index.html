@@ -440,20 +440,59 @@ body {
   pointer-events: none;
   overflow: hidden;
 }
-.menu-particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  opacity: 0;
-  animation: particleFloat linear infinite;
+
+.menu-particle{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  background:rgba(255,255,255,.9);
+  box-shadow:
+      0 0 6px rgba(255,255,255,.8),
+      0 0 12px rgba(255,180,80,.35);
+  opacity:0;
+  will-change:transform,opacity;
+  animation-name:particleFloat;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
 }
-@keyframes particleFloat {
-  0%   { opacity: 0;    transform: translateY(0)   scale(0); }
-  10%  { opacity: .6; }
-  90%  { opacity: .3; }
-  100% { opacity: 0;    transform: translateY(-160px) scale(1.5); }
+
+@keyframes particleFloat{
+
+  0%{
+    transform:
+      translateY(0)
+      translateX(0)
+      scale(.2);
+    opacity:0;
+  }
+
+  8%{
+    opacity:.85;
+  }
+
+  30%{
+    transform:
+      translateY(-80px)
+      translateX(-6px)
+      scale(.8);
+    opacity:.95;
+  }
+
+  60%{
+    transform:
+      translateY(-170px)
+      translateX(8px)
+      scale(1);
+    opacity:.65;
+  }
+
+  100%{
+    transform:
+      translateY(-300px)
+      translateX(-12px)
+      scale(1.25);
+    opacity:0;
+  }
 }
 
 /* Lore text abaixo dos botões */
@@ -2706,27 +2745,30 @@ async function api(path, method="GET", body=null) {
   }
 }
 // ── Menu particles — geradas uma vez, ficam no DOM ──────────────────────────
-(function initMenuParticles(){
-  const container = document.getElementById('menu-particles');
-  if(!container) return;
-  const count = 18;
-  for(let i = 0; i < count; i++){
-    const p = document.createElement('div');
-    p.className = 'menu-particle';
-    const x = Math.random() * 100;
-    const delay = Math.random() * 8;
-    const duration = 6 + Math.random() * 8;
-    const size = 1 + Math.random() * 2.5;
-    p.style.cssText = `
-      left:${x}%;
-      bottom:${Math.random()*20}%;
-      width:${size}px;
-      height:${size}px;
-      animation-duration:${duration}s;
-      animation-delay:${delay}s;
-    `;
-    container.appendChild(p);
-  }
+(function initMenuParticles() {
+    const container = document.getElementById('menu-particles');
+    if (!container) return;
+
+    const count = 80;
+
+    for (let i = 0; i < count; i++) {
+
+        const p = document.createElement('div');
+        p.className = 'menu-particle';
+
+        const x = Math.random() * 100;
+        const size = 1 + Math.random() * 3;
+
+        p.style.left = `${x}%`;
+        p.style.bottom = `${Math.random() * 35}%`;
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+
+        p.style.animationDelay = `${Math.random()}s`;
+        p.style.animationDuration = `${3 + Math.random() * 3}s`;
+
+        container.appendChild(p);
+    }
 })();
 
 function showScreen(id) {
