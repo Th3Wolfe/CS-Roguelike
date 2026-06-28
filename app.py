@@ -62,6 +62,25 @@ def ui_files(f):
     return send_from_directory("ui", f)
 
 
+# ── Música — lista as faixas de cada pasta de contexto ──────────────────────
+MUSIC_CONTEXTS = ["frontend", "hub", "match"]
+MUSIC_EXTS = (".mp3", ".ogg", ".wav", ".m4a")
+
+@app.route("/api/music_tracks", methods=["GET"])
+def music_tracks():
+    base = os.path.join(app.root_path, "ui", "music")
+    result = {}
+    for ctx in MUSIC_CONTEXTS:
+        folder = os.path.join(base, ctx)
+        files = []
+        if os.path.isdir(folder):
+            for name in sorted(os.listdir(folder)):
+                if name.lower().endswith(MUSIC_EXTS):
+                    files.append(f"/ui/music/{ctx}/{name}")
+        result[ctx] = files
+    return jsonify({"ok": True, "tracks": result})
+
+
 # ── Eras & Draft ───────────────────────────────────────────────────────────────
 
 @app.route("/api/eras", methods=["GET"])

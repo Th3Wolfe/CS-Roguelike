@@ -424,8 +424,8 @@ body {
 /* Hexágono central decorativo */
 .menu-hex-art {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 420px;
+  height: 420px;
   opacity: 0.9;
 }
 .menu-hex-art svg {
@@ -434,9 +434,13 @@ body {
   filter: drop-shadow(0 0 40px rgba(246,179,51,.2));
   animation: hexPulse 4s ease-in-out infinite;
 }
+.menu-hex-art img {
+  filter: drop-shadow(0 0 40px rgba(246,179,51,.25));
+  animation: hexPulse 4s ease-in-out infinite;
+}
 @keyframes hexPulse {
-  0%, 100% { filter: drop-shadow(0 0 30px rgba(246,179,51,.15)); opacity: .85; }
-  50%       { filter: drop-shadow(0 0 60px rgba(246,179,51,.3));  opacity: 1;   }
+  0%, 100% { filter: drop-shadow(0 0 30px rgba(246,179,51,.2)); opacity: .88; }
+  50%       { filter: drop-shadow(0 0 70px rgba(246,179,51,.45));  opacity: 1;   }
 }
 
 /* Partículas flutuantes */
@@ -3280,21 +3284,6 @@ body {
   100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
 
-/* Flash de tela no impacto */
-.lightning-flash {
-  position: fixed;
-  inset: 0;
-  background: rgba(246,179,51,.06);
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0;
-  animation: lightningFlash var(--flash-dur, 200ms) ease-out forwards;
-}
-@keyframes lightningFlash {
-  0%   { opacity: 1; }
-  40%  { opacity: .4; }
-  100% { opacity: 0; }
-}
 
 /* ═══════════════════════════════════════════════
    INTRO SCREEN — tela de entrada antes do menu
@@ -3574,44 +3563,7 @@ body {
       <!-- Canvas SVG para o sistema de raio -->
       <svg id="lightning-canvas" viewBox="0 0 600 700" preserveAspectRatio="xMidYMid meet"></svg>
       <div class="menu-hex-art">
-        <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Hexágono externo -->
-          <polygon points="160,16 292,88 292,232 160,304 28,232 28,88"
-            fill="none" stroke="rgba(246,179,51,.15)" stroke-width="1"/>
-          <!-- Hexágono médio -->
-          <polygon points="160,44 268,104 268,224 160,284 52,224 52,104"
-            fill="none" stroke="rgba(246,179,51,.22)" stroke-width="1.5"/>
-          <!-- Hexágono interno -->
-          <polygon points="160,80 244,128 244,224 160,272 76,224 76,128"
-            fill="rgba(246,179,51,.03)" stroke="rgba(246,179,51,.35)" stroke-width="1.5"/>
-          <!-- Raios internos -->
-          <line x1="160" y1="80"  x2="160" y2="44"  stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <line x1="244" y1="128" x2="268" y2="104" stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <line x1="244" y1="224" x2="268" y2="224" stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <line x1="160" y1="272" x2="160" y2="284" stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <line x1="76"  y1="224" x2="52"  y2="224" stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <line x1="76"  y1="128" x2="52"  y2="104" stroke="rgba(246,179,51,.2)" stroke-width="1"/>
-          <!-- Cruz central -->
-          <line x1="160" y1="104" x2="160" y2="216" stroke="rgba(246,179,51,.12)" stroke-width="1"/>
-          <line x1="104" y1="160" x2="216" y2="160" stroke="rgba(246,179,51,.12)" stroke-width="1"/>
-          <!-- Círculo central -->
-          <circle cx="160" cy="160" r="32" fill="rgba(246,179,51,.06)" stroke="rgba(246,179,51,.4)" stroke-width="1.5"/>
-          <circle cx="160" cy="160" r="18" fill="rgba(246,179,51,.08)" stroke="rgba(246,179,51,.6)" stroke-width="1"/>
-          <!-- CS text no centro -->
-          <text x="160" y="168" text-anchor="middle"
-            font-family="'Barlow Condensed',sans-serif" font-weight="900" font-size="20"
-            fill="#F6B333" letter-spacing="3">CS</text>
-          <!-- Pontos nos vértices do hex interno -->
-          <circle cx="160" cy="80"  r="3" fill="rgba(246,179,51,.6)"/>
-          <circle cx="244" cy="128" r="3" fill="rgba(246,179,51,.6)"/>
-          <circle cx="244" cy="224" r="3" fill="rgba(246,179,51,.6)"/>
-          <circle cx="160" cy="272" r="3" fill="rgba(246,179,51,.6)"/>
-          <circle cx="76"  cy="224" r="3" fill="rgba(246,179,51,.6)"/>
-          <circle cx="76"  cy="128" r="3" fill="rgba(246,179,51,.6)"/>
-          <!-- Decoração de scan lines -->
-          <line x1="28"  y1="160" x2="76"  y2="160" stroke="rgba(246,179,51,.08)" stroke-width="1" stroke-dasharray="3 4"/>
-          <line x1="244" y1="160" x2="292" y2="160" stroke="rgba(246,179,51,.08)" stroke-width="1" stroke-dasharray="3 4"/>
-        </svg>
+        <img src="/ui/static/CS_Manager_Logo_2.png" alt="Major Manager" style="width:100%;height:100%;object-fit:cover;"/>
       </div>
     </div>
 
@@ -4172,15 +4124,6 @@ async function api(path, method="GET", body=null) {
       .onfinish = () => ring.remove();
   }
 
-  // ── Flash de tela ────────────────────────────────────────────────────────
-  function doFlash(dur) {
-    const flash = document.createElement('div');
-    flash.className = 'lightning-flash';
-    flash.style.setProperty('--flash-dur', dur + 'ms');
-    document.body.appendChild(flash);
-    setTimeout(() => flash.remove(), dur + 50);
-  }
-
   // ── Renderiza um raio completo ────────────────────────────────────────────
   function strikeLightning() {
     // Ponto de origem: topo, posição X aleatória na faixa central
@@ -4217,9 +4160,6 @@ async function api(path, method="GET", body=null) {
     addBranches(points, group, 0.85);
     canvas.appendChild(group);
 
-    // Flash simultâneo ao raio
-    doFlash(120);
-
     // Anima opacidade: aparece instantâneo, desvanece
     // Canal dura 500-800ms — visível o suficiente para o olho seguir
     const totalDur = 500 + Math.random() * 300;
@@ -4233,7 +4173,6 @@ async function api(path, method="GET", body=null) {
 
     // Impacto no chão a 70% da duração
     setTimeout(() => spawnImpact(endX, endY), totalDur * 0.7);
-    setTimeout(() => doFlash(100), totalDur * 0.7);
   }
 
   // ── Scheduler sincronizado com BPM ──────────────────────────────────────
@@ -4295,16 +4234,16 @@ async function api(path, method="GET", body=null) {
     if (intensity >= 2) {
       // 2º raio meio beat depois (upbeat)
       if (Math.random() < 0.65) {
-        setTimeout(strikeLightning, BEAT_MS * 0.5);
+        setTimeout(() => { if (rafId) strikeLightning(); }, BEAT_MS * 0.5);
       }
       // 3º raio em 3/4 do beat — cria sensação de triplet ocasional
       if (Math.random() < 0.25) {
-        setTimeout(strikeLightning, BEAT_MS * 0.75);
+        setTimeout(() => { if (rafId) strikeLightning(); }, BEAT_MS * 0.75);
       }
     } else {
       // Beat simples: cluster com probabilidade menor
       if (Math.random() < 0.30) {
-        setTimeout(strikeLightning, BEAT_MS * 0.5);
+        setTimeout(() => { if (rafId) strikeLightning(); }, BEAT_MS * 0.5);
       }
     }
   }
@@ -4313,10 +4252,19 @@ async function api(path, method="GET", body=null) {
   window.LightningSync = {
     connect(el) { audioEl = el; },
     disconnect() { audioEl = null; },
+    start() {
+      if (rafId) return;
+      lastBeat = -1;
+      strikeLightning();
+      rafId = requestAnimationFrame(onFrame);
+    },
+    stop() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      canvas.innerHTML = '';
+    },
   };
 
-  // Inicia o loop imediatamente (fallback até o áudio conectar)
-  setTimeout(() => { strikeLightning(); rafId = requestAnimationFrame(onFrame); }, 300);
+  // Não inicia automaticamente — controlado por showScreen('menu') via LightningSync.start()
 
 })();
 
@@ -4347,169 +4295,292 @@ async function api(path, method="GET", body=null) {
 })();
 
 // ═══════════════════════════════════════════
-// MUSIC SYSTEM
+// MUSIC SYSTEM — MusicManager centralizado
 // ═══════════════════════════════════════════
-const Music = (() => {
-  // Mapa de faixas — coloque seus arquivos em ui/music/
-  const SRC = {
-    menu:    "/ui/music/menu.mp3",
-    veto:    "/ui/music/veto.mp3",
-    game:    "/ui/music/game.mp3",
-    victory: "/ui/music/victory.mp3",
-    defeat:  "/ui/music/defeat.mp3",
-  };
 
-  // Telas → faixas
-  const SCREEN_MAP = {
-    menu:  "menu",
-    era:   "menu",
-    draft: "menu",
-    maps:  "menu",
-    veto:  "veto",
-    game:  "game",
-  };
+// ── Configuração ──────────────────────────────────────────────
+// As playlists são carregadas dinamicamente: cada contexto tem uma pasta
+// em ui/music/<contexto>/ e TODAS as faixas dentro dela entram na playlist.
+// Para adicionar/remover música, basta jogar o arquivo na pasta — nada de
+// código precisa mudar. A lista é obtida do backend (GET /api/music_tracks),
+// que lê o conteúdo de cada pasta.
+const MUSIC_CONTEXTS = ["frontend", "hub", "match"];
 
-  // Faixas sem loop (tocam uma vez)
-  const NO_LOOP = new Set(["victory", "defeat"]);
+// Pastas vazias até a primeira resposta do backend chegar; MusicManager
+// já existe e funciona normalmente, só não tem faixa pra tocar ainda.
+const MUSIC = {};
+MUSIC_CONTEXTS.forEach(ctx => { MUSIC[ctx] = []; });
 
-  const tracks = {};
-  let current  = null;
-  let muted    = false;
-  let volume   = 0.40;
-  let _hideTimer = null;
+// Faixas avulsas — não fazem parte do ciclo de contextos, tocam uma vez
+// e devolvem o controle ao contexto atual quando terminam.
+const ONE_SHOT_TRACKS = {
+  victory: "/ui/music/victory.mp3",
+  defeat:  "/ui/music/defeat.mp3",
+};
 
-  // Lazy-create Audio elements
-  function _get(name) {
-    if (!tracks[name]) {
-      const a = new Audio(SRC[name]);
-      a.loop   = !NO_LOOP.has(name);
-      a.volume = muted ? 0 : volume;
-      tracks[name] = a;
-    }
-    return tracks[name];
+// ── Classe MusicManager ───────────────────────────────────────
+class MusicManager {
+  constructor(playlists) {
+    this.playlists       = playlists;
+    this.remainingTracks = {};
+    Object.keys(playlists).forEach(ctx => { this.remainingTracks[ctx] = []; });
+
+    this.currentContext = null;
+    this.currentTrack   = null;
+
+    // Player único, reutilizado para tudo (contextos + one-shots)
+    this.audio = new Audio();
+    this.audio.addEventListener("ended", () => this._onEnded());
+
+    this.volume  = 0.40;
+    this._muted  = false;
+    this.audio.volume = this.volume;
+
+    this._oneShotActive  = false; // true enquanto toca victory/defeat
+    this._returnContext  = null;  // contexto a retomar após o one-shot
+    this._fadeId         = null;
+    this._pendingContext = null;  // setContext pendente (autoplay bloqueado)
+    this._pendingOneShot = null;
+
+    // Qualquer gesto do usuário desbloqueia autoplay
+    ["click", "keydown", "touchstart", "pointerdown"].forEach(ev =>
+      document.addEventListener(ev, () => this._tryUnlock())
+    );
   }
 
-  // Fade helpers
-  function _fadeTo(audio, target, ms = 600, onDone) {
-    const step = 50;
-    const steps = ms / step;
-    const delta = (target - audio.volume) / steps;
+  // ── Shuffle inteligente: nunca repete antes de esgotar a playlist ──
+  _refill(ctx) {
+    const fresh = [...(this.playlists[ctx] || [])];
+    for (let i = fresh.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [fresh[i], fresh[j]] = [fresh[j], fresh[i]];
+    }
+    this.remainingTracks[ctx] = fresh;
+  }
+
+  _nextTrack(ctx) {
+    if (!this.remainingTracks[ctx] || this.remainingTracks[ctx].length === 0) {
+      this._refill(ctx);
+    }
+    return this.remainingTracks[ctx].pop();
+  }
+
+  // ── API pública de contexto ──────────────────────────────────
+  setContext(ctx) {
+    if (!this.playlists[ctx]) return;          // contexto inexistente: ignora
+    if (this.currentContext === ctx && !this._oneShotActive) return; // já está lá: nada a fazer
+    this.currentContext = ctx;
+    this._oneShotActive = false;
+    this._playFromContext(ctx);
+  }
+
+  _playFromContext(ctx) {
+    const track = this._nextTrack(ctx);
+    if (!track) return;
+    this._crossfadeTo(track);
+  }
+
+  playNext() {
+    if (!this.currentContext) return;
+    this._playFromContext(this.currentContext);
+  }
+
+  // Faixa terminou — se for contexto normal, toca a próxima da fila.
+  // Se for one-shot (victory/defeat), retoma o contexto anterior.
+  _onEnded() {
+    if (this._oneShotActive) {
+      this._oneShotActive = false;
+      if (this._returnContext) this.setContext(this._returnContext);
+      return;
+    }
+    this.playNext();
+  }
+
+  // ── Faixas avulsas (victory/defeat) ─────────────────────────
+  playOnce(src) {
+    this._oneShotActive = true;
+    this._returnContext = this.currentContext;
+    this._crossfadeTo(src);
+  }
+
+  // ── Fade + troca de faixa ───────────────────────────────────
+  _crossfadeTo(src) {
+    const FADE_MS = 800;
+    const startNewTrack = () => {
+      this.audio.pause();
+      this.currentTrack      = src;
+      this.audio.src         = src;
+      this.audio.currentTime = 0;
+      this.audio.volume      = 0;
+
+      // Sincroniza os raios com o áudio do frontend; desconecta nos demais
+      if (window.LightningSync) {
+        if (this.currentContext === "frontend") window.LightningSync.connect(this.audio);
+        else                                    window.LightningSync.disconnect();
+      }
+
+      const playPromise = this.audio.play();
+      if (playPromise && playPromise.then) {
+        playPromise.then(() => {
+          this._fadeTo(this._muted ? 0 : this.volume, FADE_MS);
+        }).catch(() => {
+          // Autoplay bloqueado — retoma no próximo gesto do usuário.
+          if (this._oneShotActive) this._pendingOneShot = src;
+          else this._pendingContext = this.currentContext;
+        });
+      }
+    };
+
+    // Só faz sentido um fade-out se já houver algo tocando de fato.
+    // Na primeira faixa (nada tocando ainda) vai direto, sem 800ms de silêncio.
+    if (this.currentTrack && !this.audio.paused) {
+      this._fadeTo(0, FADE_MS, startNewTrack);
+    } else {
+      startNewTrack();
+    }
+  }
+
+  _fadeTo(target, ms, onDone) {
+    if (this._fadeId) clearInterval(this._fadeId);
+    const step  = 50;
+    const steps = Math.max(1, ms / step);
+    const delta = (target - this.audio.volume) / steps;
     let n = 0;
-    const id = setInterval(() => {
+    this._fadeId = setInterval(() => {
       n++;
-      audio.volume = Math.max(0, Math.min(1, audio.volume + delta));
+      this.audio.volume = Math.max(0, Math.min(1, this.audio.volume + delta));
       if (n >= steps) {
-        clearInterval(id);
-        audio.volume = target;
+        clearInterval(this._fadeId);
+        this.audio.volume = target;
         if (onDone) onDone();
       }
     }, step);
-    return id;
   }
 
-  // Faixa pendente quando autoplay é bloqueado — declarada antes de play()
-  let _pendingPlay = null;
-  let _unlocked    = false;
-
-  function _tryUnlock() {
-    if (_unlocked) return;
-    _unlocked = true;
-    if (_pendingPlay) {
-      const name = _pendingPlay;
-      _pendingPlay = null;
-      // Reseta current para que play() não saia na guarda current===name
-      current = null;
-      play(name);
+  // Tenta retomar uma reprodução que ficou pendente por bloqueio de autoplay.
+  // Não usa flag de "já destravado": um gesto cedo demais (ex: clique na
+  // intro, antes da playlist carregar) não pode consumir o desbloqueio e
+  // travar tentativas futuras. Só importa se existe algo pendente agora.
+  _tryUnlock() {
+    if (this._pendingOneShot) {
+      const src = this._pendingOneShot;
+      this._pendingOneShot = null;
+      this.playOnce(src);
+    } else if (this._pendingContext) {
+      const ctx = this._pendingContext;
+      this._pendingContext = null;
+      this.currentContext = null; // permite que setContext não saia pela guarda
+      this.setContext(ctx);
     }
   }
-  // Qualquer gesto do usuário desbloqueia — listener permanente até unlock
-  ["click","keydown","touchstart","pointerdown"].forEach(ev =>
-    document.addEventListener(ev, _tryUnlock)
-  );
+
+  stop() {
+    this._fadeTo(0, 400, () => { this.audio.pause(); this.audio.currentTime = 0; });
+    this.currentContext = null;
+    this._oneShotActive = false;
+  }
+
+  setVolume(v) {
+    this.volume = Math.max(0, Math.min(1, v));
+    if (!this._muted) this.audio.volume = this.volume;
+  }
+
+  toggleMute() {
+    this._muted = !this._muted;
+    this.audio.volume = this._muted ? 0 : this.volume;
+    return this._muted;
+  }
+
+  // Atualiza as playlists em runtime (usado quando a lista de faixas
+  // chega do backend, depois de ler o conteúdo das pastas ui/music/<ctx>/).
+  setPlaylists(playlists) {
+    Object.keys(playlists).forEach(ctx => {
+      this.playlists[ctx] = playlists[ctx] || [];
+      this.remainingTracks[ctx] = []; // refaz o shuffle com a lista atual
+    });
+    // Se já estamos num contexto mas nenhuma faixa tocou ainda
+    // (pasta estava vazia até agora), começa a tocar.
+    if (this.currentContext && !this.currentTrack && !this._oneShotActive) {
+      this._playFromContext(this.currentContext);
+    }
+  }
+}
+
+const musicManager = new MusicManager(MUSIC);
+
+// Carrega as faixas de cada pasta (ui/music/frontend/, /hub/, /match/) do backend.
+// Quando chegar, preenche as playlists — se o jogador já estiver em algum
+// contexto e a pasta tiver acabado de ganhar conteúdo, a música começa sozinha.
+fetch("/api/music_tracks")
+  .then(r => r.json())
+  .then(data => {
+    if (data && data.ok && data.tracks) musicManager.setPlaylists(data.tracks);
+  })
+  .catch(() => { /* backend indisponível — segue sem música até conseguir carregar */ });
+
+// ── Camada de compatibilidade ────────────────────────────────
+// Mantém a API antiga (Music.play/stop/setVolume/toggleMute/onScreen)
+// funcionando exatamente como antes; por baixo, tudo passa pelo
+// MusicManager. Nenhuma chamada existente no resto do projeto precisa mudar.
+const Music = (() => {
+  // Telas → contexto
+  const SCREEN_CONTEXT = {
+    menu:  "frontend",
+    era:   "frontend",
+    draft: "frontend",
+    maps:  "frontend",
+    veto:  "match",
+    game:  "hub",
+  };
+
+  // Compat: chamadas antigas como Music.play("menu"), Music.play("veto") etc.
+  const LEGACY_CONTEXT = { menu: "frontend", veto: "match", game: "hub" };
+
+  let _hideTimer = null;
 
   function play(name) {
-    if (!SRC[name]) return;
-    if (current === name) return;
-
-    // Fade out the current track then fade in the new one
-    if (current && tracks[current]) {
-      const prev = tracks[current];
-      _fadeTo(prev, 0, 500, () => { prev.pause(); prev.currentTime = 0; });
-    }
-
-    current = name;
-    const a = _get(name);
-    a.volume = 0;
-
-    // Sincroniza raios com o áudio do menu; desconecta nas demais telas
-    if (window.LightningSync) {
-      if (name === "menu") window.LightningSync.connect(a);
-      else                 window.LightningSync.disconnect();
-    }
-
-    a.play().then(() => {
-      _unlocked = true;
-      _fadeTo(a, muted ? 0 : volume, 700);
-    }).catch(() => {
-      // Autoplay bloqueado — toca no próximo gesto do usuário.
-      // Reseta current para que _tryUnlock possa chamar play() novamente.
-      current = null;
-      _pendingPlay = name;
-    });
+    if (ONE_SHOT_TRACKS[name]) { musicManager.playOnce(ONE_SHOT_TRACKS[name]); return; }
+    if (LEGACY_CONTEXT[name])  { musicManager.setContext(LEGACY_CONTEXT[name]); return; }
   }
 
-  function stop() {
-    if (current && tracks[current]) {
-      _fadeTo(tracks[current], 0, 400, () => {
-        tracks[current].pause();
-        tracks[current].currentTime = 0;
-      });
-    }
-    current = null;
-  }
+  function stop() { musicManager.stop(); }
 
-  function setVolume(v) {
-    volume = Math.max(0, Math.min(1, v));
-    if (!muted && current && tracks[current]) {
-      tracks[current].volume = volume;
-    }
-  }
+  function setVolume(v) { musicManager.setVolume(v); }
 
   function toggleMute() {
-    muted = !muted;
+    const muted = musicManager.toggleMute();
     const btn = document.getElementById("music-btn");
-    if (current && tracks[current]) {
-      tracks[current].volume = muted ? 0 : volume;
-    }
     btn.textContent = muted ? "🔇" : "🎵";
     btn.classList.toggle("muted", muted);
   }
 
   function onScreen(id) {
-    const track = SCREEN_MAP[id];
-    if (track) play(track);
+    const ctx = SCREEN_CONTEXT[id];
+    if (ctx) musicManager.setContext(ctx);
   }
 
-  // Popup show/hide with delay so it doesn't vanish when moving mouse
+  // Popup show/hide (inalterado)
   function showPopup() {
     clearTimeout(_hideTimer);
     document.getElementById("music-popup").classList.add("visible");
   }
   function scheduleHidePopup() {
     _hideTimer = setTimeout(() => {
-      // Only hide if mouse isn't over the popup itself
       document.getElementById("music-popup").classList.remove("visible");
     }, 320);
   }
-
-  // Keep popup open while hovering over it
   const popupEl = document.getElementById("music-popup");
   if (popupEl) {
     popupEl.addEventListener("mouseenter", () => clearTimeout(_hideTimer));
     popupEl.addEventListener("mouseleave", scheduleHidePopup);
   }
 
-  return { play, stop, setVolume, toggleMute, onScreen, showPopup, scheduleHidePopup };
+  return {
+    play, stop, setVolume, toggleMute, onScreen, showPopup, scheduleHidePopup,
+    // exposto para quem quiser falar diretamente com o MusicManager
+    setContext: (ctx) => musicManager.setContext(ctx),
+    manager: musicManager,
+  };
 })();
 
 function showScreen(id) {
@@ -4528,6 +4599,12 @@ function showScreen(id) {
   document.body.scrollTop = 0;
   next.scrollTop = 0;
   next.querySelectorAll("*").forEach(el => { if (el.scrollTop) el.scrollTop = 0; });
+
+  // Para o raio ao sair do menu; retoma ao voltar
+  if (window.LightningSync) {
+    if (id === 'menu') window.LightningSync.start();
+    else               window.LightningSync.stop();
+  }
 
   // Música por tela
   Music.onScreen(id);
@@ -6105,11 +6182,12 @@ async function animSeriesCollect() {
 
   // ── 2. Open overlay and call backend (maps 1+ use defaults; player can pause to change) ─
   document.getElementById("match-overlay").classList.add("show");
+  Music.setContext("match");
   document.getElementById("auto-pause-bar").style.display = "block";
   document.getElementById("spd-label").textContent = SPEED_LEVELS[_simSpeed].label;
 
   const r = await api("/play_series", "POST", { tactics: _tacState.tactics });
-  if(!r.ok){ toast(r.error||"Erro","err"); document.getElementById("match-overlay").classList.remove("show"); return; }
+  if(!r.ok){ toast(r.error||"Erro","err"); document.getElementById("match-overlay").classList.remove("show"); Music.setContext("hub"); return; }
   G.team = r.team; G.campaign = r.campaign; G.shareCode = r.share_code;
   G.bracket = r.bracket || G.bracket;
   G._lastTeamScore = r.team_score;
@@ -6321,6 +6399,7 @@ async function maybeEnemyPause(mapIdx) {
 function closeMatch(){
   document.getElementById("match-overlay").classList.remove("show");
   document.getElementById("auto-pause-bar").style.display = "none";
+  Music.setContext("hub");
   const stg=G.campaign?.stage;
   if(stg==="finished_win"||stg==="finished_loss"){
     showStageModal(false, stg==="finished_win");
