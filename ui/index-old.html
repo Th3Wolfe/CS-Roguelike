@@ -3282,13 +3282,14 @@ body {
 
 /* Flash de tela no impacto */
 .lightning-flash {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(246,179,51,.06);
   pointer-events: none;
-  z-index: 9999;
+  z-index: 3;
   opacity: 0;
   animation: lightningFlash var(--flash-dur, 200ms) ease-out forwards;
+  border-radius: inherit;
 }
 @keyframes lightningFlash {
   0%   { opacity: 1; }
@@ -4177,7 +4178,7 @@ async function api(path, method="GET", body=null) {
     const flash = document.createElement('div');
     flash.className = 'lightning-flash';
     flash.style.setProperty('--flash-dur', dur + 'ms');
-    document.body.appendChild(flash);
+    menuRight.appendChild(flash);
     setTimeout(() => flash.remove(), dur + 50);
   }
 
