@@ -2134,23 +2134,19 @@ body {
   background-size: cover;
   background-position: center center;
 }
-/* Mesmo princípio do match-overlay: overlay radial fino,
-   mais aberto no centro, mais fechado nas bordas.
-   Stage result é mais solene — ligeiramente mais escuro que a partida. */
 #stage-overlay::before {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse at center, rgba(6,10,15,.52) 0%, rgba(6,10,15,.80) 100%);
+  background: rgba(6, 10, 15, .88);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
   pointer-events: none;
   z-index: 0;
 }
 #stage-overlay .stage-modal {
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(var(--blur-sm));
-  -webkit-backdrop-filter: blur(var(--blur-sm));
 }
 #stage-overlay.show { display:flex; }
 .stage-modal {
@@ -2218,32 +2214,27 @@ body {
   justify-content: center;
   padding: 20px;
   overflow-y: auto;
-  /* Plano 1 — imagem de confronto CT vs T, levemente desfocada */
+  /* Plano 1 — imagem de confronto CT vs T */
   background-image: url('/ui/static/bg-match.png');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
 }
-/* Overlay: FINO — apenas o suficiente para o modal ser legível.
-   A imagem precisa ser sentida, não apagada.
-   Sem blur aqui — blur fica só no modal. */
+/* Overlay escuro para legibilidade do modal */
 #match-overlay::before {
   content: '';
   position: fixed;
   inset: 0;
-  /* gradiente: mais escuro nas extremidades (onde estão os soldados),
-     mais aberto no centro (onde fica o modal) */
-  background:
-    radial-gradient(ellipse at center, rgba(6,10,15,.45) 0%, rgba(6,10,15,.72) 100%);
+  background: rgba(6, 10, 15, .82);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
   pointer-events: none;
   z-index: 0;
 }
-/* Modal: vidro com blur próprio — não contamina o fundo */
+/* Modal acima do overlay */
 #match-overlay .match-modal {
   position: relative;
   z-index: 1;
-  backdrop-filter: blur(var(--blur-sm));
-  -webkit-backdrop-filter: blur(var(--blur-sm));
 }
 #match-overlay.show { display:flex; }
 .match-modal {
@@ -2938,16 +2929,17 @@ body {
   animation: modalSlideUp var(--duration-medium) var(--ease);
 }
 
-/* event-overlay e panel-overlay: sem imagem de fundo, ficam com blur */
+/* Upgrade overlay backdrops to use blur */
+#stage-overlay,
+#match-overlay,
 #event-overlay {
-  backdrop-filter: blur(var(--blur-sm));
-  -webkit-backdrop-filter: blur(var(--blur-sm));
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
 }
 .panel-overlay {
   backdrop-filter: blur(var(--blur-sm));
   -webkit-backdrop-filter: blur(var(--blur-sm));
 }
-/* stage e match: blur está no modal, não no overlay — ver blocos acima */
 
 /* ── Modals — upgrade borders + radius ── */
 .stage-modal {
