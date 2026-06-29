@@ -823,69 +823,6 @@ body {
 /* garante que topbar e body ficam acima do overlay */
 #screen-draft > * { position: relative; z-index: 1; }
 
-/* ═══════════════════════════════════════════════
-   MAP PROFICIENCY & VETO SCREENS — mesmo princípio
-   de atmosfera do Draft: imagem de fundo + overlay
-   de vinheta para legibilidade. Maps reaproveita o
-   cenário do Draft; Veto reaproveita o cenário do
-   Match (são, conceitualmente, a mesma "sala").
-═══════════════════════════════════════════════ */
-#screen-maps,
-#screen-veto {
-  overflow: hidden;
-  position: relative;
-  background-color: var(--bg);
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-#screen-maps { background-image: url('/ui/static/bg-draft.png'); }
-#screen-veto { background-image: url('/ui/static/bg-match.png'); }
-
-#screen-maps::before,
-#screen-veto::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 70% 30%, rgba(246,179,51,.05) 0%, transparent 55%),
-    radial-gradient(ellipse at 100% 0%,  rgba(0,0,0,.65) 0%, transparent 55%),
-    radial-gradient(ellipse at 0%  100%, rgba(0,0,0,.55) 0%, transparent 55%),
-    linear-gradient(180deg,
-      rgba(11,16,22,.88) 0%,
-      rgba(11,16,22,.55) 25%,
-      rgba(11,16,22,.45) 65%,
-      rgba(11,16,22,.92) 100%);
-  pointer-events: none;
-  z-index: 0;
-}
-#screen-maps > *,
-#screen-veto > * { position: relative; z-index: 1; }
-
-/* Conteúdo scrollável dentro das telas de setup (Maps/Veto) */
-.setup-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: 28px 32px;
-  max-width: 980px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* Action bar fixa no rodapé — espelha .draft-sidebar-footer.
-   Garante que a ação principal nunca exija scroll, mesmo
-   conforme o log de veto / picks crescem. */
-.setup-action-bar {
-  flex-shrink: 0;
-  padding: 16px 32px;
-  border-top: 1px solid rgba(246,179,51,.15);
-  background: rgba(11,16,22,.82);
-  backdrop-filter: blur(var(--blur-sm));
-  -webkit-backdrop-filter: blur(var(--blur-sm));
-  box-shadow: 0 -8px 24px rgba(0,0,0,.28);
-}
-.setup-action-bar:empty { display: none; }
-
 /* ── Input de nome do time — estilo HUD, não Word ── */
 .team-name-inp {
   width: 100%;
@@ -980,7 +917,7 @@ body {
    Cor: bg2, borda direita sutil, scroll interno
 ──────────────────────────────────────────── */
 .draft-sidebar {
-  background: #111720cc;
+  background: var(--bg2);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -1228,7 +1165,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #11172000;
+  background: var(--bg);
 }
 
 /* Cabeçalho do painel direito com team banner */
@@ -1236,7 +1173,7 @@ body {
   padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: #111720cc;
+  background: var(--bg2);
 }
 
 /* Team banner — espelha o card de time do protótipo */
@@ -2185,18 +2122,6 @@ body {
   color: var(--color-primary);
 }
 .screen-topbar-spacer { flex: 1; }
-.screen-topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.screen-topbar-meta {
-  font-family: var(--font-display);
-  font-size: .72rem;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-}
 
 /* layout */
 /* ═══════════════════════════════════════════════
@@ -2645,17 +2570,17 @@ body {
 .mp-card:hover:not(.mp-none) { border-color:var(--border2); transform:translateY(-2px); }
 .mp-card.mp-full {
   border-color: rgba(54,217,120,.45);
-  background: rgba(54,217,120,.19);
+  background: rgba(54,217,120,.06);
   box-shadow: var(--glow-success);
 }
 .mp-card.mp-half {
   border-color: rgba(246,179,51,.4);
-  background: rgba(246,179,51,.19);
+  background: rgba(246,179,51,.05);
   box-shadow: var(--glow-primary);
 }
 .mp-card.mp-none {
   border-color: rgba(241,76,76,.3);
-  background: rgba(241,76,76,.35);
+  background: rgba(241,76,76,.04);
   opacity: .55;
   pointer-events: none;
 }
@@ -3137,16 +3062,7 @@ body {
 #match-overlay.show { display:flex; }
 .match-modal {
   background:var(--bg2); border:2px solid var(--orange); border-radius:var(--r);
-  width:680px; max-width:98vw;
-  max-height:90vh;
-  display:flex; flex-direction:column;
-  overflow:hidden;
-}
-.match-modal-scroll {
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  padding:24px 24px 4px;
+  width:680px; max-width:98vw; padding:24px;
 }
 .mm-header {
   text-align:center; margin-bottom:18px;
@@ -3301,16 +3217,11 @@ body {
 .pst-kd-pos { color:var(--green); }
 .pst-kd-neg { color:var(--red); }
 
-/* match summary — agora fora da área de scroll, sempre visível.
-   Espelha .setup-action-bar: rodapé fixo com a ação principal. */
+/* match summary */
 .match-summary {
-  flex-shrink: 0;
-  background: rgba(11,16,22,.82);
-  backdrop-filter: blur(var(--blur-sm));
-  -webkit-backdrop-filter: blur(var(--blur-sm));
-  padding: 18px 24px; text-align: center; display: none;
-  border-top: 1px solid rgba(246,179,51,.15);
-  box-shadow: 0 -8px 24px rgba(0,0,0,.28);
+  margin-top:16px; background:var(--bg3); border-radius:var(--r);
+  padding:20px; text-align:center; display:none;
+  border:1px solid var(--border);
 }
 .match-summary.show { display:block; }
 .ms-result {
@@ -3520,15 +3431,11 @@ body {
   .match-modal {
     width:100vw;
     height:100dvh;
-    max-height:100dvh;
     max-width:none;
     border-radius:0;
-  }
-  .match-modal-scroll {
-    padding:max(12px, env(safe-area-inset-top)) 12px 12px;
-  }
-  .match-summary {
-    padding-bottom:max(18px, env(safe-area-inset-bottom));
+    padding:12px 12px max(12px, env(safe-area-inset-bottom));
+    overflow-y:auto;
+    padding-top:max(12px, env(safe-area-inset-top));
   }
   .mm-matchup   { gap:8px; }
   .mm-team-name { min-width:auto; font-size:.95rem; }
@@ -3677,6 +3584,7 @@ body {
   .sidebar-action {
     padding-bottom:max(10px, env(safe-area-inset-bottom));
   }
+  .match-modal,
   .stage-modal,
   .panel-box,
   .ev-modal {
@@ -4504,20 +4412,14 @@ body {
 </div>
 
 <!-- ═══════════════════════════  MAP POOL  ═══════════════════════════ -->
-<div id="screen-maps" class="screen">
-  <div class="screen-topbar">
-    <div class="screen-topbar-left">
-      <button class="btn btn-ghost btn-sm" onclick="showScreen('draft')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Time
-      </button>
-      <span class="screen-topbar-title">Proficiência de Mapas</span>
-    </div>
+<div id="screen-maps" class="screen" style="flex-direction:column;background:var(--bg);">
+  <div class="top-bar">
+    <span class="screen-topbar-title">Proficiência de Mapas</span>
     <div class="screen-topbar-spacer"></div>
-    <span class="screen-topbar-meta">Passo 3 de 3</span>
-    <span id="maps-sel-status" class="screen-topbar-meta" style="margin-left:16px;color:var(--text2);"></span>
+    <span style="font-family:var(--font-display);font-size:.7rem;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;">Passo 3 de 3</span>
+    <span id="maps-sel-status" style="font-family:var(--font-display);font-size:.78rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-left:16px;"></span>
   </div>
-  <div class="setup-scroll">
+  <div style="flex:1;overflow-y:auto;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;">
     <div style="margin-bottom:24px;">
       <div class="section-head" style="font-size:.9rem;letter-spacing:.12em;margin-bottom:10px;">Como seu time joga cada mapa?</div>
       <div style="font-size:.88rem;color:var(--text2);line-height:1.7;max-width:680px;">
@@ -4530,42 +4432,34 @@ body {
       <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--red)"></div><span>Nula (−10% win rate)</span></div>
     </div>
     <div id="mp-grid" class="mp-grid"></div>
-  </div>
-  <div class="setup-action-bar" style="display:flex;justify-content:flex-end;">
-    <button class="btn btn-orange btn-lg" id="btn-confirm-maps" disabled onclick="confirmMapPool()">
-      Confirmar e Iniciar Major →
-    </button>
+    <div style="margin-top:32px;display:flex;justify-content:flex-end;">
+      <button class="btn btn-orange btn-lg" id="btn-confirm-maps" disabled onclick="confirmMapPool()">
+        Confirmar e Iniciar Major →
+      </button>
+    </div>
   </div>
 </div>
 
 <!-- ═══════════════════════════  VETO  ═══════════════════════════ -->
-<div id="screen-veto" class="screen">
-  <div class="screen-topbar">
-    <div class="screen-topbar-left">
-      <button class="btn btn-ghost btn-sm" onclick="showScreen('maps')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Mapas
-      </button>
-      <span class="screen-topbar-title">Pick &amp; Ban de Mapas</span>
-    </div>
+<div id="screen-veto" class="screen" style="flex-direction:column;background:var(--bg);">
+  <div class="top-bar">
+    <span class="screen-topbar-title">Pick & Ban de Mapas</span>
     <div class="screen-topbar-spacer"></div>
-    <span class="screen-topbar-meta">Vete mapas ruins · Escolha os seus favoritos</span>
-    <span id="veto-vs-label" class="screen-topbar-meta" style="margin-left:16px;color:var(--text2);"></span>
+    <span style="font-family:var(--font-display);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Vete mapas ruins · Escolha os seus favoritos</span>
+    <span id="veto-vs-label" style="font-family:var(--font-display);font-size:.82rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-left:16px;"></span>
   </div>
-  <div class="setup-scroll">
+  <div style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;margin:0 auto;width:100%;">
     <!-- Coin flip result -->
     <div id="veto-coin" style="margin-bottom:16px;padding:11px 16px;background:var(--color-bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;color:var(--text2);font-family:var(--font-mono);"></div>
     <!-- Veto sequence log -->
     <div id="veto-log" style="margin-bottom:20px;display:flex;flex-direction:column;gap:6px;"></div>
     <!-- Map grid -->
-    <div>
+    <div style="margin-bottom:20px;">
       <div id="veto-instruction" style="font-family:var(--font-display);font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--color-primary);margin-bottom:14px;min-height:1.5em;"></div>
       <div id="veto-map-grid" class="veto-map-grid"></div>
     </div>
-  </div>
-  <!-- Action bar fixa: lado escolhido + picks finais nunca exigem scroll -->
-  <div class="setup-action-bar">
-    <div id="veto-side-panel" style="display:none;padding:14px 16px;background:var(--bg2);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);margin-bottom:12px;">
+    <!-- Side choice (appears when needed) -->
+    <div id="veto-side-panel" style="display:none;margin-bottom:20px;padding:18px 20px;background:var(--bg2);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);">
       <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:12px;">
         Escolha seu lado em <span id="veto-side-map" style="color:var(--text)"></span>
       </div>
@@ -4575,7 +4469,7 @@ body {
       </div>
     </div>
     <!-- Final picks display -->
-    <div id="veto-picks" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+    <div id="veto-picks" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;"></div>
   </div>
 </div>
 
@@ -4743,44 +4637,41 @@ body {
 <!-- ═══════════════════════════  MATCH OVERLAY  ═══════════════════════════ -->
 <div id="match-overlay">
   <div class="match-modal">
-    <div class="match-modal-scroll">
-      <div class="mm-header">
-        <div class="mm-live">● LIVE</div>
-        <div class="mm-matchup">
-          <div class="mm-team-name left"  id="mv-team">–</div>
-          <div class="mm-vs">VS</div>
-          <div class="mm-team-name right" id="mv-opp">–</div>
-        </div>
-        <div class="mm-controls">
-          <div class="speed-ctrl" title="Velocidade da simulação — mais rápido pula detalhes, mais lento mostra rodada a rodada">
-            <button class="spd-btn" onclick="changeSpeed(-1)" title="Mais devagar">–</button>
-            <span id="spd-label">▶ Normal</span>
-            <button class="spd-btn" onclick="changeSpeed(1)" title="Mais rápido">+</button>
-          </div>
-          <button class="btn btn-ghost btn-sm" id="btn-pause-match" onclick="playerPauseMatch()" title="Pause Técnico — permite trocar a tática no meio do mapa (1x por mapa)">⏸ Pause Técnico</button>
-        </div>
+    <div class="mm-header">
+      <div class="mm-live">● LIVE</div>
+      <div class="mm-matchup">
+        <div class="mm-team-name left"  id="mv-team">–</div>
+        <div class="mm-vs">VS</div>
+        <div class="mm-team-name right" id="mv-opp">–</div>
       </div>
-      <div class="mm-half-banner" id="mm-half-banner" style="display:none;"></div>
-      <div class="series-maps" id="series-maps">
-        <div class="sm-dot" id="dot-0">1</div>
-        <div class="sm-dot" id="dot-1">2</div>
-        <div class="sm-dot" id="dot-2">3</div>
-      </div>
-      <div id="maps-area"></div>
-      <div class="pst-section" id="pst-section" style="display:none;">
-        <div class="pst-label">Desempenho do Time</div>
-        <table class="pst-table" id="pst-table">
-          <thead>
-            <tr>
-              <th>Jogador</th>
-              <th>K</th><th>D</th><th>K/D</th><th>ADR</th>
-            </tr>
-          </thead>
-          <tbody id="pst-body"></tbody>
-        </table>
+      <div class="mm-controls">
+        <div class="speed-ctrl" title="Velocidade da simulação — mais rápido pula detalhes, mais lento mostra rodada a rodada">
+          <button class="spd-btn" onclick="changeSpeed(-1)" title="Mais devagar">–</button>
+          <span id="spd-label">▶ Normal</span>
+          <button class="spd-btn" onclick="changeSpeed(1)" title="Mais rápido">+</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-pause-match" onclick="playerPauseMatch()" title="Pause Técnico — permite trocar a tática no meio do mapa (1x por mapa)">⏸ Pause Técnico</button>
       </div>
     </div>
-    <!-- Sempre visível, sem precisar rolar — espelha .setup-action-bar -->
+    <div class="mm-half-banner" id="mm-half-banner" style="display:none;"></div>
+    <div class="series-maps" id="series-maps">
+      <div class="sm-dot" id="dot-0">1</div>
+      <div class="sm-dot" id="dot-1">2</div>
+      <div class="sm-dot" id="dot-2">3</div>
+    </div>
+    <div id="maps-area"></div>
+    <div class="pst-section" id="pst-section" style="display:none;">
+      <div class="pst-label">Desempenho do Time</div>
+      <table class="pst-table" id="pst-table">
+        <thead>
+          <tr>
+            <th>Jogador</th>
+            <th>K</th><th>D</th><th>K/D</th><th>ADR</th>
+          </tr>
+        </thead>
+        <tbody id="pst-body"></tbody>
+      </table>
+    </div>
     <div class="match-summary" id="match-summary">
       <div class="ms-result" id="ms-result">–</div>
       <div class="ms-desc"   id="ms-desc">–</div>
