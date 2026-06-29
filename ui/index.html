@@ -1710,8 +1710,6 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(246,179,51,.10);
-  position: relative;
-  z-index: 10;
 }
 .hub-nav-tab {
   font-family: var(--font-display);
@@ -1842,79 +1840,302 @@ body {
 .hub-ic-waiting { font-size: .78rem; color: var(--color-primary); font-weight: 600; }
 
 /* ── GET READY SECTION ── */
+/* ══ GET READY — layout protótipo ══ */
 .hub-get-ready {
-  background: rgba(22,29,40,0.92);
-  border: 1px solid rgba(246,179,51,.18);
+  background: rgba(14,19,28,0.97);
+  border: 1px solid rgba(255,255,255,.07);
   border-radius: var(--radius);
-  padding: 24px 28px;
   margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-.hub-get-ready::before {
-  content:'';
-  position: absolute;
-  top:0; left:0; right:0; height:2px;
-  background: linear-gradient(90deg, var(--color-primary), transparent);
+
+/* Cabeçalho */
+.hub-gr-head {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.hub-gr-eyebrow {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  color: var(--text3);
+  margin-bottom: 5px;
 }
 .hub-gr-title {
   font-family: var(--font-display);
-  font-size: .62rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .2em;
-  color: var(--text3);
-  margin-bottom: 14px;
-}
-.hub-gr-tactics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-.hub-gr-side-label {
-  font-family: var(--font-display);
-  font-size: .65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  color: var(--text3);
-  margin-bottom: 8px;
-}
-.hub-tac-cards { display:flex; flex-direction:column; gap:6px; }
-.hub-tac-opt {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-  text-align: left;
-  width: 100%;
-}
-.hub-tac-opt:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
-.hub-tac-opt.selected {
-  background: rgba(246,179,51,.10);
-  border-color: rgba(246,179,51,.40);
-}
-.hub-tac-opt-label {
-  font-family: var(--font-display);
-  font-size: .82rem;
-  font-weight: 700;
+  letter-spacing: .05em;
   color: var(--text);
-  margin-bottom: 2px;
-}
-.hub-tac-opt.selected .hub-tac-opt-label { color: var(--color-primary); }
-.hub-tac-opt-desc { font-size: .72rem; color: var(--text3); }
-
-.hub-gr-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 9px;
+  margin-bottom: 5px;
 }
-.hub-gr-tac-summary { font-family: var(--font-mono); font-size: .72rem; color: var(--text3); }
-.hub-gr-tac-summary span { color: var(--color-primary); }
+.hub-gr-subtitle {
+  font-size: .76rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* Corpo 3 colunas */
+.hub-gr-body {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  min-height: 440px;
+}
+.hub-gr-col {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px 16px;
+}
+.hub-gr-col-ct { border-right: 1px solid rgba(255,255,255,.05); }
+.hub-gr-col-t  { border-left:  1px solid rgba(255,255,255,.05); }
+
+.hub-gr-col-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.hub-gr-badge {
+  font-family: var(--font-display);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  padding: 3px 9px;
+  border-radius: 3px;
+}
+.hub-gr-badge-ct { background: rgba(59,130,246,.18); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.hub-gr-badge-t  { background: rgba(246,179,51,.14); color: #f6b333; border: 1px solid rgba(246,179,51,.28); }
+.hub-gr-col-name {
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text2);
+}
+.hub-gr-col-hint { font-size: .66rem; color: var(--text3); }
+
+/* Cards */
+.hub-tac-cards { display: flex; flex-direction: column; gap: 7px; }
+.hub-tac-opt {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: background .14s, border-color .14s;
+  text-align: left;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 72px;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.hub-tac-opt:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.13); }
+.hub-tac-opt.sel-ct { background: rgba(59,130,246,.09); border-color: rgba(59,130,246,.42); }
+.hub-tac-opt.sel-t  { background: rgba(246,179,51,.09); border-color: rgba(246,179,51,.40); }
+.hub-tac-opt.previewing { border-color: rgba(255,255,255,.2); }
+
+.hub-tac-inner { display: flex; flex-direction: column; gap: 3px; }
+.hub-tac-opt-label {
+  font-family: var(--font-display);
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.hub-tac-opt.sel-ct .hub-tac-opt-label { color: #60a5fa; }
+.hub-tac-opt.sel-t  .hub-tac-opt-label { color: #f6b333; }
+.hub-tac-opt-desc { font-size: .68rem; color: var(--text3); line-height: 1.4; }
+
+/* minimap thumbnail */
+.hub-tac-thumb {
+  width: 72px;
+  height: 54px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+.hub-tac-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .82;
+  transition: opacity .15s;
+}
+.hub-tac-opt:hover .hub-tac-thumb img,
+.hub-tac-opt.sel-ct .hub-tac-thumb img,
+.hub-tac-opt.sel-t  .hub-tac-thumb img { opacity: 1; }
+
+/* check tick */
+.hub-tac-check {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: .65rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.hub-tac-opt.sel-ct .hub-tac-check { display:flex; background:#3b82f6; color:#fff; }
+.hub-tac-opt.sel-t  .hub-tac-check { display:flex; background:#f6b333; color:#000; }
+
+/* ── Preview central ── */
+.hub-gr-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 18px 20px;
+  background: rgba(255,255,255,.015);
+  gap: 0;
+}
+.hub-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 8px;
+  color: var(--text3);
+  font-size: .76rem;
+  text-align: center;
+  opacity: .55;
+}
+.hub-preview-empty-icon { font-size: 2.2rem; opacity: .35; }
+
+/* big map image */
+.hub-preview-img {
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  aspect-ratio: 4/3;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.hub-preview-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+.hub-preview-badge {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 7px;
+}
+.hub-preview-badge-ct { background: rgba(59,130,246,.2); color: #60a5fa; }
+.hub-preview-badge-t  { background: rgba(246,179,51,.15); color: #f6b333; }
+
+.hub-preview-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.hub-preview-flavor {
+  font-size: .73rem;
+  color: var(--text2);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+/* stats bars */
+
+
+/* matchup hint */
+.hub-preview-matchup {
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.hub-pm-row { display: flex; align-items: flex-start; gap: 6px; font-size: .69rem; }
+.hub-pm-row + .hub-pm-row { margin-top: 5px; }
+.hub-pm-good { color: #4ade80; }
+.hub-pm-bad  { color: #f87171; }
+
+/* ── Footer ── */
+.hub-gr-footer {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding: 13px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(11,16,22,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+.hub-gr-footer-label {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.hub-gr-combo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.hub-gr-combo-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 5px;
+  font-family: var(--font-display);
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+.hub-gr-combo-pill-ct { background: rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); color:#93c5fd; }
+.hub-gr-combo-pill-t  { background: rgba(246,179,51,.10); border:1px solid rgba(246,179,51,.28); color:#fcd563; }
+.hub-gr-combo-empty   { color: var(--text3); font-size: .73rem; font-style: italic; }
+.hub-gr-combo-vs {
+  font-family: var(--font-display);
+  font-size: .72rem;
+  font-weight: 900;
+  color: var(--text3);
+  letter-spacing: .1em;
+}
+.hub-gr-footer-tip {
+  font-size: .67rem;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+/* hidden spans — mantidos para compatibilidade JS */
+#hub-sel-ct, #hub-sel-t { display: none; }
 
 /* history feed in hub panel */
 .hub-history {
@@ -3395,277 +3616,401 @@ body {
 /* toast — moved to Motion Design block */
 
 /* ═══════════════════════════════════════════════
-   MOBILE APP MODE
+   MOBILE APP MODE (≤768px)
+   Princípios:
+   · screens permanecem display:none até .active — nunca empilham
+   · overflow controlado por screen, não por body/html
+   · bottom nav SOMENTE dentro do #screen-game.active
+   · touch targets mínimos 44px
+   · safe-area via env()
 ═══════════════════════════════════════════════ */
+
+/* ── Bottom nav: hidden por padrão (desktop e screens não-game) ── */
+.mobile-bottom-nav { display: none !important; }
 
 @media (max-width:768px){
 
-  /* ── BASE ── */
-  html, body { overflow-y:auto; }
-  .screen.active { height:auto; min-height:100vh; }
-
-  /* ── BUTTONS ── */
+  /* ── BASE: NÃO alterar overflow do body — isso causa o empilhamento
+     Cada screen gerencia seu próprio scroll internamente ── */
   .btn    { min-height:44px; }
   .btn-sm { min-height:38px; }
 
+  /* ── screens continuam display:none até .active ──
+     Só muda o height para não travar scroll interno */
+  .screen.active { height: 100dvh; overflow: hidden; }
+
   /* ── MENU ── */
-  .menu-inner   { flex-direction:column; padding:40px 24px 80px; justify-content:center; gap:0; }
+  #screen-menu.active {
+    overflow-y: auto;
+    height: 100dvh;
+  }
+  .menu-inner   { flex-direction:column; padding:40px 20px 80px; justify-content:center; gap:0; align-items:center; }
   .menu-left    { flex:none; width:100%; max-width:100%; align-items:center; text-align:center; }
-  .menu-right   { display:none; }  /* arte oculta em mobile */
+  .menu-right   { display:none; }
   .menu-brand   { margin-bottom:32px; align-items:center; }
   .menu-brand-eyebrow { justify-content:center; }
-  .menu-brand-title { font-size:2.6rem; }
-  .menu-btns    { width:100%; max-width:380px; }
+  .menu-brand-title { font-size:2.4rem; }
+  .menu-btns    { width:100%; max-width:360px; }
+  .menu-btns .btn-orange,
+  .menu-btns .btn-ghost { width:100%; justify-content:center; }
   #load-saves-panel { width:100%; }
-  .menu-lore    { text-align:center; border-left:none; border-top:2px solid rgba(246,179,51,.2); padding:12px 0 0; margin-top:24px; }
+  .menu-lore    { text-align:center; border-left:none; border-top:1px solid rgba(246,179,51,.2); padding:12px 0 0; margin-top:20px; }
+  .menu-howto   { width:100%; max-width:360px; }
 
   /* ── ERA SELECT ── */
-  .era-grid { width:95vw; }
-  .era-card { padding:14px; }
-  .era-year { font-size:1.5rem; min-width:50px; }
+  #screen-era.active { overflow-y: auto; height: 100dvh; }
+  .era-grid { width:100%; }
+  .era-card { padding:14px 16px; gap:14px; }
+  .era-year { font-size:1.6rem; min-width:52px; }
+  .era-inner { padding:0 16px 60px; max-width:100%; }
+  .era-title { font-size:1.7rem; }
 
-  /* ── TOP BAR (game) ── */
-  .game-topbar {
-    position: sticky;
-    top: 0;
-    z-index: var(--z-active);
-    height: 52px;
-    padding: 0 10px;
+  /* ── DRAFT ── */
+  #screen-draft.active { overflow-y: auto; height: 100dvh; }
+  .draft-topbar { padding:0 12px; height:48px; position:sticky; top:0; z-index:20; }
+  .draft-topbar-title { font-size:.88rem; }
+  .draft-step-label { display:none; }
+  .draft-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    overflow-y: auto;
   }
-  .hud-logo { display: none; }   /* logo oculto em mobile */
-  .hud-status { margin: 0 8px; gap: 10px; }
-  .hud-badge-label { display: none; }
-  .hud-badge-value { font-size: .78rem; }
-  .hud-divider { display: none; }
-  .team-title {
-    font-size: .88rem;
-    max-width: 110px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .draft-sidebar { border-right:none; border-bottom:1px solid var(--border); overflow:visible; }
+  .draft-name-field { padding:10px 14px; }
+  .draft-reshuffle-block { padding:8px 14px; }
+  .draft-progress-row { padding:8px 14px 6px; }
+  .slot-list {
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    overflow:visible;
+    padding:8px 12px 12px;
+    gap:6px;
   }
-  .gtb-left  { gap: 6px; }
-  .gtb-right { gap: 4px; }
-  .stage-chip { font-size: .6rem; padding: 2px 6px; }
-
-  /* ── GAME LAYOUT — sidebar acima, botão sticky no bottom ── */
-  .game-layout {
-    display:flex;
+  .slot {
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
     flex-direction:column;
-    min-height:calc(100vh - 52px);
-    position:relative;
+    align-items:center;
+    justify-content:center;
+    padding:8px 4px;
+    min-height:64px;
+    gap:4px;
+    border-left:1px solid var(--border);
+    text-align:center;
+  }
+  .slot.active { border-color:var(--orange); background:rgba(246,179,51,.06); }
+  .slot.filled { border-color:var(--green);  background:rgba(54,217,120,.05); }
+  .slot-icon { display:none; }
+  .slot-drag-handle { display:none; }
+  .slot-role-lbl { font-size:.52rem; letter-spacing:.06em; }
+  .slot-nick { font-size:.76rem; white-space:normal; word-break:break-word; line-height:1.1; }
+  .slot-empty { font-size:.62rem; }
+  .slot-sub { display:none; }
+  .draft-sidebar-footer {
+    position:sticky;
+    bottom:0;
+    z-index:10;
+    background:var(--bg2);
+    border-top:2px solid rgba(246,179,51,.3);
+    padding:10px 14px max(12px, env(safe-area-inset-bottom));
+  }
+  .draft-sidebar-footer .btn { width:100%; justify-content:center; }
+  .draft-right-panel { overflow:visible; }
+  .draft-panel-header { padding:12px 14px 10px; position:sticky; top:48px; z-index:15; background:rgba(11,16,22,.97); }
+  .draft-pool-scroll { overflow:visible; padding:12px 14px 20px; }
+  .pool-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .pool-card { padding:11px 10px; }
+  .pool-card-header { gap:6px; margin-bottom:6px; }
+  .pool-flag { font-size:1rem; }
+  .pool-nick { font-size:.88rem; }
+  .pool-real { font-size:.65rem; }
+  .pool-badges { gap:3px; margin-bottom:6px; }
+  .pool-role-badge  { font-size:.55rem; padding:1px 6px; }
+  .pool-trait-badge { font-size:.55rem; padding:1px 5px; }
+  .pool-stats { gap:2px; margin-top:6px; }
+  .ps-mini   { padding:4px 0; }
+  .ps-mini-v { font-size:.7rem; }
+  .ps-mini-k { font-size:.48rem; }
+
+  /* ── MAP POOL & VETO ── */
+  #screen-maps.active,
+  #screen-veto.active { overflow-y: auto; height: 100dvh; }
+  .screen-topbar { height:50px; padding:0 12px; gap:8px; }
+  .screen-topbar-title { font-size:.9rem; }
+  .screen-topbar-meta { font-size:.65rem; }
+  .setup-scroll { padding:16px 14px 100px; }
+  .setup-action-bar {
+    position:sticky;
+    bottom:0;
+    padding:10px 14px max(12px, env(safe-area-inset-bottom));
+    background:rgba(11,16,22,.97);
+    border-top:1px solid rgba(246,179,51,.2);
+    justify-content:stretch;
+    z-index:10;
+  }
+  .setup-action-bar .btn { flex:1; justify-content:center; }
+  .mp-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .mp-card { padding:13px 10px; }
+  .mp-card-name { font-size:.9rem; }
+  .veto-map-grid { grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:7px; }
+  .veto-map-card { padding:10px 6px; }
+  .vmc-name { font-size:.74rem; }
+  #veto-side-panel > div:last-child { flex-wrap:wrap; gap:8px; }
+  #veto-side-panel .btn { flex:1; justify-content:center; }
+
+  /* ── GAME SCREEN: scroll gerenciado internamente ── */
+  #screen-game.active {
+    overflow: hidden;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Sidebar compactada: mostra só stage + record + botão */
+  /* Header compacto */
+  .game-topbar {
+    height:50px;
+    padding:0 12px;
+    flex-shrink:0;
+  }
+  .hud-logo { display:none; }
+  .hud-divider { display:none; }
+  .hud-status { margin:0 8px; gap:8px; }
+  .hud-badge-label { display:none; }
+  .hud-badge-value { font-size:.76rem; }
+  .team-title { font-size:.84rem; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stage-chip { font-size:.58rem; padding:2px 6px; }
+  .gtb-left { gap:6px; }
+  .gtb-right { gap:4px; }
+  .gtb-right .btn { min-width:36px; padding:5px 8px; justify-content:center; }
+
+  /* Desktop hub-nav: esconde, bottom nav substitui */
+  .hub-nav { display:none; }
+
+  /* BOTTOM NAV: ativa SOMENTE dentro de #screen-game.active */
+  #screen-game.active .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: var(--z-active);
+    background: rgba(11,16,22,.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(246,179,51,.15);
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 24px rgba(0,0,0,.4);
+  }
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    min-height: 52px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    gap: 3px;
+    color: var(--text3);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: color var(--duration-fast) var(--ease);
+  }
+  .mobile-nav-item.active { color: var(--color-primary); }
+  .mobile-nav-item:active  { opacity: .7; }
+  .mobile-nav-icon { font-size:1.2rem; line-height:1; }
+  .mobile-nav-label {
+    font-family: var(--font-display);
+    font-size: .52rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* Hub content: scroll interno com espaço para bottom nav */
+  .hub-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+  }
+  .hub-panel { display:none; }
+  .hub-panel.active { display:block; }
+  .hub-inner { padding:14px 12px max(80px, calc(env(safe-area-inset-bottom) + 72px)); }
+
+  /* Info strip: 1 coluna */
+  .hub-info-strip { grid-template-columns:1fr; gap:10px; margin-bottom:14px; }
+  .hub-info-card  { padding:13px 14px; }
+  .hub-ic-stage   { font-size:1.3rem; }
+
+  /* Get Ready: 1 coluna */
+  .hub-get-ready { margin-bottom:14px; }
+  .hub-gr-head   { padding:13px 14px 11px; }
+  .hub-gr-title  { font-size:.9rem; }
+  .hub-gr-body   { grid-template-columns:1fr; min-height:auto; }
+  .hub-gr-col-ct { border-right:none; border-bottom:1px solid rgba(255,255,255,.05); }
+  .hub-gr-col-t  { border-left:none; }
+  .hub-gr-col    { padding:12px 14px; }
+  .hub-gr-preview { padding:12px 14px; }
+  .hub-preview-img { aspect-ratio:16/9; }
+  .hub-gr-footer  { padding:10px 14px; gap:8px; flex-wrap:wrap; }
+  .hub-gr-combo   { flex-wrap:wrap; }
+  .hub-tac-opt    { padding:11px; }
+  .hub-tac-thumb  { width:58px; height:44px; }
+
+  /* Game layout */
+  .game-layout { display:flex; flex-direction:column; flex:1; min-height:0; }
   .game-sidebar {
     order:-1;
     border-right:none;
     border-bottom:1px solid var(--border);
-    overflow:visible;
     flex-shrink:0;
+    overflow:visible;
   }
-
-  /* Esconde histórico no topo — já está no main */
   .game-sidebar .sb-section:has(.hist-feed) { display:none; }
+  .sb-section { padding:10px 12px; }
+  .team-stats-block { grid-template-columns:1fr 1fr 1fr 1fr; gap:4px; }
 
-  /* Botão "Próxima Série" sticky no bottom */
+  /* Botão "Próxima Série" — acima da bottom nav */
   .sidebar-action {
     position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    z-index:400;
-    background:var(--bg2);
+    bottom:max(52px, calc(env(safe-area-inset-bottom) + 52px));
+    left:0; right:0;
+    z-index:calc(var(--z-active) - 1);
+    background:rgba(17,23,32,.97);
     border-top:2px solid var(--orange);
-    padding:10px 14px max(10px, env(safe-area-inset-bottom));
-    display:flex;
-    flex-direction:column;
+    padding:10px 14px 10px;
     gap:4px;
   }
   .sidebar-action .btn { font-size:.85rem; }
+  .series-hint { font-size:.62rem; margin-bottom:4px; }
 
-  /* Main: padding bottom para não ficar atrás do botão sticky */
   .game-main {
     flex:1;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    padding:12px 12px 100px;
+    padding:12px 12px 160px;
+    min-height:0;
   }
+  .hist-feed { max-height:180px; }
 
-  /* Histórico: aparece no main em mobile */
-  .hist-feed { max-height:160px; }
-
-  /* ── PLAYER CARDS ── */
-  .players-grid {
-    grid-template-columns:1fr;
-    gap:8px;
-  }
+  /* Player cards */
+  .players-grid { grid-template-columns:1fr; gap:8px; }
   .player-card  { padding:11px; }
   .pc-stats     { gap:3px; }
   .ps-v         { font-size:.95rem; }
-
-  /* Status: 2 colunas × 2 linhas em vez de 4×1 */
-  .pc-status {
-    grid-template-columns:1fr 1fr;
-    gap:6px;
-  }
-
-  /* ── CARDS ── */
+  .pc-status    { grid-template-columns:1fr 1fr; gap:6px; }
   .campaign-card { padding:11px; }
   .cc-stage-name { font-size:1rem; }
-  .result-card   { padding:11px; }
 
-  /* ── MATCH OVERLAY — full screen ── */
+  /* Match overlay: full screen */
   #match-overlay { padding:0; }
-  .match-modal {
-    width:100vw;
-    height:100dvh;
-    max-height:100dvh;
-    max-width:none;
-    border-radius:0;
-  }
-  .match-modal-scroll {
-    padding:max(12px, env(safe-area-inset-top)) 12px 12px;
-  }
-  .match-summary {
-    padding-bottom:max(18px, env(safe-area-inset-bottom));
-  }
-  .mm-matchup   { gap:8px; }
-  .mm-team-name { min-width:auto; font-size:.95rem; }
-  .series-maps  { gap:6px; }
+  .match-modal { width:100vw; height:100dvh; max-height:100dvh; max-width:none; border-radius:0; }
+  .match-modal-scroll { padding:max(12px, env(safe-area-inset-top)) 12px 12px; }
+  .match-summary { padding-bottom:max(18px, env(safe-area-inset-bottom)); }
+  .mm-matchup   { gap:8px; flex-wrap:wrap; justify-content:center; }
+  .mm-team-name { min-width:auto; font-size:.92rem; }
+  .series-maps  { gap:6px; flex-wrap:wrap; justify-content:center; }
   .sm-dot       { width:30px; height:30px; font-size:.72rem; }
   .score-dig    { font-size:2rem; min-width:38px; }
   .msc-team-lbl { width:auto; font-size:.62rem; }
-
-  /* Stats table: remove coluna KPR em mobile */
-  .pst-table    { font-size:.68rem; }
+  .pst-section  { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .pst-table    { min-width:400px; font-size:.68rem; }
   .pst-table th, .pst-table td { padding:4px 3px; }
   .pst-col-kpr  { display:none; }
 
-  /* ── STAGE OVERLAY — full screen ── */
+  /* Stage overlay: full screen */
   #stage-overlay { padding:0; }
-  .stage-modal {
-    width:100vw;
-    min-height:100dvh;
-    max-width:none;
-    border-radius:0;
-    padding:16px 16px max(16px, env(safe-area-inset-bottom));
-    padding-top:max(16px, env(safe-area-inset-top));
-  }
-  .stm-title   { font-size:1.6rem; }
-  .stm-roster  { grid-template-columns:1fr 1fr; }
+  .stage-modal { width:100vw; min-height:100dvh; max-width:none; border-radius:0;
+    padding:max(16px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom)); }
+  .stm-title  { font-size:1.5rem; }
+  .stm-roster { grid-template-columns:1fr 1fr; }
 
-  /* ── EVENT OVERLAY ── */
+  /* Event overlay: full screen */
   #event-overlay { padding:0; }
-  .ev-modal {
-    width:100vw;
-    min-height:100dvh;
-    max-width:none;
-    border-radius:0;
-    padding:18px 18px max(18px, env(safe-area-inset-bottom));
-    padding-top:max(18px, env(safe-area-inset-top));
-  }
+  .ev-modal { width:100vw; min-height:100dvh; max-width:none; border-radius:0;
+    padding:max(18px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom)); }
 
-  /* ── SHARE PANEL ── */
+  /* Share panel: full screen */
   .panel-overlay { padding:0; }
-  .panel-box {
-    width:100vw;
-    height:100dvh;
-    max-width:none;
-    max-height:none;
-    border-radius:0;
-  }
+  .panel-box { width:100vw; height:100dvh; max-width:none; max-height:none; border-radius:0; }
 
-  /* ── END SCREEN ── */
+  /* End screen */
   .end-wrap  { padding:24px; }
   .end-title { font-size:2.2rem; }
   .end-acts  { flex-direction:column; width:100%; }
   .end-acts .btn { width:100%; }
 
-  /* ── TOAST ── */
+  /* Toast */
   #toast { width:100%; padding:0 12px; }
   .ti    { width:100%; max-width:none; }
 
-  /* ── BRACKET (mobile) ── */
-  .bk-col       { min-width:128px; }
-  .bk-team-name { font-size:.78rem; }
-  .bk-connector { width:18px; padding-top:34px; }
-  .bk-connector-line { height:60px; }
-  .bk-round-col { min-width:168px; gap:14px; }
-  .bk-bucket-team { font-size:.78rem; }
-  .bk-bucket-row  { padding:6px 10px; }
+  /* Bracket */
+  .bk-col       { min-width:124px; }
+  .bk-team-name { font-size:.76rem; }
+  .bk-connector { width:16px; padding-top:32px; }
+  .bk-connector-line { height:56px; }
+  .bk-round-col { min-width:160px; gap:12px; }
+  .bk-bucket-team { font-size:.76rem; }
+  .bk-bucket-row  { padding:5px 10px; }
 
-  /* ── MAP POOL / VETO SCREENS (inline-styled wrappers) ── */
-  #screen-maps > div:nth-child(2),
-  #screen-veto > div:nth-child(2) {
-    padding:16px !important;
+  /* Music btn acima da sidebar-action/bottom-nav */
+  #music-btn {
+    bottom:max(118px, calc(env(safe-area-inset-bottom) + 112px));
+    right:.9rem;
+    width:2.4rem; height:2.4rem; font-size:.9rem;
   }
-  .mp-grid       { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
-  .mp-card       { padding:13px 10px; }
-  .veto-map-grid { grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:8px; }
-  .veto-map-card { padding:10px 6px; }
-  .vmc-name      { font-size:.76rem; }
-  #veto-side-panel > div:last-child { flex-wrap:wrap; }
-
-  /* ── STATS TABLE: scroll instead of squeeze ── */
-  .pst-section { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .pst-table   { min-width:440px; }
+  #music-popup {
+    bottom:max(162px, calc(env(safe-area-inset-bottom) + 156px));
+    right:.9rem;
+  }
 
 }
 
 /* ═══════════════════════════════════════════════
-   TELAS PEQUENAS (≤480px)
+   TELAS MUITO PEQUENAS (≤480px)
 ═══════════════════════════════════════════════ */
 @media (max-width:480px){
 
-  .menu-logo h1   { font-size:2rem; }
-  .cc-stage-name  { font-size:.9rem; }
-  .pc-nick        { font-size:.88rem; }
-  .team-title     { max-width:90px; }
-  .gtb-right .btn { padding:5px 8px; }
-  .score-dig      { font-size:1.6rem; }
-  .stm-title      { font-size:1.3rem; }
-  .mm-team-name   { font-size:.82rem; }
-
-  /* Pool: 1 coluna em telas muito estreitas */
-  .pool-grid { grid-template-columns:1fr; }
-
-  /* Slots: 1 coluna */
-  .slot-list { grid-template-columns:1fr; }
-
-  /* Stats player card: mantém legível */
-  .ps-v { font-size:.9rem; }
-  .ps-k { font-size:.5rem; }
-
-  /* Status: 2 colunas mantidas */
-  .pc-status { grid-template-columns:1fr 1fr; }
-
-  /* Stm roster: 1 coluna */
-  .stm-roster { grid-template-columns:1fr; }
-
-  /* Bracket: scroll horizontal continua, mas compacta ainda mais */
-  .bk-col       { min-width:108px; padding:0 4px; }
-  .bk-team-name { font-size:.7rem; }
-  .bk-team      { padding:7px 8px; }
-  .bk-res       { font-size:.62rem; }
-  .bk-col-head  { font-size:.66rem; }
-  .bk-connector { width:14px; padding-top:30px; }
-  .bk-connector-line { height:50px; }
-  .bk-round-col { min-width:148px; gap:12px; padding:0 4px; }
-  .bk-bucket-team   { font-size:.7rem; }
-  .bk-bucket-row    { padding:6px 8px; }
-  .bk-bucket-head   { font-size:.66rem; padding:6px 8px; }
-  .bk-result-strip  { padding:8px 10px; }
-  .bk-result-label  { font-size:.68rem; padding:4px 9px; }
-  .bk-result-chip   { font-size:.66rem; padding:3px 7px; }
-
-  /* ── MAP POOL / VETO — single column on very narrow screens ── */
-  .mp-grid       { grid-template-columns:1fr 1fr; }
-  .veto-map-grid { grid-template-columns:repeat(3,1fr); gap:6px; }
+  .menu-brand-title { font-size:2rem; }
+  .era-year         { font-size:1.4rem; min-width:46px; }
+  .slot-nick        { font-size:.7rem; }
+  .pool-nick        { font-size:.82rem; }
+  .ps-mini-v        { font-size:.65rem; }
+  .team-title       { max-width:80px; font-size:.78rem; }
+  .stage-chip       { display:none; }
+  .gtb-right .btn   { padding:4px 7px; }
+  .team-stats-block { grid-template-columns:1fr 1fr; gap:4px; }
+  .tsb-value        { font-size:.95rem; }
+  .pc-nick          { font-size:.88rem; }
+  .ps-v             { font-size:.9rem; }
+  .ps-k             { font-size:.5rem; }
+  .cc-stage-name    { font-size:.9rem; }
+  .score-dig        { font-size:1.6rem; }
+  .stm-title        { font-size:1.3rem; }
+  .mm-team-name     { font-size:.82rem; }
+  .pool-grid        { grid-template-columns:repeat(2,1fr); gap:6px; }
+  .slot-list        { grid-template-columns:repeat(5,1fr); }
+  .slot             { min-height:58px; padding:6px 2px; }
+  .slot-role-lbl    { font-size:.44rem; }
+  .mp-grid          { grid-template-columns:1fr 1fr; }
+  .veto-map-grid    { grid-template-columns:repeat(3,1fr); gap:5px; }
   .veto-pick-summary { min-width:120px; }
-  .gtb-right .btn { min-width:32px; justify-content:center; }
+  .gtb-right .btn   { min-width:32px; justify-content:center; }
+  .stm-roster       { grid-template-columns:1fr 1fr; }
+  .mobile-nav-label { font-size:.48rem; }
+  .bk-col           { min-width:106px; padding:0 4px; }
+  .bk-team-name     { font-size:.68rem; }
+  .bk-connector     { width:12px; }
+  .bk-connector-line { height:46px; }
+  .bk-round-col     { min-width:140px; gap:10px; padding:0 4px; }
+  .bk-bucket-team   { font-size:.68rem; }
+  .bk-bucket-row    { padding:5px 7px; }
 
 }
+
+
 
 /* ═══════════════════════════════════════════════
    SAFE AREA (iPhone — notch + home indicator)
@@ -4623,11 +4968,27 @@ body {
     </div>
   </div>
 
-  <!-- ── SUB-NAV TABS ── -->
+  <!-- ── SUB-NAV TABS (desktop) ── -->
   <nav class="hub-nav">
     <button class="hub-nav-tab active" id="hubtab-hub"        onclick="switchHubTab('hub')">🏠 Hub</button>
     <button class="hub-nav-tab"        id="hubtab-campeonato" onclick="switchHubTab('campeonato')">🏆 Chaveamento</button>
     <button class="hub-nav-tab"        id="hubtab-roster"     onclick="switchHubTab('roster')">👥 Elenco</button>
+  </nav>
+
+  <!-- ── BOTTOM NAV BAR (mobile, dentro de #screen-game) ── -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mobile-nav-item active" id="mbnav-hub" onclick="switchHubTab('hub')">
+      <span class="mobile-nav-icon">🏠</span>
+      <span class="mobile-nav-label">Hub</span>
+    </button>
+    <button class="mobile-nav-item" id="mbnav-campeonato" onclick="switchHubTab('campeonato')">
+      <span class="mobile-nav-icon">🏆</span>
+      <span class="mobile-nav-label">Chave</span>
+    </button>
+    <button class="mobile-nav-item" id="mbnav-roster" onclick="switchHubTab('roster')">
+      <span class="mobile-nav-icon">👥</span>
+      <span class="mobile-nav-label">Elenco</span>
+    </button>
   </nav>
 
   <!-- ── HUB PANEL ── -->
@@ -4665,43 +5026,90 @@ body {
           </div>
         </div>
 
-        <!-- Welcome banner — aparece quando não há histórico, some depois -->
-        <div class="hub-welcome" id="hub-welcome" style="display:none;">
-          <div class="hub-welcome-icon">🎮</div>
-          <div class="hub-welcome-body">
-            <div class="hub-welcome-title">Bem-vindo ao Major!</div>
-            <div class="hub-welcome-text">Escolha suas <b>táticas CT e TR</b> abaixo e clique em <b>Iniciar Partida</b>. Você pode mudar a tática durante o jogo com um <b>Pause Técnico</b>.</div>
-          </div>
-          <button class="hub-welcome-close" onclick="document.getElementById('hub-welcome').style.display='none'" title="Fechar">✕</button>
-        </div>
-
-        <!-- GET READY section -->
+        <!-- GET READY — 3 colunas -->
         <div class="hub-get-ready" id="hub-get-ready">
-          <div class="hub-gr-title">⚔️ Defina seu plano de jogo para a próxima partida</div>
-          <div style="font-size:.78rem;color:var(--text2);margin-bottom:14px;line-height:1.5;">Escolha uma tática para cada lado. Isso afeta como seu time vai jogar — tente combinações diferentes ao longo da campanha.</div>
-          <div class="hub-gr-tactics">
-            <div>
-              <div class="hub-gr-side-label">🛡️ CT — Defesa do Site</div>
+
+          <!-- Cabeçalho -->
+          <div class="hub-gr-head">
+            <div class="hub-gr-eyebrow">Antes de entrar em quadra</div>
+            <div class="hub-gr-title">
+              &#x2694;&#xFE0F; Defina seu plano de jogo para a pr&#xF3;xima partida
+            </div>
+            <div class="hub-gr-subtitle">Escolha uma t&#xE1;tica para cada lado. Isso afeta como seu time vai jogar &#x2014; tente combina&#xE7;&#xF5;es diferentes ao longo da campanha.</div>
+          </div>
+
+          <!-- Corpo 3 colunas -->
+          <div class="hub-gr-body">
+
+            <!-- CT -->
+            <div class="hub-gr-col hub-gr-col-ct">
+              <div class="hub-gr-col-header">
+                <span class="hub-gr-badge hub-gr-badge-ct">CT</span>
+                <div>
+                  <div class="hub-gr-col-name">Defesa do Site</div>
+                  <div class="hub-gr-col-hint">Impedir o plantio da bomba</div>
+                </div>
+              </div>
               <div class="hub-tac-cards" id="hub-ct-opts"></div>
             </div>
-            <div>
-              <div class="hub-gr-side-label">💣 TR — Plantio da Bomba</div>
+
+            <!-- Preview central -->
+            <div class="hub-gr-preview" id="hub-gr-preview">
+              <div class="hub-preview-empty" id="hub-preview-empty">
+                <div class="hub-preview-empty-icon">&#x1F5FA;</div>
+                <div>Clique em uma t&#xE1;tica<br>para ver os detalhes</div>
+              </div>
+              <div id="hub-preview-content" style="display:none;">
+                <div class="hub-preview-img" id="hub-preview-img">
+                  <img id="hub-preview-map-img" src="" alt="">
+                </div>
+                <div id="hub-preview-badge" class="hub-preview-badge hub-preview-badge-ct">CT</div>
+                <div id="hub-preview-name"   class="hub-preview-name"></div>
+                <div id="hub-preview-flavor" class="hub-preview-flavor"></div>
+                <div class="hub-preview-matchup" id="hub-preview-matchup"></div>
+              </div>
+            </div>
+
+            <!-- TR -->
+            <div class="hub-gr-col hub-gr-col-t">
+              <div class="hub-gr-col-header">
+                <span class="hub-gr-badge hub-gr-badge-t">TR</span>
+                <div>
+                  <div class="hub-gr-col-name">Plantio da Bomba</div>
+                  <div class="hub-gr-col-hint">Explodir um dos bombsites</div>
+                </div>
+              </div>
               <div class="hub-tac-cards" id="hub-t-opts"></div>
             </div>
+
           </div>
+
+          <!-- Footer -->
           <div class="hub-gr-footer">
-            <div class="hub-gr-tac-summary" id="hub-tac-summary">CT: <span id="hub-sel-ct">N&#xE3;o definida</span> &nbsp;&middot;&nbsp; TR: <span id="hub-sel-t">N&#xE3;o definida</span></div>
-            <button class="btn btn-orange" id="btn-next" onclick="handleNext()" disabled>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div class="hub-gr-footer-label">Sua combina&#xE7;&#xE3;o</div>
+            <div class="hub-gr-combo">
+              <div id="hub-combo-ct" class="hub-gr-combo-empty">&#x2014; escolha CT</div>
+              <div id="hub-combo-vs" class="hub-gr-combo-vs" style="display:none">VS</div>
+              <div id="hub-combo-t"  style="display:none"></div>
+            </div>
+            <div class="hub-gr-footer-tip">
+              &#x2139;&#xFE0F;&nbsp; Durante a partida voc&#xEA; tem <b>&nbsp;2 pauses&nbsp;</b> para mudar de t&#xE1;tica.
+            </div>
+            <!-- hidden spans mantidos para JS -->
+            <span id="hub-sel-ct"></span>
+            <span id="hub-sel-t"></span>
+            <button class="btn btn-orange btn-lg" id="btn-next" onclick="handleNext()" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Iniciar Partida
             </button>
           </div>
+
         </div>
 
         <!-- Hist&#xF3;rico -->
         <div class="hub-history">
-          <div class="hub-history-title">Hist&#xF3;rico</div>
-          <div class="hist-feed" id="hist-feed"><div class="hf-empty">Nenhuma s&#xE9;rie jogada.</div></div>
+          <div class="hub-history-title">Hist&#xF3;rico de Partidas</div>
+          <div class="hist-feed" id="hist-feed"><div class="hf-empty">Nenhuma s&#xE9;rie jogada ainda.</div></div>
         </div>
 
       </div>
@@ -6461,6 +6869,7 @@ function switchHubTab(name) {
   ["hub","campeonato","roster"].forEach(t => {
     document.getElementById("hubtab-"+t)?.classList.toggle("active", t===name);
     document.getElementById("hubpanel-"+t)?.classList.toggle("active", t===name);
+    document.getElementById("mbnav-"+t)?.classList.toggle("active", t===name);
   });
   if(name==="campeonato") renderBracket();
   if(name==="roster")     renderPlayersGrid(G.team?.players||[]);
@@ -6969,50 +7378,143 @@ async function loadHubTactics() {
   renderHubTactics();
 }
 
+// ── Mapa de imagens por chave de tática ──────────────────────────────────────
+const TAC_MAP_IMG = {
+  aggressive:   "/ui/static/map-ct-agressivo.png",
+  passive:      "/ui/static/map-ct-passivo-hold.png",
+  retake:       "/ui/static/map-ct-retake.png",
+  fast_rush:    "/ui/static/map-tr-fastrush-execute.png",
+  slow_default: "/ui/static/map-tr-slowdefault.png",
+  anti_eco:     "/ui/static/map-tr-antieco-push.png",
+};
+
+function _tacCardHTML(side, key, v, selected) {
+  const selClass = selected ? (side==="ct" ? " sel-ct" : " sel-t") : "";
+  const imgSrc   = TAC_MAP_IMG[key] || "";
+  const labelClean = (v.label||key).replace(/^[\S]+\s/,""); // remove emoji prefix
+  const emoji    = v.emoji || (v.label||"").split(" ")[0] || "";
+  return `<button class="hub-tac-opt${selClass}"
+      onclick="selectHubTactic('${side}','${key}',this)"
+      onmouseenter="previewTactic('${side}','${key}')">
+    <div class="hub-tac-inner">
+      <div class="hub-tac-opt-label">${emoji} ${labelClean}</div>
+      <div class="hub-tac-opt-desc">${v.desc||""}</div>
+    </div>
+    <div class="hub-tac-thumb">
+      <img src="${imgSrc}" alt="${labelClean}" loading="lazy">
+    </div>
+    <div class="hub-tac-check">&#x2713;</div>
+  </button>`;
+}
+
 function renderHubTactics() {
   const ctEl = document.getElementById("hub-ct-opts");
   const tEl  = document.getElementById("hub-t-opts");
   if(!ctEl||!tEl) return;
-
-  ctEl.innerHTML = Object.entries(_tacState.ctTactics).map(([k,v])=>
-    `<button class="hub-tac-opt${k===_hubSelectedCT?" selected":""}" onclick="selectHubTactic('ct','${k}',this)">
-      <div class="hub-tac-opt-label">${v.label}</div>
-      <div class="hub-tac-opt-desc">${v.desc}</div>
-    </button>`
-  ).join("");
-
-  tEl.innerHTML = Object.entries(_tacState.tTactics).map(([k,v])=>
-    `<button class="hub-tac-opt${k===_hubSelectedT?" selected":""}" onclick="selectHubTactic('t','${k}',this)">
-      <div class="hub-tac-opt-label">${v.label}</div>
-      <div class="hub-tac-opt-desc">${v.desc}</div>
-    </button>`
-  ).join("");
-
+  ctEl.innerHTML = Object.entries(_tacState.ctTactics)
+    .map(([k,v])=>_tacCardHTML("ct",k,v,k===_hubSelectedCT)).join("");
+  tEl.innerHTML  = Object.entries(_tacState.tTactics)
+    .map(([k,v])=>_tacCardHTML("t", k,v,k===_hubSelectedT )).join("");
   updateHubTacSummary();
+  // Auto-preview primeira selecionada (ou primeira da lista)
+  if(_hubSelectedCT) previewTactic("ct",_hubSelectedCT);
+  else if(_hubSelectedT) previewTactic("t",_hubSelectedT);
+}
+
+// ── Preview central com imagem real ──────────────────────────────────────────
+let _previewSide=null, _previewKey=null;
+
+function previewTactic(side, key) {
+  if(_previewSide===side && _previewKey===key) return;
+  _previewSide=side; _previewKey=key;
+
+  const tacs = side==="ct" ? _tacState.ctTactics : _tacState.tTactics;
+  const v = tacs[key]; if(!v) return;
+
+  document.getElementById("hub-preview-empty").style.display   = "none";
+  document.getElementById("hub-preview-content").style.display = "block";
+
+  // Imagem real
+  const imgEl = document.getElementById("hub-preview-map-img");
+  if(imgEl){ imgEl.src = TAC_MAP_IMG[key]||""; imgEl.alt = v.label||key; }
+
+  // Badge
+  const badgeEl = document.getElementById("hub-preview-badge");
+  if(badgeEl){
+    badgeEl.textContent = side==="ct" ? "CT — DEFESA" : "TR — ATAQUE";
+    badgeEl.className   = "hub-preview-badge " + (side==="ct" ? "hub-preview-badge-ct" : "hub-preview-badge-t");
+  }
+
+  // Nome e flavor
+  const labelClean = (v.label||key).replace(/^[\S]+\s/,"");
+  const emoji      = v.emoji || (v.label||"").split(" ")[0] || "";
+  const nameEl   = document.getElementById("hub-preview-name");
+  const flavorEl = document.getElementById("hub-preview-flavor");
+  if(nameEl)   nameEl.textContent   = emoji + " " + labelClean;
+  if(flavorEl) flavorEl.textContent = v.flavor || v.desc || "";
+
+
+
+  // Matchup
+  const matchupEl = document.getElementById("hub-preview-matchup");
+  if(matchupEl) matchupEl.innerHTML = [
+    v.counters ? `<div class="hub-pm-row hub-pm-good">&#x2714; <b>Bom contra:</b>&nbsp;${v.counters}</div>` : "",
+    v.weak     ? `<div class="hub-pm-row hub-pm-bad">&#x26A0; <b>Fraco contra:</b>&nbsp;${v.weak}</div>`     : "",
+  ].join("");
+
+  // Highlight card being previewed (not selected)
+  document.querySelectorAll(".hub-tac-opt.previewing").forEach(b=>b.classList.remove("previewing"));
+  const allCards = document.querySelectorAll("#hub-ct-opts .hub-tac-opt, #hub-t-opts .hub-tac-opt");
+  allCards.forEach(b=>{
+    if(b.onclick?.toString().includes(`'${side}','${key}'`)) b.classList.add("previewing");
+  });
 }
 
 function selectHubTactic(side, key, el) {
   if(side==="ct"){
     _hubSelectedCT = key;
-    document.querySelectorAll("#hub-ct-opts .hub-tac-opt").forEach(b=>b.classList.remove("selected"));
+    document.querySelectorAll("#hub-ct-opts .hub-tac-opt").forEach(b=>b.classList.remove("sel-ct","previewing"));
+    el.classList.add("sel-ct");
   } else {
     _hubSelectedT = key;
-    document.querySelectorAll("#hub-t-opts .hub-tac-opt").forEach(b=>b.classList.remove("selected"));
+    document.querySelectorAll("#hub-t-opts .hub-tac-opt").forEach(b=>b.classList.remove("sel-t","previewing"));
+    el.classList.add("sel-t");
   }
-  el.classList.add("selected");
+  previewTactic(side, key);
   updateHubTacSummary();
 }
 
 function updateHubTacSummary() {
-  const ctLabel = _hubSelectedCT ? (_tacState.ctTactics[_hubSelectedCT]?.label||_hubSelectedCT) : null;
-  const tLabel  = _hubSelectedT  ? (_tacState.tTactics[_hubSelectedT]?.label||_hubSelectedT)   : null;
-  const ctEl = document.getElementById("hub-sel-ct");
-  const tEl  = document.getElementById("hub-sel-t");
-  if(ctEl) ctEl.textContent = ctLabel||"Não definida";
-  if(tEl)  tEl.textContent  = tLabel||"Não definida";
+  const ctV = _hubSelectedCT ? _tacState.ctTactics[_hubSelectedCT] : null;
+  const tV  = _hubSelectedT  ? _tacState.tTactics[_hubSelectedT]   : null;
+  const ctLabel = ctV ? ((ctV.emoji||"")+" "+(ctV.label||"").replace(/^[\S]+\s/,"")) : null;
+  const tLabel  = tV  ? ((tV.emoji ||"")+" "+(tV.label ||"").replace(/^[\S]+\s/,"")) : null;
+
+  // Combo pills no footer
+  const comboCT = document.getElementById("hub-combo-ct");
+  const comboT  = document.getElementById("hub-combo-t");
+  const comboVS = document.getElementById("hub-combo-vs");
+  if(comboCT){
+    if(ctLabel){
+      comboCT.className = "hub-gr-combo-pill hub-gr-combo-pill-ct";
+      comboCT.innerHTML = `<span>&#x1F6E1;</span>${ctLabel}`;
+    } else {
+      comboCT.className   = "hub-gr-combo-empty";
+      comboCT.textContent = "— escolha CT";
+    }
+  }
+  if(comboT){
+    if(tLabel){
+      comboT.className = "hub-gr-combo-pill hub-gr-combo-pill-t";
+      comboT.innerHTML = `<span>&#x1F4A3;</span>${tLabel}`;
+      comboT.style.display = "";
+    } else { comboT.style.display="none"; }
+  }
+  if(comboVS) comboVS.style.display = (ctLabel&&tLabel) ? "" : "none";
+
   const btn = document.getElementById("btn-next");
-  if(btn) btn.disabled = !_hubSelectedCT || !_hubSelectedT ||
-    G.campaign?.stage==="finished_win" || G.campaign?.stage==="finished_loss";
+  const fin = G.campaign?.stage==="finished_win"||G.campaign?.stage==="finished_loss";
+  if(btn) btn.disabled = !_hubSelectedCT || !_hubSelectedT || fin;
 }
 
 let _tacState = {

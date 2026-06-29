@@ -823,6 +823,69 @@ body {
 /* garante que topbar e body ficam acima do overlay */
 #screen-draft > * { position: relative; z-index: 1; }
 
+/* ═══════════════════════════════════════════════
+   MAP PROFICIENCY & VETO SCREENS — mesmo princípio
+   de atmosfera do Draft: imagem de fundo + overlay
+   de vinheta para legibilidade. Maps reaproveita o
+   cenário do Draft; Veto reaproveita o cenário do
+   Match (são, conceitualmente, a mesma "sala").
+═══════════════════════════════════════════════ */
+#screen-maps,
+#screen-veto {
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+#screen-maps { background-image: url('/ui/static/bg-draft.png'); }
+#screen-veto { background-image: url('/ui/static/bg-match.png'); }
+
+#screen-maps::before,
+#screen-veto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(246,179,51,.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 0%,  rgba(0,0,0,.65) 0%, transparent 55%),
+    radial-gradient(ellipse at 0%  100%, rgba(0,0,0,.55) 0%, transparent 55%),
+    linear-gradient(180deg,
+      rgba(11,16,22,.88) 0%,
+      rgba(11,16,22,.55) 25%,
+      rgba(11,16,22,.45) 65%,
+      rgba(11,16,22,.92) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+#screen-maps > *,
+#screen-veto > * { position: relative; z-index: 1; }
+
+/* Conteúdo scrollável dentro das telas de setup (Maps/Veto) */
+.setup-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Action bar fixa no rodapé — espelha .draft-sidebar-footer.
+   Garante que a ação principal nunca exija scroll, mesmo
+   conforme o log de veto / picks crescem. */
+.setup-action-bar {
+  flex-shrink: 0;
+  padding: 16px 32px;
+  border-top: 1px solid rgba(246,179,51,.15);
+  background: rgba(11,16,22,.82);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+  box-shadow: 0 -8px 24px rgba(0,0,0,.28);
+}
+.setup-action-bar:empty { display: none; }
+
 /* ── Input de nome do time — estilo HUD, não Word ── */
 .team-name-inp {
   width: 100%;
@@ -917,7 +980,7 @@ body {
    Cor: bg2, borda direita sutil, scroll interno
 ──────────────────────────────────────────── */
 .draft-sidebar {
-  background: var(--bg2);
+  background: #111720cc;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -1165,7 +1228,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg);
+  background: #11172000;
 }
 
 /* Cabeçalho do painel direito com team banner */
@@ -1173,7 +1236,7 @@ body {
   padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: var(--bg2);
+  background: #111720cc;
 }
 
 /* Team banner — espelha o card de time do protótipo */
@@ -1647,8 +1710,6 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(246,179,51,.10);
-  position: relative;
-  z-index: 10;
 }
 .hub-nav-tab {
   font-family: var(--font-display);
@@ -1678,7 +1739,7 @@ body {
 .hub-content {
   flex: 1;
   overflow-y: auto;
-  background: rgba(11,16,22,0.52);
+  background: rgba(11,16,22,0);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -1779,79 +1840,302 @@ body {
 .hub-ic-waiting { font-size: .78rem; color: var(--color-primary); font-weight: 600; }
 
 /* ── GET READY SECTION ── */
+/* ══ GET READY — layout protótipo ══ */
 .hub-get-ready {
-  background: rgba(22,29,40,0.92);
-  border: 1px solid rgba(246,179,51,.18);
+  background: rgba(14,19,28,0.97);
+  border: 1px solid rgba(255,255,255,.07);
   border-radius: var(--radius);
-  padding: 24px 28px;
   margin-bottom: 20px;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-.hub-get-ready::before {
-  content:'';
-  position: absolute;
-  top:0; left:0; right:0; height:2px;
-  background: linear-gradient(90deg, var(--color-primary), transparent);
+
+/* Cabeçalho */
+.hub-gr-head {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.hub-gr-eyebrow {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  color: var(--text3);
+  margin-bottom: 5px;
 }
 .hub-gr-title {
   font-family: var(--font-display);
-  font-size: .62rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: .2em;
-  color: var(--text3);
-  margin-bottom: 14px;
-}
-.hub-gr-tactics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-.hub-gr-side-label {
-  font-family: var(--font-display);
-  font-size: .65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  color: var(--text3);
-  margin-bottom: 8px;
-}
-.hub-tac-cards { display:flex; flex-direction:column; gap:6px; }
-.hub-tac-opt {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-  text-align: left;
-  width: 100%;
-}
-.hub-tac-opt:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
-.hub-tac-opt.selected {
-  background: rgba(246,179,51,.10);
-  border-color: rgba(246,179,51,.40);
-}
-.hub-tac-opt-label {
-  font-family: var(--font-display);
-  font-size: .82rem;
-  font-weight: 700;
+  letter-spacing: .05em;
   color: var(--text);
-  margin-bottom: 2px;
-}
-.hub-tac-opt.selected .hub-tac-opt-label { color: var(--color-primary); }
-.hub-tac-opt-desc { font-size: .72rem; color: var(--text3); }
-
-.hub-gr-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 9px;
+  margin-bottom: 5px;
 }
-.hub-gr-tac-summary { font-family: var(--font-mono); font-size: .72rem; color: var(--text3); }
-.hub-gr-tac-summary span { color: var(--color-primary); }
+.hub-gr-subtitle {
+  font-size: .76rem;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* Corpo 3 colunas */
+.hub-gr-body {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  min-height: 440px;
+}
+.hub-gr-col {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px 16px;
+}
+.hub-gr-col-ct { border-right: 1px solid rgba(255,255,255,.05); }
+.hub-gr-col-t  { border-left:  1px solid rgba(255,255,255,.05); }
+
+.hub-gr-col-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.hub-gr-badge {
+  font-family: var(--font-display);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  padding: 3px 9px;
+  border-radius: 3px;
+}
+.hub-gr-badge-ct { background: rgba(59,130,246,.18); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+.hub-gr-badge-t  { background: rgba(246,179,51,.14); color: #f6b333; border: 1px solid rgba(246,179,51,.28); }
+.hub-gr-col-name {
+  font-family: var(--font-display);
+  font-size: .68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text2);
+}
+.hub-gr-col-hint { font-size: .66rem; color: var(--text3); }
+
+/* Cards */
+.hub-tac-cards { display: flex; flex-direction: column; gap: 7px; }
+.hub-tac-opt {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: background .14s, border-color .14s;
+  text-align: left;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 72px;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.hub-tac-opt:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.13); }
+.hub-tac-opt.sel-ct { background: rgba(59,130,246,.09); border-color: rgba(59,130,246,.42); }
+.hub-tac-opt.sel-t  { background: rgba(246,179,51,.09); border-color: rgba(246,179,51,.40); }
+.hub-tac-opt.previewing { border-color: rgba(255,255,255,.2); }
+
+.hub-tac-inner { display: flex; flex-direction: column; gap: 3px; }
+.hub-tac-opt-label {
+  font-family: var(--font-display);
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.hub-tac-opt.sel-ct .hub-tac-opt-label { color: #60a5fa; }
+.hub-tac-opt.sel-t  .hub-tac-opt-label { color: #f6b333; }
+.hub-tac-opt-desc { font-size: .68rem; color: var(--text3); line-height: 1.4; }
+
+/* minimap thumbnail */
+.hub-tac-thumb {
+  width: 72px;
+  height: 54px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+.hub-tac-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .82;
+  transition: opacity .15s;
+}
+.hub-tac-opt:hover .hub-tac-thumb img,
+.hub-tac-opt.sel-ct .hub-tac-thumb img,
+.hub-tac-opt.sel-t  .hub-tac-thumb img { opacity: 1; }
+
+/* check tick */
+.hub-tac-check {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: .65rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.hub-tac-opt.sel-ct .hub-tac-check { display:flex; background:#3b82f6; color:#fff; }
+.hub-tac-opt.sel-t  .hub-tac-check { display:flex; background:#f6b333; color:#000; }
+
+/* ── Preview central ── */
+.hub-gr-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 18px 20px;
+  background: rgba(255,255,255,.015);
+  gap: 0;
+}
+.hub-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 8px;
+  color: var(--text3);
+  font-size: .76rem;
+  text-align: center;
+  opacity: .55;
+}
+.hub-preview-empty-icon { font-size: 2.2rem; opacity: .35; }
+
+/* big map image */
+.hub-preview-img {
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  aspect-ratio: 4/3;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.hub-preview-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+.hub-preview-badge {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 7px;
+}
+.hub-preview-badge-ct { background: rgba(59,130,246,.2); color: #60a5fa; }
+.hub-preview-badge-t  { background: rgba(246,179,51,.15); color: #f6b333; }
+
+.hub-preview-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.hub-preview-flavor {
+  font-size: .73rem;
+  color: var(--text2);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+/* stats bars */
+
+
+/* matchup hint */
+.hub-preview-matchup {
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.hub-pm-row { display: flex; align-items: flex-start; gap: 6px; font-size: .69rem; }
+.hub-pm-row + .hub-pm-row { margin-top: 5px; }
+.hub-pm-good { color: #4ade80; }
+.hub-pm-bad  { color: #f87171; }
+
+/* ── Footer ── */
+.hub-gr-footer {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding: 13px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(11,16,22,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+.hub-gr-footer-label {
+  font-family: var(--font-display);
+  font-size: .58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.hub-gr-combo { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.hub-gr-combo-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 5px;
+  font-family: var(--font-display);
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+.hub-gr-combo-pill-ct { background: rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); color:#93c5fd; }
+.hub-gr-combo-pill-t  { background: rgba(246,179,51,.10); border:1px solid rgba(246,179,51,.28); color:#fcd563; }
+.hub-gr-combo-empty   { color: var(--text3); font-size: .73rem; font-style: italic; }
+.hub-gr-combo-vs {
+  font-family: var(--font-display);
+  font-size: .72rem;
+  font-weight: 900;
+  color: var(--text3);
+  letter-spacing: .1em;
+}
+.hub-gr-footer-tip {
+  font-size: .67rem;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+/* hidden spans — mantidos para compatibilidade JS */
+#hub-sel-ct, #hub-sel-t { display: none; }
 
 /* history feed in hub panel */
 .hub-history {
@@ -2122,6 +2406,18 @@ body {
   color: var(--color-primary);
 }
 .screen-topbar-spacer { flex: 1; }
+.screen-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.screen-topbar-meta {
+  font-family: var(--font-display);
+  font-size: .72rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
 
 /* layout */
 /* ═══════════════════════════════════════════════
@@ -2570,17 +2866,17 @@ body {
 .mp-card:hover:not(.mp-none) { border-color:var(--border2); transform:translateY(-2px); }
 .mp-card.mp-full {
   border-color: rgba(54,217,120,.45);
-  background: rgba(54,217,120,.06);
+  background: rgba(54,217,120,.19);
   box-shadow: var(--glow-success);
 }
 .mp-card.mp-half {
   border-color: rgba(246,179,51,.4);
-  background: rgba(246,179,51,.05);
+  background: rgba(246,179,51,.19);
   box-shadow: var(--glow-primary);
 }
 .mp-card.mp-none {
   border-color: rgba(241,76,76,.3);
-  background: rgba(241,76,76,.04);
+  background: rgba(241,76,76,.35);
   opacity: .55;
   pointer-events: none;
 }
@@ -3062,7 +3358,16 @@ body {
 #match-overlay.show { display:flex; }
 .match-modal {
   background:var(--bg2); border:2px solid var(--orange); border-radius:var(--r);
-  width:680px; max-width:98vw; padding:24px;
+  width:680px; max-width:98vw;
+  max-height:90vh;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.match-modal-scroll {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:24px 24px 4px;
 }
 .mm-header {
   text-align:center; margin-bottom:18px;
@@ -3217,11 +3522,16 @@ body {
 .pst-kd-pos { color:var(--green); }
 .pst-kd-neg { color:var(--red); }
 
-/* match summary */
+/* match summary — agora fora da área de scroll, sempre visível.
+   Espelha .setup-action-bar: rodapé fixo com a ação principal. */
 .match-summary {
-  margin-top:16px; background:var(--bg3); border-radius:var(--r);
-  padding:20px; text-align:center; display:none;
-  border:1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(11,16,22,.82);
+  backdrop-filter: blur(var(--blur-sm));
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+  padding: 18px 24px; text-align: center; display: none;
+  border-top: 1px solid rgba(246,179,51,.15);
+  box-shadow: 0 -8px 24px rgba(0,0,0,.28);
 }
 .match-summary.show { display:block; }
 .ms-result {
@@ -3431,11 +3741,15 @@ body {
   .match-modal {
     width:100vw;
     height:100dvh;
+    max-height:100dvh;
     max-width:none;
     border-radius:0;
-    padding:12px 12px max(12px, env(safe-area-inset-bottom));
-    overflow-y:auto;
-    padding-top:max(12px, env(safe-area-inset-top));
+  }
+  .match-modal-scroll {
+    padding:max(12px, env(safe-area-inset-top)) 12px 12px;
+  }
+  .match-summary {
+    padding-bottom:max(18px, env(safe-area-inset-bottom));
   }
   .mm-matchup   { gap:8px; }
   .mm-team-name { min-width:auto; font-size:.95rem; }
@@ -3584,7 +3898,6 @@ body {
   .sidebar-action {
     padding-bottom:max(10px, env(safe-area-inset-bottom));
   }
-  .match-modal,
   .stage-modal,
   .panel-box,
   .ev-modal {
@@ -4412,14 +4725,20 @@ body {
 </div>
 
 <!-- ═══════════════════════════  MAP POOL  ═══════════════════════════ -->
-<div id="screen-maps" class="screen" style="flex-direction:column;background:var(--bg);">
-  <div class="top-bar">
-    <span class="screen-topbar-title">Proficiência de Mapas</span>
+<div id="screen-maps" class="screen">
+  <div class="screen-topbar">
+    <div class="screen-topbar-left">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('draft')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Time
+      </button>
+      <span class="screen-topbar-title">Proficiência de Mapas</span>
+    </div>
     <div class="screen-topbar-spacer"></div>
-    <span style="font-family:var(--font-display);font-size:.7rem;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;">Passo 3 de 3</span>
-    <span id="maps-sel-status" style="font-family:var(--font-display);font-size:.78rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-left:16px;"></span>
+    <span class="screen-topbar-meta">Passo 3 de 3</span>
+    <span id="maps-sel-status" class="screen-topbar-meta" style="margin-left:16px;color:var(--text2);"></span>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:32px 40px;max-width:900px;margin:0 auto;width:100%;">
+  <div class="setup-scroll">
     <div style="margin-bottom:24px;">
       <div class="section-head" style="font-size:.9rem;letter-spacing:.12em;margin-bottom:10px;">Como seu time joga cada mapa?</div>
       <div style="font-size:.88rem;color:var(--text2);line-height:1.7;max-width:680px;">
@@ -4432,34 +4751,42 @@ body {
       <div class="mp-leg-item"><div class="mp-leg-dot" style="background:var(--red)"></div><span>Nula (−10% win rate)</span></div>
     </div>
     <div id="mp-grid" class="mp-grid"></div>
-    <div style="margin-top:32px;display:flex;justify-content:flex-end;">
-      <button class="btn btn-orange btn-lg" id="btn-confirm-maps" disabled onclick="confirmMapPool()">
-        Confirmar e Iniciar Major →
-      </button>
-    </div>
+  </div>
+  <div class="setup-action-bar" style="display:flex;justify-content:flex-end;">
+    <button class="btn btn-orange btn-lg" id="btn-confirm-maps" disabled onclick="confirmMapPool()">
+      Confirmar e Iniciar Major →
+    </button>
   </div>
 </div>
 
 <!-- ═══════════════════════════  VETO  ═══════════════════════════ -->
-<div id="screen-veto" class="screen" style="flex-direction:column;background:var(--bg);">
-  <div class="top-bar">
-    <span class="screen-topbar-title">Pick & Ban de Mapas</span>
+<div id="screen-veto" class="screen">
+  <div class="screen-topbar">
+    <div class="screen-topbar-left">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('maps')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Mapas
+      </button>
+      <span class="screen-topbar-title">Pick &amp; Ban de Mapas</span>
+    </div>
     <div class="screen-topbar-spacer"></div>
-    <span style="font-family:var(--font-display);font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Vete mapas ruins · Escolha os seus favoritos</span>
-    <span id="veto-vs-label" style="font-family:var(--font-display);font-size:.82rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-left:16px;"></span>
+    <span class="screen-topbar-meta">Vete mapas ruins · Escolha os seus favoritos</span>
+    <span id="veto-vs-label" class="screen-topbar-meta" style="margin-left:16px;color:var(--text2);"></span>
   </div>
-  <div style="flex:1;overflow-y:auto;padding:28px 32px;max-width:980px;margin:0 auto;width:100%;">
+  <div class="setup-scroll">
     <!-- Coin flip result -->
     <div id="veto-coin" style="margin-bottom:16px;padding:11px 16px;background:var(--color-bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem;color:var(--text2);font-family:var(--font-mono);"></div>
     <!-- Veto sequence log -->
     <div id="veto-log" style="margin-bottom:20px;display:flex;flex-direction:column;gap:6px;"></div>
     <!-- Map grid -->
-    <div style="margin-bottom:20px;">
+    <div>
       <div id="veto-instruction" style="font-family:var(--font-display);font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--color-primary);margin-bottom:14px;min-height:1.5em;"></div>
       <div id="veto-map-grid" class="veto-map-grid"></div>
     </div>
-    <!-- Side choice (appears when needed) -->
-    <div id="veto-side-panel" style="display:none;margin-bottom:20px;padding:18px 20px;background:var(--bg2);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);">
+  </div>
+  <!-- Action bar fixa: lado escolhido + picks finais nunca exigem scroll -->
+  <div class="setup-action-bar">
+    <div id="veto-side-panel" style="display:none;padding:14px 16px;background:var(--bg2);border:1px solid rgba(232,160,32,.4);border-radius:var(--r);margin-bottom:12px;">
       <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:12px;">
         Escolha seu lado em <span id="veto-side-map" style="color:var(--text)"></span>
       </div>
@@ -4469,7 +4796,7 @@ body {
       </div>
     </div>
     <!-- Final picks display -->
-    <div id="veto-picks" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;"></div>
+    <div id="veto-picks" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
   </div>
 </div>
 
@@ -4559,43 +4886,90 @@ body {
           </div>
         </div>
 
-        <!-- Welcome banner — aparece quando não há histórico, some depois -->
-        <div class="hub-welcome" id="hub-welcome" style="display:none;">
-          <div class="hub-welcome-icon">🎮</div>
-          <div class="hub-welcome-body">
-            <div class="hub-welcome-title">Bem-vindo ao Major!</div>
-            <div class="hub-welcome-text">Escolha suas <b>táticas CT e TR</b> abaixo e clique em <b>Iniciar Partida</b>. Você pode mudar a tática durante o jogo com um <b>Pause Técnico</b>.</div>
-          </div>
-          <button class="hub-welcome-close" onclick="document.getElementById('hub-welcome').style.display='none'" title="Fechar">✕</button>
-        </div>
-
-        <!-- GET READY section -->
+        <!-- GET READY — 3 colunas -->
         <div class="hub-get-ready" id="hub-get-ready">
-          <div class="hub-gr-title">⚔️ Defina seu plano de jogo para a próxima partida</div>
-          <div style="font-size:.78rem;color:var(--text2);margin-bottom:14px;line-height:1.5;">Escolha uma tática para cada lado. Isso afeta como seu time vai jogar — tente combinações diferentes ao longo da campanha.</div>
-          <div class="hub-gr-tactics">
-            <div>
-              <div class="hub-gr-side-label">🛡️ CT — Defesa do Site</div>
+
+          <!-- Cabeçalho -->
+          <div class="hub-gr-head">
+            <div class="hub-gr-eyebrow">Antes de entrar em quadra</div>
+            <div class="hub-gr-title">
+              &#x2694;&#xFE0F; Defina seu plano de jogo para a pr&#xF3;xima partida
+            </div>
+            <div class="hub-gr-subtitle">Escolha uma t&#xE1;tica para cada lado. Isso afeta como seu time vai jogar &#x2014; tente combina&#xE7;&#xF5;es diferentes ao longo da campanha.</div>
+          </div>
+
+          <!-- Corpo 3 colunas -->
+          <div class="hub-gr-body">
+
+            <!-- CT -->
+            <div class="hub-gr-col hub-gr-col-ct">
+              <div class="hub-gr-col-header">
+                <span class="hub-gr-badge hub-gr-badge-ct">CT</span>
+                <div>
+                  <div class="hub-gr-col-name">Defesa do Site</div>
+                  <div class="hub-gr-col-hint">Impedir o plantio da bomba</div>
+                </div>
+              </div>
               <div class="hub-tac-cards" id="hub-ct-opts"></div>
             </div>
-            <div>
-              <div class="hub-gr-side-label">💣 TR — Plantio da Bomba</div>
+
+            <!-- Preview central -->
+            <div class="hub-gr-preview" id="hub-gr-preview">
+              <div class="hub-preview-empty" id="hub-preview-empty">
+                <div class="hub-preview-empty-icon">&#x1F5FA;</div>
+                <div>Clique em uma t&#xE1;tica<br>para ver os detalhes</div>
+              </div>
+              <div id="hub-preview-content" style="display:none;">
+                <div class="hub-preview-img" id="hub-preview-img">
+                  <img id="hub-preview-map-img" src="" alt="">
+                </div>
+                <div id="hub-preview-badge" class="hub-preview-badge hub-preview-badge-ct">CT</div>
+                <div id="hub-preview-name"   class="hub-preview-name"></div>
+                <div id="hub-preview-flavor" class="hub-preview-flavor"></div>
+                <div class="hub-preview-matchup" id="hub-preview-matchup"></div>
+              </div>
+            </div>
+
+            <!-- TR -->
+            <div class="hub-gr-col hub-gr-col-t">
+              <div class="hub-gr-col-header">
+                <span class="hub-gr-badge hub-gr-badge-t">TR</span>
+                <div>
+                  <div class="hub-gr-col-name">Plantio da Bomba</div>
+                  <div class="hub-gr-col-hint">Explodir um dos bombsites</div>
+                </div>
+              </div>
               <div class="hub-tac-cards" id="hub-t-opts"></div>
             </div>
+
           </div>
+
+          <!-- Footer -->
           <div class="hub-gr-footer">
-            <div class="hub-gr-tac-summary" id="hub-tac-summary">CT: <span id="hub-sel-ct">N&#xE3;o definida</span> &nbsp;&middot;&nbsp; TR: <span id="hub-sel-t">N&#xE3;o definida</span></div>
-            <button class="btn btn-orange" id="btn-next" onclick="handleNext()" disabled>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <div class="hub-gr-footer-label">Sua combina&#xE7;&#xE3;o</div>
+            <div class="hub-gr-combo">
+              <div id="hub-combo-ct" class="hub-gr-combo-empty">&#x2014; escolha CT</div>
+              <div id="hub-combo-vs" class="hub-gr-combo-vs" style="display:none">VS</div>
+              <div id="hub-combo-t"  style="display:none"></div>
+            </div>
+            <div class="hub-gr-footer-tip">
+              &#x2139;&#xFE0F;&nbsp; Durante a partida voc&#xEA; tem <b>&nbsp;2 pauses&nbsp;</b> para mudar de t&#xE1;tica.
+            </div>
+            <!-- hidden spans mantidos para JS -->
+            <span id="hub-sel-ct"></span>
+            <span id="hub-sel-t"></span>
+            <button class="btn btn-orange btn-lg" id="btn-next" onclick="handleNext()" disabled>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Iniciar Partida
             </button>
           </div>
+
         </div>
 
         <!-- Hist&#xF3;rico -->
         <div class="hub-history">
-          <div class="hub-history-title">Hist&#xF3;rico</div>
-          <div class="hist-feed" id="hist-feed"><div class="hf-empty">Nenhuma s&#xE9;rie jogada.</div></div>
+          <div class="hub-history-title">Hist&#xF3;rico de Partidas</div>
+          <div class="hist-feed" id="hist-feed"><div class="hf-empty">Nenhuma s&#xE9;rie jogada ainda.</div></div>
         </div>
 
       </div>
@@ -4637,41 +5011,44 @@ body {
 <!-- ═══════════════════════════  MATCH OVERLAY  ═══════════════════════════ -->
 <div id="match-overlay">
   <div class="match-modal">
-    <div class="mm-header">
-      <div class="mm-live">● LIVE</div>
-      <div class="mm-matchup">
-        <div class="mm-team-name left"  id="mv-team">–</div>
-        <div class="mm-vs">VS</div>
-        <div class="mm-team-name right" id="mv-opp">–</div>
-      </div>
-      <div class="mm-controls">
-        <div class="speed-ctrl" title="Velocidade da simulação — mais rápido pula detalhes, mais lento mostra rodada a rodada">
-          <button class="spd-btn" onclick="changeSpeed(-1)" title="Mais devagar">–</button>
-          <span id="spd-label">▶ Normal</span>
-          <button class="spd-btn" onclick="changeSpeed(1)" title="Mais rápido">+</button>
+    <div class="match-modal-scroll">
+      <div class="mm-header">
+        <div class="mm-live">● LIVE</div>
+        <div class="mm-matchup">
+          <div class="mm-team-name left"  id="mv-team">–</div>
+          <div class="mm-vs">VS</div>
+          <div class="mm-team-name right" id="mv-opp">–</div>
         </div>
-        <button class="btn btn-ghost btn-sm" id="btn-pause-match" onclick="playerPauseMatch()" title="Pause Técnico — permite trocar a tática no meio do mapa (1x por mapa)">⏸ Pause Técnico</button>
+        <div class="mm-controls">
+          <div class="speed-ctrl" title="Velocidade da simulação — mais rápido pula detalhes, mais lento mostra rodada a rodada">
+            <button class="spd-btn" onclick="changeSpeed(-1)" title="Mais devagar">–</button>
+            <span id="spd-label">▶ Normal</span>
+            <button class="spd-btn" onclick="changeSpeed(1)" title="Mais rápido">+</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-pause-match" onclick="playerPauseMatch()" title="Pause Técnico — permite trocar a tática no meio do mapa (1x por mapa)">⏸ Pause Técnico</button>
+        </div>
+      </div>
+      <div class="mm-half-banner" id="mm-half-banner" style="display:none;"></div>
+      <div class="series-maps" id="series-maps">
+        <div class="sm-dot" id="dot-0">1</div>
+        <div class="sm-dot" id="dot-1">2</div>
+        <div class="sm-dot" id="dot-2">3</div>
+      </div>
+      <div id="maps-area"></div>
+      <div class="pst-section" id="pst-section" style="display:none;">
+        <div class="pst-label">Desempenho do Time</div>
+        <table class="pst-table" id="pst-table">
+          <thead>
+            <tr>
+              <th>Jogador</th>
+              <th>K</th><th>D</th><th>K/D</th><th>ADR</th>
+            </tr>
+          </thead>
+          <tbody id="pst-body"></tbody>
+        </table>
       </div>
     </div>
-    <div class="mm-half-banner" id="mm-half-banner" style="display:none;"></div>
-    <div class="series-maps" id="series-maps">
-      <div class="sm-dot" id="dot-0">1</div>
-      <div class="sm-dot" id="dot-1">2</div>
-      <div class="sm-dot" id="dot-2">3</div>
-    </div>
-    <div id="maps-area"></div>
-    <div class="pst-section" id="pst-section" style="display:none;">
-      <div class="pst-label">Desempenho do Time</div>
-      <table class="pst-table" id="pst-table">
-        <thead>
-          <tr>
-            <th>Jogador</th>
-            <th>K</th><th>D</th><th>K/D</th><th>ADR</th>
-          </tr>
-        </thead>
-        <tbody id="pst-body"></tbody>
-      </table>
-    </div>
+    <!-- Sempre visível, sem precisar rolar — espelha .setup-action-bar -->
     <div class="match-summary" id="match-summary">
       <div class="ms-result" id="ms-result">–</div>
       <div class="ms-desc"   id="ms-desc">–</div>
@@ -6860,50 +7237,143 @@ async function loadHubTactics() {
   renderHubTactics();
 }
 
+// ── Mapa de imagens por chave de tática ──────────────────────────────────────
+const TAC_MAP_IMG = {
+  aggressive:   "/ui/static/map-ct-agressivo.png",
+  passive:      "/ui/static/map-ct-passivo-hold.png",
+  retake:       "/ui/static/map-ct-retake.png",
+  fast_rush:    "/ui/static/map-tr-fastrush-execute.png",
+  slow_default: "/ui/static/map-tr-slowdefault.png",
+  anti_eco:     "/ui/static/map-tr-antieco-push.png",
+};
+
+function _tacCardHTML(side, key, v, selected) {
+  const selClass = selected ? (side==="ct" ? " sel-ct" : " sel-t") : "";
+  const imgSrc   = TAC_MAP_IMG[key] || "";
+  const labelClean = (v.label||key).replace(/^[\S]+\s/,""); // remove emoji prefix
+  const emoji    = v.emoji || (v.label||"").split(" ")[0] || "";
+  return `<button class="hub-tac-opt${selClass}"
+      onclick="selectHubTactic('${side}','${key}',this)"
+      onmouseenter="previewTactic('${side}','${key}')">
+    <div class="hub-tac-inner">
+      <div class="hub-tac-opt-label">${emoji} ${labelClean}</div>
+      <div class="hub-tac-opt-desc">${v.desc||""}</div>
+    </div>
+    <div class="hub-tac-thumb">
+      <img src="${imgSrc}" alt="${labelClean}" loading="lazy">
+    </div>
+    <div class="hub-tac-check">&#x2713;</div>
+  </button>`;
+}
+
 function renderHubTactics() {
   const ctEl = document.getElementById("hub-ct-opts");
   const tEl  = document.getElementById("hub-t-opts");
   if(!ctEl||!tEl) return;
-
-  ctEl.innerHTML = Object.entries(_tacState.ctTactics).map(([k,v])=>
-    `<button class="hub-tac-opt${k===_hubSelectedCT?" selected":""}" onclick="selectHubTactic('ct','${k}',this)">
-      <div class="hub-tac-opt-label">${v.label}</div>
-      <div class="hub-tac-opt-desc">${v.desc}</div>
-    </button>`
-  ).join("");
-
-  tEl.innerHTML = Object.entries(_tacState.tTactics).map(([k,v])=>
-    `<button class="hub-tac-opt${k===_hubSelectedT?" selected":""}" onclick="selectHubTactic('t','${k}',this)">
-      <div class="hub-tac-opt-label">${v.label}</div>
-      <div class="hub-tac-opt-desc">${v.desc}</div>
-    </button>`
-  ).join("");
-
+  ctEl.innerHTML = Object.entries(_tacState.ctTactics)
+    .map(([k,v])=>_tacCardHTML("ct",k,v,k===_hubSelectedCT)).join("");
+  tEl.innerHTML  = Object.entries(_tacState.tTactics)
+    .map(([k,v])=>_tacCardHTML("t", k,v,k===_hubSelectedT )).join("");
   updateHubTacSummary();
+  // Auto-preview primeira selecionada (ou primeira da lista)
+  if(_hubSelectedCT) previewTactic("ct",_hubSelectedCT);
+  else if(_hubSelectedT) previewTactic("t",_hubSelectedT);
+}
+
+// ── Preview central com imagem real ──────────────────────────────────────────
+let _previewSide=null, _previewKey=null;
+
+function previewTactic(side, key) {
+  if(_previewSide===side && _previewKey===key) return;
+  _previewSide=side; _previewKey=key;
+
+  const tacs = side==="ct" ? _tacState.ctTactics : _tacState.tTactics;
+  const v = tacs[key]; if(!v) return;
+
+  document.getElementById("hub-preview-empty").style.display   = "none";
+  document.getElementById("hub-preview-content").style.display = "block";
+
+  // Imagem real
+  const imgEl = document.getElementById("hub-preview-map-img");
+  if(imgEl){ imgEl.src = TAC_MAP_IMG[key]||""; imgEl.alt = v.label||key; }
+
+  // Badge
+  const badgeEl = document.getElementById("hub-preview-badge");
+  if(badgeEl){
+    badgeEl.textContent = side==="ct" ? "CT — DEFESA" : "TR — ATAQUE";
+    badgeEl.className   = "hub-preview-badge " + (side==="ct" ? "hub-preview-badge-ct" : "hub-preview-badge-t");
+  }
+
+  // Nome e flavor
+  const labelClean = (v.label||key).replace(/^[\S]+\s/,"");
+  const emoji      = v.emoji || (v.label||"").split(" ")[0] || "";
+  const nameEl   = document.getElementById("hub-preview-name");
+  const flavorEl = document.getElementById("hub-preview-flavor");
+  if(nameEl)   nameEl.textContent   = emoji + " " + labelClean;
+  if(flavorEl) flavorEl.textContent = v.flavor || v.desc || "";
+
+
+
+  // Matchup
+  const matchupEl = document.getElementById("hub-preview-matchup");
+  if(matchupEl) matchupEl.innerHTML = [
+    v.counters ? `<div class="hub-pm-row hub-pm-good">&#x2714; <b>Bom contra:</b>&nbsp;${v.counters}</div>` : "",
+    v.weak     ? `<div class="hub-pm-row hub-pm-bad">&#x26A0; <b>Fraco contra:</b>&nbsp;${v.weak}</div>`     : "",
+  ].join("");
+
+  // Highlight card being previewed (not selected)
+  document.querySelectorAll(".hub-tac-opt.previewing").forEach(b=>b.classList.remove("previewing"));
+  const allCards = document.querySelectorAll("#hub-ct-opts .hub-tac-opt, #hub-t-opts .hub-tac-opt");
+  allCards.forEach(b=>{
+    if(b.onclick?.toString().includes(`'${side}','${key}'`)) b.classList.add("previewing");
+  });
 }
 
 function selectHubTactic(side, key, el) {
   if(side==="ct"){
     _hubSelectedCT = key;
-    document.querySelectorAll("#hub-ct-opts .hub-tac-opt").forEach(b=>b.classList.remove("selected"));
+    document.querySelectorAll("#hub-ct-opts .hub-tac-opt").forEach(b=>b.classList.remove("sel-ct","previewing"));
+    el.classList.add("sel-ct");
   } else {
     _hubSelectedT = key;
-    document.querySelectorAll("#hub-t-opts .hub-tac-opt").forEach(b=>b.classList.remove("selected"));
+    document.querySelectorAll("#hub-t-opts .hub-tac-opt").forEach(b=>b.classList.remove("sel-t","previewing"));
+    el.classList.add("sel-t");
   }
-  el.classList.add("selected");
+  previewTactic(side, key);
   updateHubTacSummary();
 }
 
 function updateHubTacSummary() {
-  const ctLabel = _hubSelectedCT ? (_tacState.ctTactics[_hubSelectedCT]?.label||_hubSelectedCT) : null;
-  const tLabel  = _hubSelectedT  ? (_tacState.tTactics[_hubSelectedT]?.label||_hubSelectedT)   : null;
-  const ctEl = document.getElementById("hub-sel-ct");
-  const tEl  = document.getElementById("hub-sel-t");
-  if(ctEl) ctEl.textContent = ctLabel||"Não definida";
-  if(tEl)  tEl.textContent  = tLabel||"Não definida";
+  const ctV = _hubSelectedCT ? _tacState.ctTactics[_hubSelectedCT] : null;
+  const tV  = _hubSelectedT  ? _tacState.tTactics[_hubSelectedT]   : null;
+  const ctLabel = ctV ? ((ctV.emoji||"")+" "+(ctV.label||"").replace(/^[\S]+\s/,"")) : null;
+  const tLabel  = tV  ? ((tV.emoji ||"")+" "+(tV.label ||"").replace(/^[\S]+\s/,"")) : null;
+
+  // Combo pills no footer
+  const comboCT = document.getElementById("hub-combo-ct");
+  const comboT  = document.getElementById("hub-combo-t");
+  const comboVS = document.getElementById("hub-combo-vs");
+  if(comboCT){
+    if(ctLabel){
+      comboCT.className = "hub-gr-combo-pill hub-gr-combo-pill-ct";
+      comboCT.innerHTML = `<span>&#x1F6E1;</span>${ctLabel}`;
+    } else {
+      comboCT.className   = "hub-gr-combo-empty";
+      comboCT.textContent = "— escolha CT";
+    }
+  }
+  if(comboT){
+    if(tLabel){
+      comboT.className = "hub-gr-combo-pill hub-gr-combo-pill-t";
+      comboT.innerHTML = `<span>&#x1F4A3;</span>${tLabel}`;
+      comboT.style.display = "";
+    } else { comboT.style.display="none"; }
+  }
+  if(comboVS) comboVS.style.display = (ctLabel&&tLabel) ? "" : "none";
+
   const btn = document.getElementById("btn-next");
-  if(btn) btn.disabled = !_hubSelectedCT || !_hubSelectedT ||
-    G.campaign?.stage==="finished_win" || G.campaign?.stage==="finished_loss";
+  const fin = G.campaign?.stage==="finished_win"||G.campaign?.stage==="finished_loss";
+  if(btn) btn.disabled = !_hubSelectedCT || !_hubSelectedT || fin;
 }
 
 let _tacState = {
