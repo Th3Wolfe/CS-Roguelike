@@ -1,12 +1,12 @@
+<p align="center">
+  <img src="ui/static/demo/menu-principal.gif" alt="Menu principal animado" width="800">
+</p>
+
 # CS Major Manager (CS-Roguelike)
 
 Um simulador roguelike de gestão de equipes de Counter-Strike. Monte um time com jogadores de diferentes eras do competitivo, dispute uma campanha inteira de Major — fase de grupos (formato Swiss), playoffs single-elimination e veto de mapas BO3 — até erguer o troféu ou ser eliminado.
 
 Construído em Python (Flask) no back-end com uma interface web single-page em HTML/JS puro.
-
-<p align="center">
-  <img src="ui/static/demo/menu-principal.gif" alt="Menu principal animado" width="800">
-</p>
 
 ---
 
