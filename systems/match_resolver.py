@@ -227,7 +227,10 @@ def _simulate_map(ts: float, os_: float,
     opp_ot  = 0
     if t_r == 12 and o_r == 12:
         went_ot = True
-        ot_side = team_start_side
+        # Per current CS2 rules, OT starts with each team on the side it
+        # ended regulation on (i.e. its half-2 side), switching only after
+        # the first 3 OT rounds — NOT back to its half-1 side.
+        ot_side = team_side_h2
         while True:
             ot_t = ot_o = 0
             p1 = side_p(ot_side)

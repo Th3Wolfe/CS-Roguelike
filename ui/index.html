@@ -1835,7 +1835,9 @@ body {
   border: 1px solid rgba(246,179,51,.2);
   display: flex; align-items: center; justify-content: center;
   font-size: 1.2rem;
+  overflow: hidden;
 }
+.hub-ic-shield img { width: 100%; height: 100%; object-fit: contain; }
 .hub-ic-vs { font-family: var(--font-display); font-size: .75rem; color: var(--text3); }
 .hub-ic-waiting { font-size: .78rem; color: var(--color-primary); font-weight: 600; }
 
@@ -5019,7 +5021,7 @@ body {
             <div class="hub-ic-matchup">
               <div class="hub-ic-shield" id="hub-team-shield">&#x1F6E1;&#xFE0F;</div>
               <div class="hub-ic-vs">VS</div>
-              <div class="hub-ic-shield">&#x1F98A;</div>
+              <div class="hub-ic-shield" id="hub-opp-shield">&#x1F998;</div>
             </div>
             <div class="hub-ic-waiting" id="hub-opp-label">Aguardando adversario</div>
             <div style="font-size:.7rem;color:var(--text3);margin-top:4px;" id="hub-opp-sub">Pr&#xF3;xima rodada em breve.</div>
@@ -6691,6 +6693,102 @@ function updateHeader(){
   }
 }
 
+// ═══════════════════════════════════════════
+// TEAM SHIELDS (Próxima Partida card)
+// ═══════════════════════════════════════════
+function slugifyTeamName(name) {
+  return (name || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // strip accents
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// Called from the <img onerror> handler when a shield file is missing —
+// swaps the broken image for a generic emoji so the layout never breaks.
+function handleShieldImgError(img, fallback) {
+  img.onerror = null;
+  const holder = img.parentNode;
+  if (holder) holder.textContent = fallback;
+}
+
+function setShield(elId, teamName, fallbackEmoji) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!teamName) { el.textContent = fallbackEmoji; return; }
+  const slug = slugifyTeamName(teamName);
+  el.innerHTML = `<img src="/ui/static/shields/${slug}.png" alt="${teamName}" ` +
+    `onerror="handleShieldImgError(this, '${fallbackEmoji}')">`;
+}
+
+// Figures out who the player faces next, mirroring the backend's
+// _get_paired_opponent / _get_playoff_opponent logic, using data already
+// present in G.bracket (pending_pairings for Swiss, playoff_bracket for POs).
+function getNextOpponentInfo() {
+  const { campaign, team } = G;
+  if (!campaign || !team) return null;
+  const stg = campaign.stage;
+  const bracket = G.bracket || {};
+  const playerName = team.name;
+
+  if (stg === "stage1" || stg === "stage2") {
+    const pairing = (bracket.pending_pairings || [])
+      .find(p => p.a === playerName || p.b === playerName);
+    if (!pairing) return null;
+    const oppName = pairing.a === playerName ? pairing.b : pairing.a;
+    const npc = (bracket.npc_teams || []).find(t => t.name === oppName);
+    return {
+      name: oppName,
+      strength: npc ? npc.strength : null,
+      stageLabel: stg === "stage1" ? "Stage 1 — Swiss" : "Stage 2 — Swiss",
+    };
+  }
+
+  const keyMap = { playoffs_qf: "qf", playoffs_sf: "sf", playoffs_final: "final" };
+  const key = keyMap[stg];
+  if (!key) return null; // finished_win / finished_loss — no next match
+
+  const target = (bracket.playoff_bracket || {})[key];
+  const matches = Array.isArray(target) ? target : (target ? [target] : []);
+  const pm = matches.find(m => m.is_player_match);
+  if (!pm) return null;
+  const oppName = pm.a === playerName ? pm.b : pm.a;
+  if (!oppName || oppName === "?") return null;
+
+  const stageLabels = {
+    playoffs_qf: "Quartas de Final",
+    playoffs_sf: "Semifinal",
+    playoffs_final: "Grande Final",
+  };
+  const npc = (bracket.npc_teams || []).find(t => t.name === oppName);
+  return { name: oppName, strength: npc ? npc.strength : null, stageLabel: stageLabels[stg] };
+}
+
+function updateNextMatchupCard(finished) {
+  const oppInfo   = finished ? null : getNextOpponentInfo();
+  const hubLabel  = document.getElementById("hub-opp-label");
+  const hubSub    = document.getElementById("hub-opp-sub");
+
+  if (hubLabel) {
+    if (oppInfo) {
+      hubLabel.textContent = oppInfo.name;
+      if (hubSub) {
+        hubSub.textContent = oppInfo.strength != null
+          ? `${oppInfo.stageLabel} · Força ${oppInfo.strength.toFixed(1)}`
+          : (oppInfo.stageLabel || "");
+      }
+    } else {
+      hubLabel.textContent = finished
+        ? (G.campaign?.stage === "finished_win" ? "Campanha concluída" : "Eliminado")
+        : "Aguardando adversário";
+      if (hubSub) hubSub.textContent = finished ? "" : "Próxima rodada em breve.";
+    }
+  }
+
+  setShield("hub-team-shield", G.team?.name, "🛡️");
+  setShield("hub-opp-shield", oppInfo ? oppInfo.name : null, "🦅");
+}
+
 function updateGameUI(){
   if(!G.team) return;
   const {team,campaign}=G;
@@ -6755,6 +6853,7 @@ function updateGameUI(){
 
   renderHistoryFeed(campaign.history||[]);
   renderBracket();
+  updateNextMatchupCard(finished);
 
   // Get-ready / btn-next
   const btn=document.getElementById("btn-next");
@@ -7923,8 +8022,17 @@ async function animHalfReal(rvId, teamRounds, oppRounds, teamSide, startT=0, sta
     if(won){ t++; tEl.textContent=t; tEl.style.transform="scale(1.18)"; setTimeout(()=>{tEl.style.transform="scale(1)";},100); }
     else   { o++; oEl.textContent=o; oEl.style.transform="scale(1.18)"; setTimeout(()=>{oEl.style.transform="scale(1)";},100); }
     await sleep(SPEED_LEVELS[_simSpeed].delay);
-    // Stop immediately after the round that decides the half/map
-    if(t >= 13 || o >= 13) break;
+    // NOTE: previously this broke as soon as either counter hit 13, assuming
+    // that always meant the half/map was decided. That's only true in
+    // regulation (12-12 max before OT). During overtime the score legitimately
+    // continues past 13 (16, 19, 22...), and since the round order here is
+    // shuffled for visual variety, the *opponent's* counter could hit 13
+    // first purely by chance — freezing the scoreboard on a false reading
+    // (e.g. showing the player ahead 13-12) even when the real final score
+    // (map.team_score / map.opponent_score) has them losing. The animation
+    // now always plays out every round in this segment (seq already has the
+    // exact real count from the backend), so the displayed score can never
+    // diverge from the true result.
   }
 }
 
