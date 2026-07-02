@@ -4,6 +4,10 @@ Um simulador roguelike de gestão de equipes de Counter-Strike. Monte um time co
 
 Construído em Python (Flask) no back-end com uma interface web single-page em HTML/JS puro.
 
+<p align="center">
+  <img src="ui/static/demo/menu-principal.gif" alt="Menu principal animado" width="800">
+</p>
+
 ---
 
 ## Funcionalidades
@@ -33,6 +37,15 @@ Construído em Python (Flask) no back-end com uma interface web single-page em H
 - **Efeitos de traço pós-série** — Workaholic perde mais físico; Tilta Fácil perde mais mental em derrotas; Veterano e Piadista resistem melhor ao desgaste mental.
 - **Sistema de buffs** — efeitos temporários (por jogador ou por time) com duração em séries, gerados por eventos. Decaem a cada série e são removidos quando expiram. A sinergia do time decai 10% por série para evitar snowball de eventos.
 - **Eventos narrativos** — sistema opt-in de eventos (drama interno, lesões, polêmicas, boas notícias) que alteram atributos, moral, sinergia e buffs. Divididos em três categorias: performance, relações e outros. Até 2 eventos por série; sem repetição dentro de uma mesma campanha.
+
+### Áudio e ambientação
+- **Trilha sonora contextual** — faixas separadas para menu/frontend, hub da campanha e partidas, tocadas automaticamente conforme a tela ativa e listadas dinamicamente pelo servidor (basta adicionar um arquivo de áudio na pasta correspondente).
+- **Arte de fundo por tela** — ilustrações dedicadas para menu, draft/proficiência de mapas, hub e partidas/veto.
+- **Ilustrações de táticas** — cada tática de CT e T tem uma arte própria exibida na tela de escolha, facilitando a leitura rápida da opção.
+
+### Interface e responsividade
+- **UI single-page reformulada** — hub, chave de campeonato, elenco, veto e partida em uma única página, com navegação inferior dedicada para telas de toque.
+- **Layout mobile-first** — barra de navegação inferior (`Hub` / `Chave` / `Elenco`), fluxo de toque para seleção (tap-to-select) e ajustes de rolagem pensados para uso em celular, além do layout completo em desktop.
 
 ### Utilitários
 - **Save/Load** — salve e carregue o progresso da campanha em qualquer momento.
@@ -107,8 +120,8 @@ Cada half de cada mapa tem uma escolha tática independente. As táticas formam 
 ## Arquitetura
 
 ```
-cs_roguelike_v9/
-├── app.py                     # Servidor Flask e rotas da API REST
+CS-Roguelike/
+├── app.py                     # Servidor Flask, rotas da API REST e listagem de faixas de música
 ├── models/                    # Entidades de domínio (dataclasses)
 │   ├── player.py              #   Jogador, atributos, papéis, status, score efetivo
 │   ├── team.py                #   Time, sinergia, buffs, score total
@@ -129,11 +142,15 @@ cs_roguelike_v9/
 │   └── event_manager.py       #   Seleção e aplicação de eventos narrativos
 ├── data/                      # Bases de dados em JSON
 │   ├── players_database.json  #   Jogadores por era (2015, 2018, 2021, 2023, 2025)
+│   ├── players_database_novo.json #  Base em preparação/staging para atualização de jogadores
 │   ├── events_performance.json#   Eventos de performance individual
 │   ├── events_relations.json  #   Eventos de relacionamento e sinergia
 │   └── events_other.json      #   Demais eventos narrativos
 ├── ui/
-│   └── index.html             #   Front-end single-page (HTML/CSS/JS)
+│   ├── index.html              #   Front-end single-page atual (HTML/CSS/JS), com layout desktop e mobile
+│   ├── index-premobile.html    #   Versão anterior ao rework mobile, mantida como referência
+│   ├── music/                  #   Trilhas por contexto: frontend/, hub/, match/
+│   └── static/                 #   Logo, artes de fundo (bg-menu, bg-draft, bg-hub, bg-match) e ilustrações de táticas (map-ct-*, map-tr-*)
 ├── saves/                     # Partidas salvas (gerado em runtime)
 ├── update_db_from_csapi.py    # Script para atualizar era 2025 via API externa
 ├── requirements.txt
@@ -151,7 +168,7 @@ cs_roguelike_v9/
 
 ```bash
 git clone <url-do-repositorio>
-cd cs_roguelike_v9
+cd CS-Roguelike
 pip install -r requirements.txt
 ```
 
@@ -186,6 +203,7 @@ gunicorn app:app
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
+| GET | `/api/music_tracks` | Lista as faixas de música disponíveis por contexto (`frontend`, `hub`, `match`) |
 | GET | `/api/eras` | Eras disponíveis para draft |
 | POST | `/api/draft_team` | Sorteia um time real de uma era |
 | POST | `/api/draft_candidates` | Lista candidatos para um papel específico |
@@ -258,8 +276,8 @@ python update_db_from_csapi.py --debug     # inspeciona a estrutura retornada pe
 
 ## Stack técnica
 
-- **Back-end:** Python 3.10+, Flask, sessões server-side em memória (dict por UUID de sessão)
-- **Front-end:** HTML/CSS/JS puro (single-page, sem build step)
+- **Back-end:** Python 3.10+, Flask 3.x, sessões server-side em memória (dict por UUID de sessão)
+- **Front-end:** HTML/CSS/JS puro (single-page, sem build step), com layout responsivo desktop/mobile e trilha sonora/artes servidas estaticamente pelo Flask
 - **Persistência:** JSON em disco (`data/`, `saves/`)
 - **Deploy:** Gunicorn + Procfile (compatível com Heroku e similares)
 
