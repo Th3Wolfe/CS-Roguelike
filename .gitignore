@@ -1,0 +1,24 @@
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+
+# ── Saves de jogo (systems/save_system.py) ────────────────
+saves/
+
+# ── Frontend (Vite/React) ──────────────────────────────────
+# node_modules e o build de produção não devem ser versionados —
+# `cd frontend && npm install` e `npm run build` os recriam sempre.
+frontend/node_modules/
+ui_dist/
+
+# ── Editor / SO ─────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,85 @@
+/*
+ * Design tokens portados de ui/index.html (versão vanilla).
+ * Mantém exatamente a mesma paleta/tipografia pra migração ser incremental
+ * sem quebrar a identidade visual já estabelecida do jogo.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  /* ── BACKGROUNDS ── */
+  --bg:    #0B1016;
+  --bg2:   #111720;
+  --bg3:   #161D28;
+  --bg4:   #1C2430;
+  --bg5:   #212D3A;
+
+  --color-bg:            #0B1016;
+  --color-bg-secondary:  #111720;
+  --color-surface:       #161D28;
+  --color-surface-hover: #1C2430;
+  --color-overlay:       rgba(6, 8, 12, 0.72);
+
+  /* ── ACCENT COLORS ── */
+  --orange:  #F6B333;
+  --orange2: #D4942A;
+  --blue:    #4AA8FF;
+  --blue2:   #1E6ABF;
+  --teal:    #36D978;
+  --red:     #F14C4C;
+  --green:   #36D978;
+  --purple:  #A36CFF;
+
+  --color-primary: #F6B333;
+  --color-success: #36D978;
+  --color-danger:  #F14C4C;
+  --color-info:    #4AA8FF;
+  --color-purple:  #A36CFF;
+
+  /* ── TEXT ── */
+  --text:  #D8E0EA;
+  --text2: #8A97AA;
+  --text3: #5C6572;
+
+  /* ── TYPE ── */
+  --font-display: 'Barlow Condensed', 'Impact', sans-serif;
+  --font-body:    'Inter', 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  /* ── RADIUS ── */
+  --r:          6px;
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  /* ── TEXT (títulos) ── */
+  --color-text-title:   #F4F6F8;
+  --color-text-primary: #D8E0EA;
+
+  /* ── BORDERS / SHADOWS / MOTION ── */
+  --border:  rgba(255, 255, 255, 0.06);
+  --border2: rgba(255, 255, 255, 0.12);
+  --shadow-sm:    0 6px 18px rgba(0, 0, 0, 0.18);
+  --shadow-md:    0 12px 32px rgba(0, 0, 0, 0.26);
+  --blur-sm: 8px;
+  --glow-primary: 0 0 24px rgba(246, 179, 51, 0.18);
+  --glow-success: 0 0 20px rgba(54, 217, 120, 0.18);
+  --glow-danger:  0 0 20px rgba(241, 76, 76, 0.18);
+  --duration-fast:    120ms;
+  --duration-default: 180ms;
+  --duration-medium:  250ms;
+  --ease: ease-out;
+  --space-sm: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.mono          { font-family: var(--font-mono); }
+.font-display  { font-family: var(--font-display); }

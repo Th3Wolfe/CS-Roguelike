@@ -1,0 +1,124 @@
+.era-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.era-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 20px;
+}
+.era-eyebrow {
+  font-family: var(--font-display);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.era-eyebrow::before, .era-eyebrow::after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: rgba(246,179,51,.4);
+}
+.era-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--color-text-title);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.era-title span { color: var(--color-primary); }
+.era-sub {
+  text-align: center;
+  color: var(--text2);
+  font-size: .82rem;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.era-grid { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 24px; }
+.era-card {
+  position: relative;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-default) var(--ease),
+    background var(--duration-default) var(--ease),
+    transform var(--duration-default) var(--ease),
+    box-shadow var(--duration-default) var(--ease);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+}
+.era-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(246,179,51,.04) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--duration-default) var(--ease);
+}
+.era-card:hover {
+  border-color: rgba(246,179,51,.45);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), var(--glow-primary);
+}
+.era-card:hover::before { opacity: 1; }
+.era-card.selected {
+  border-color: var(--color-primary);
+  background: rgba(246,179,51,.06);
+  box-shadow: var(--glow-primary);
+}
+.era-card.selected::before { opacity: 1; }
+.era-year {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 70px;
+  line-height: 1;
+  position: relative; z-index: 1;
+}
+.era-card.selected .era-year { text-shadow: 0 0 20px rgba(246,179,51,.4); }
+.era-info { position: relative; z-index: 1; }
+.era-info .era-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--color-text-title);
+}
+.era-info .era-desc { font-size: .76rem; color: var(--text2); margin-top: 3px; line-height: 1.5; }
+.era-check {
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--duration-default) var(--ease), border-color var(--duration-default) var(--ease);
+  position: relative; z-index: 1;
+}
+.era-card.selected .era-check { background: var(--color-primary); border-color: var(--color-primary); }

@@ -589,6 +589,12 @@ class CampaignManager:
 
     def _get_paired_opponent(self, stage: str) -> "Opponent":
         """Swiss stages: use the pre-revealed pending pairing."""
+        # _init_bracket() era chamado só dentro de play_series(), então
+        # start_veto() (que precisa do adversário ANTES de jogar) rodava
+        # com self.npc_teams/self.pending_pairings ainda vazios na primeira
+        # série da campanha — caindo no fallback generate_opponent() e
+        # mostrando um time diferente do que a partida de fato simulava.
+        self._init_bracket()
         pairing = next(
             (p for p in self.pending_pairings
              if p["a"] == self.team.name or p["b"] == self.team.name),
@@ -615,6 +621,7 @@ class CampaignManager:
 
     def _get_playoff_opponent(self, stage: str) -> "Opponent":
         """Playoffs: read opponent from the bracket's is_player_match slot."""
+        self._init_bracket()
         key_map = {"playoffs_qf": "qf", "playoffs_sf": "sf", "playoffs_final": "final"}
         key = key_map.get(stage)
         pb = self.playoff_bracket
@@ -926,6 +933,7 @@ class CampaignManager:
         return self.state.current_stage_label()
 
     def get_bracket_state(self) -> dict:
+        self._init_bracket()
         return {
             "npc_teams":        [t.to_dict() for t in self.npc_teams],
             "playoff_bracket":  self.playoff_bracket,
