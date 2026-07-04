@@ -1,0 +1,114 @@
+.hub-screen {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-image: url('/ui/static/bg-hub.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.game-topbar {
+  height: 72px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  background: rgba(11, 16, 22, 0.82);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(246,179,51,.06), var(--shadow-sm);
+  position: relative;
+}
+.gtb-left  { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+.gtb-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+.hud-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-right: 8px; }
+.hud-logo-mark { width: 36px; height: 36px; background: var(--color-primary); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hud-logo-text { display: flex; flex-direction: column; line-height: 1; }
+.hud-logo-top { font-family: var(--font-display); font-size: 1.05rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; color: var(--color-primary); }
+.hud-logo-sub { font-family: var(--font-display); font-size: .6rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--text2); margin-top: 1px; }
+
+.hud-divider { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; }
+
+.team-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; color: var(--color-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stage-chip { font-family: var(--font-display); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; background: rgba(246,179,51,.08); border: 1px solid rgba(246,179,51,.2); border-radius: var(--radius-xs); padding: 3px 10px; color: var(--color-primary); flex-shrink: 0; }
+
+.hud-status { display: flex; align-items: center; gap: 16px; margin: 0 24px; flex-shrink: 0; }
+.hud-badge { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; }
+.hud-badge-label { font-family: var(--font-display); font-size: .58rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+.hud-badge-value { font-family: var(--font-mono); font-size: .92rem; font-weight: 700; color: var(--color-primary); letter-spacing: .04em; }
+.hud-badge-value.success { color: var(--color-success); }
+
+@media (max-width: 720px) {
+  .hud-status, .hud-logo-text { display: none; }
+  .game-topbar { padding: 0 12px; height: 56px; }
+}
+
+/* ── Nav de abas (Hub / Chaveamento / Elenco) ── */
+.hub-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 28px;
+  height: 44px;
+  flex-shrink: 0;
+  background: rgba(11,16,22,0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(246,179,51,.10);
+}
+.hub-nav-tab {
+  font-family: var(--font-display);
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--text2);
+  padding: 0 18px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color .18s, border-color .18s;
+}
+.hub-nav-tab:hover { color: var(--text); }
+.hub-nav-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+@media (max-width: 720px) { .hub-nav { display: none; } }
+
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 58px;
+  background: rgba(11,16,22,.97);
+  border-top: 1px solid rgba(246,179,51,.15);
+  z-index: 40;
+}
+@media (max-width: 720px) {
+  .mobile-bottom-nav { display: flex; }
+  .hub-content { padding-bottom: 58px; }
+}
+.mobile-nav-item {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  background: transparent; border: none;
+  color: var(--text3);
+  font-family: var(--font-display);
+  font-size: .62rem; font-weight: 700; text-transform: uppercase;
+}
+.mobile-nav-item.active { color: var(--color-primary); }
+.mobile-nav-icon { font-size: 1.1rem; }
+
+/* ── Área de conteúdo ── */
+.hub-content { flex: 1; overflow-y: auto; background: rgba(11,16,22,0.52); }
+.hub-inner { max-width: 1200px; margin: 0 auto; padding: 28px 32px 48px; }
+@media (max-width: 720px) { .hub-inner { padding: 16px 14px 32px; } }

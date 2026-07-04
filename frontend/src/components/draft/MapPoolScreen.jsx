@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { get } from '../../api/client';
 import Button from '../ui/Button';
+import '../ui/screenChrome.css';
 import './MapPoolScreen.css';
 
 export default function MapPoolScreen({ onBack, onConfirm, confirming }) {

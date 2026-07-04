@@ -62,14 +62,17 @@
   --shadow-sm:    0 6px 18px rgba(0, 0, 0, 0.18);
   --shadow-md:    0 12px 32px rgba(0, 0, 0, 0.26);
   --blur-sm: 8px;
+  --blur-md: 16px;
   --glow-primary: 0 0 24px rgba(246, 179, 51, 0.18);
   --glow-success: 0 0 20px rgba(54, 217, 120, 0.18);
   --glow-danger:  0 0 20px rgba(241, 76, 76, 0.18);
   --duration-fast:    120ms;
   --duration-default: 180ms;
   --duration-medium:  250ms;
+  --duration-slow:    400ms;
   --ease: ease-out;
   --space-sm: 8px;
+  --z-active: 400;
 }
 
 * { box-sizing: border-box; }
@@ -79,6 +82,19 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
+  /* Jogo é feito de cards/botões clicáveis e arrastáveis — sem isso, um
+     clique-e-arraste um pouco mais longo seleciona o texto por baixo (como
+     texto normal de página), e o navegador entra num estado de seleção que
+     parece um menu de contexto/clique direito ao soltar. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+input,
+textarea {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
 }
 
 .mono          { font-family: var(--font-mono); }

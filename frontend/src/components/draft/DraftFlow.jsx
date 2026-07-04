@@ -8,7 +8,7 @@ import MapPoolScreen from './MapPoolScreen';
 // 1) escolher era → 2) montar elenco (sorteio + slots) → 3) proficiência de
 // mapas → POST /api/new_game. Ao terminar, `onGameCreated` avisa o App pra
 // buscar o estado novo e trocar pro Hub.
-export default function DraftFlow({ onGameCreated }) {
+export default function DraftFlow({ onGameCreated, onBack }) {
   const [step, setStep] = useState('era'); // 'era' | 'roster' | 'maps'
   const [eraId, setEraId] = useState(null);
   const [rosterData, setRosterData] = useState(null); // { teamName, picks }
@@ -56,7 +56,7 @@ export default function DraftFlow({ onGameCreated }) {
   }
 
   if (step === 'era') {
-    return <EraSelect onConfirm={handleEraConfirm} />;
+    return <EraSelect onConfirm={handleEraConfirm} onBack={onBack} />;
   }
 
   if (step === 'roster') {

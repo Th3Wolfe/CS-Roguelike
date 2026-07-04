@@ -1,0 +1,143 @@
+/* Portado 1:1 de ui/index.html — sistema de bracket "fold" (acordeão) usado
+   tanto para as fases Swiss quanto para os playoffs. */
+
+.stage-fold { margin-bottom: 4px; }
+.stage-fold-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r);
+  cursor: pointer; user-select: none;
+  transition: background .12s, border-color .12s;
+}
+.stage-fold-header:hover { background: var(--color-surface); border-color: var(--border2); }
+.stage-fold.open .stage-fold-header {
+  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+.stage-fold-chevron {
+  font-size: .7rem; color: var(--text3); flex-shrink: 0; margin-left: auto;
+  transition: transform .2s;
+}
+.stage-fold.open .stage-fold-chevron { transform: rotate(180deg); }
+.stage-fold-title {
+  font-family: var(--font-display); font-size: .95rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .14em; color: var(--text2);
+}
+.stage-fold.open .stage-fold-title { color: var(--text); }
+.stage-fold-body {
+  display: none;
+  padding: 20px 16px 14px;
+  border: 1px solid var(--border); border-top: none;
+  border-bottom-left-radius: var(--r); border-bottom-right-radius: var(--r);
+  background: var(--bg);
+}
+.stage-fold.open .stage-fold-body { display: block; }
+.stage-fold.current .stage-fold-header {
+  border-color: rgba(232,160,32,.45);
+  background: rgba(232,160,32,.04);
+}
+.stage-fold.current .stage-fold-title { color: var(--orange); }
+.stage-fold.current .stage-fold-body  { border-color: rgba(232,160,32,.3); }
+
+.br-pill {
+  font-family: var(--font-display); font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em; padding: 4px 11px;
+  border-radius: 10px; flex-shrink: 0;
+}
+.brp-current { background: rgba(232,160,32,.15); color: var(--orange); border: 1px solid rgba(232,160,32,.35); }
+.brp-done    { background: rgba(40,200,80,.10);  color: var(--green);  border: 1px solid rgba(40,200,80,.25); }
+.brp-locked  { background: rgba(255,255,255,.04); color: var(--text3); border: 1px solid var(--border); }
+.brp-elim    { background: rgba(224,48,48,.10);  color: var(--red);   border: 1px solid rgba(224,48,48,.25); }
+
+/* ── Grid unificado: usado pelo Swiss (5 rodadas) e Playoffs (3 rodadas) ── */
+.bk-wrap { margin-bottom: 24px; overflow-x: auto; padding-bottom: 6px; }
+.bk-wrap-locked { opacity: .45; pointer-events: none; }
+.bk-grid { display: flex; align-items: flex-start; min-width: max-content; }
+.bk-col { display: flex; flex-direction: column; gap: 10px; min-width: 152px; padding: 0 6px; }
+.bk-col-head {
+  font-family: var(--font-display); font-size: .78rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .12em; color: var(--text3);
+  text-align: center; padding: 0 0 9px; margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.bk-col-head.bkh-elim  { color: var(--red); }
+.bk-col-head.bkh-now   { color: var(--orange); }
+.bk-col-head.bkh-done  { color: var(--green); }
+.bk-col-head.bkh-final { color: var(--orange); }
+
+.bk-connector { display: flex; justify-content: center; align-items: center; width: 26px; flex-shrink: 0; padding-top: 38px; }
+.bk-connector-line { width: 2px; background: var(--border2); border-radius: 1px; height: 70px; }
+
+.bk-match { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.bk-match.bkm-current {
+  border-color: rgba(232,160,32,.65);
+  box-shadow: 0 0 12px rgba(232,160,32,.18);
+  animation: bkpulse 1.8s ease-in-out infinite;
+}
+.bk-match.bkm-empty { opacity: .42; border-style: dashed; }
+@keyframes bkpulse { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+
+.bk-team { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
+.bk-team:last-child { border-bottom: none; }
+.bk-team.bkt-winner { background: rgba(40,200,80,.07); }
+.bk-team.bkt-loser  { opacity: .5; }
+.bk-team-name {
+  font-family: var(--font-display); font-size: .88rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .02em; color: var(--text);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bkt-you   { color: var(--orange); }
+.bkt-empty { color: var(--text3); font-size: .72rem; font-weight: 400; font-family: var(--font-body); text-transform: none; font-style: italic; }
+.bk-res { font-family: var(--font-display); font-size: .72rem; font-weight: 700; padding: 2px 6px; border-radius: 2px; flex-shrink: 0; }
+.bkr-win  { background: rgba(40,200,80,.18);  color: var(--green); }
+.bkr-loss { background: rgba(224,48,48,.18);  color: var(--red); }
+.bkr-vs   { color: var(--text3); font-size: .66rem; }
+
+/* ── Coluna de rodada Swiss: buckets empilhados ── */
+.bk-round-col { display: flex; flex-direction: column; gap: 18px; min-width: 190px; padding: 0 6px; }
+.bk-bucket { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.bk-bucket-head {
+  font-family: var(--font-display); font-size: .72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--text2);
+  background: var(--bg3); padding: 7px 12px; border-bottom: 1px solid var(--border);
+}
+.bk-bucket-head.bbh-now { color: var(--orange); }
+.bk-bucket-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 12px; border-bottom: 1px solid var(--border2); font-size: .82rem; }
+.bk-bucket-row:last-child { border-bottom: none; }
+.bk-bucket-row.bbr-you { background: rgba(232,160,32,.07); }
+.bk-bucket-team { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.bk-bucket-team.bbt-you  { color: var(--orange); }
+.bk-bucket-team.bbt-win  { color: var(--green); }
+.bk-bucket-team.bbt-loss { color: var(--red); opacity: .7; }
+.bk-bucket-score { font-family: var(--font-display); font-weight: 800; font-size: .8rem; color: var(--text2); flex-shrink: 0; min-width: 32px; text-align: center; }
+.bk-bucket-vs { color: var(--text3); font-size: .74rem; flex-shrink: 0; }
+.bk-bucket-pending { color: var(--text3); font-style: italic; font-size: .78rem; font-family: var(--font-body); }
+
+/* ── Resumo Avançaram/Eliminados ── */
+.bk-result-strip { border-radius: var(--r); border: 1px solid; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bk-result-strip.brs-adv  { background: rgba(40,200,80,.08);  border-color: rgba(40,200,80,.3); }
+.bk-result-strip.brs-elim { background: rgba(224,48,48,.07);  border-color: rgba(224,48,48,.28); }
+.bk-result-label { font-family: var(--font-display); font-weight: 800; font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; padding: 5px 12px; border-radius: 4px; flex-shrink: 0; }
+.brs-adv  .bk-result-label { background: var(--green); color: #06140a; }
+.brs-elim .bk-result-label { background: var(--red);   color: #1a0606; }
+.bk-result-teams { display: flex; gap: 7px; flex-wrap: wrap; flex: 1; }
+.bk-result-chip { font-family: var(--font-display); font-size: .74rem; font-weight: 700; text-transform: uppercase; padding: 4px 9px; border-radius: 3px; background: var(--bg3); color: var(--text2); }
+.bk-result-chip.brc-you { background: rgba(232,160,32,.2); color: var(--orange); }
+
+.bk-round-sep { width: 1px; background: var(--border); flex-shrink: 0; align-self: stretch; margin: 0 2px; }
+
+.bk-champion { margin-top: 8px; text-align: center; padding: 16px 8px; background: rgba(232,160,32,.07); border: 1px solid rgba(232,160,32,.22); border-radius: var(--r); }
+.bk-champ-locked { background: var(--bg2); border-color: var(--border); opacity: .35; }
+.bk-champ-trophy { font-size: 2.1rem; line-height: 1; }
+.bk-champ-name { font-family: var(--font-display); font-size: .88rem; font-weight: 900; color: var(--orange); text-transform: uppercase; letter-spacing: .08em; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; }
+.bk-champ-label { font-family: var(--font-display); font-size: .62rem; font-weight: 700; color: var(--orange); letter-spacing: .16em; opacity: .65; margin-top: 2px; }
+
+.bracket-divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+.bk-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.bk-leg-item { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--text3); }
+.bk-leg-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+.bkl-win  { background: var(--green); }
+.bkl-loss { background: var(--red); }
+.bkl-you  { background: var(--orange); }
+.bkl-emp  { background: var(--bg4); border: 1px dashed var(--border2); }

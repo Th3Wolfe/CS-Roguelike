@@ -3,9 +3,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: url('/ui/static/bg-draft.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+.era-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11,16,22,.9) 0%, rgba(11,16,22,.6) 30%, rgba(11,16,22,.92) 100%);
 }
 .era-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;

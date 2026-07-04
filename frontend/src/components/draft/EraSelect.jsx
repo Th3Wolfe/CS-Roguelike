@@ -10,7 +10,7 @@ const CHECK_ICON = (
   </svg>
 );
 
-export default function EraSelect({ onConfirm }) {
+export default function EraSelect({ onConfirm, onBack }) {
   const [eras, setEras] = useState(null);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState(null);
@@ -23,6 +23,14 @@ export default function EraSelect({ onConfirm }) {
 
   return (
     <div className="era-screen">
+      {onBack && (
+        <div style={{ position: 'absolute', top: 16, left: 20, zIndex: 2 }}>
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+            Voltar
+          </Button>
+        </div>
+      )}
       <div className="era-inner">
         <div className="era-eyebrow">CS Major Manager</div>
         <div className="era-title">Escolha a <span>Era</span></div>
