@@ -6,10 +6,10 @@ import './VetoScreen.css';
 
 // Migração da tela de Pick & Ban (ver systems/veto_engine.py pro protocolo
 // BO3 completo: ban, ban, pick+lado, pick+lado, ban, ban, decider+coin-flip).
-// Ao concluir o veto, essa mesma tela já chama /api/play_series (sem tela de
-// táticas ainda — isso fica pra uma próxima migração) e devolve o resultado
-// via onComplete, deixando o App decidir o que fazer (voltar pro Hub).
-export default function VetoScreen({ team, tactics, onBack, onComplete }) {
+// Ao concluir o veto, só avisa o App (via onSeriesPlayed) que já pode ir pra
+// tela de Partida — quem toca a série mapa a mapa (e monta as táticas) agora
+// é a própria MatchScreen, pra poder suportar o Pause Técnico entre mapas.
+export default function VetoScreen({ team, onBack, onSeriesPlayed }) {
   const [mapPool, setMapPool] = useState([]);
   const [veto, setVeto] = useState(null);
   const [opponentName, setOpponentName] = useState('');
@@ -17,7 +17,6 @@ export default function VetoScreen({ team, tactics, onBack, onComplete }) {
   const [coinFlipWon, setCoinFlipWon] = useState(null);
   const [log, setLog] = useState([]); // [{actor, action, map}]
   const [error, setError] = useState(null);
-  const [playing, setPlaying] = useState(false);
   const logEndRef = useRef(null);
 
   useEffect(() => {
@@ -58,42 +57,6 @@ export default function VetoScreen({ team, tactics, onBack, onComplete }) {
     if (!r.ok) { setError(r.error); return; }
     pushLog([{ actor: 'player', action: 'side', map: `${map} → ${side.toUpperCase()}` }, ...(r.events || []).map((ev) => ({ actor: ev.actor, action: ev.action, map: ev.map }))]);
     setVeto(r.veto);
-  }
-
-  async function handlePlaySeries() {
-    setPlaying(true);
-    setError(null);
-    try {
-      // /api/tactics_info precisa ser chamado de novo aqui (não só quando a
-      // TacticsPanel montou) porque agora o veto já terminou — o backend usa
-      // os mapas/lados reais do veto (state["veto_maps"], setado quando o
-      // veto termina) para pré-gerar as táticas do time adversário mapa a
-      // mapa. Chamar antes disso geraria táticas do adversário desalinhadas
-      // com os mapas que de fato vão ser jogados.
-      const info = await get('/api/tactics_info');
-      const enemyByMap = info.ok ? (info.enemy_tactics || {}) : {};
-
-      // Monta {mapIndex: {team_h1, team_h2, enemy_h1, enemy_h2}} a partir da
-      // tática CT/T escolhida na Hub + o lado que o time começa em cada mapa
-      // (definido durante o próprio veto).
-      const tacticsByMap = {};
-      picks.forEach((p, i) => {
-        const startsCT = p.team_side === 'ct';
-        tacticsByMap[i] = {
-          team_h1: startsCT ? tactics?.ct : tactics?.t,
-          team_h2: startsCT ? tactics?.t : tactics?.ct,
-          enemy_h1: enemyByMap[i]?.h1,
-          enemy_h2: enemyByMap[i]?.h2,
-        };
-      });
-
-      const r = await post('/api/play_series', { tactics: tacticsByMap });
-      if (!r.ok) { setError(r.error || 'Erro ao jogar a série'); setPlaying(false); return; }
-      onComplete(r);
-    } catch (err) {
-      setError(err.message);
-      setPlaying(false);
-    }
   }
 
   if (error && !veto) {
@@ -247,8 +210,8 @@ export default function VetoScreen({ team, tactics, onBack, onComplete }) {
         </div>
 
         {veto.done && (
-          <Button variant="orange" size="lg" style={{ marginTop: 16 }} disabled={playing} onClick={handlePlaySeries}>
-            {playing ? 'Jogando série…' : '▶ Jogar Série'}
+          <Button variant="orange" size="lg" style={{ marginTop: 16 }} onClick={() => onSeriesPlayed(opponentName)}>
+            ▶ Ir para a Partida
           </Button>
         )}
       </div>

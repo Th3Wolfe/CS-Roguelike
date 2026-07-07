@@ -25,7 +25,14 @@ function emojiOf(v) {
   return v.emoji || (v.label || '').split(' ')[0] || '';
 }
 
-export default function TacticsPanel({ selectedCT, selectedT, onSelectCT, onSelectT, onPlay, disabled }) {
+export default function TacticsPanel({
+  selectedCT, selectedT, onSelectCT, onSelectT, onPlay, disabled,
+  eyebrow = 'Antes de entrar em quadra',
+  title = '⚔️ Defina seu plano de jogo para a próxima partida',
+  subtitle = 'Escolha uma tática para cada lado. Isso afeta como seu time vai jogar — tente combinações diferentes ao longo da campanha.',
+  footerTip = <>Você tem <b>&nbsp;1 pause técnico&nbsp;</b> por partida para rever CT e TR.</>,
+  playLabel = 'Iniciar Partida',
+}) {
   const [ctTactics, setCtTactics] = useState(null);
   const [tTactics, setTTactics] = useState(null);
   const [preview, setPreview] = useState(null); // { side, key }
@@ -50,12 +57,9 @@ export default function TacticsPanel({ selectedCT, selectedT, onSelectCT, onSele
   return (
     <div className="hub-get-ready">
       <div className="hub-gr-head">
-        <div className="hub-gr-eyebrow">Antes de entrar em quadra</div>
-        <div className="hub-gr-title">⚔️ Defina seu plano de jogo para a próxima partida</div>
-        <div className="hub-gr-subtitle">
-          Escolha uma tática para cada lado. Isso afeta como seu time vai jogar — tente combinações
-          diferentes ao longo da campanha.
-        </div>
+        <div className="hub-gr-eyebrow">{eyebrow}</div>
+        <div className="hub-gr-title">{title}</div>
+        <div className="hub-gr-subtitle">{subtitle}</div>
       </div>
 
       <div className="hub-gr-body">
@@ -128,10 +132,10 @@ export default function TacticsPanel({ selectedCT, selectedT, onSelectCT, onSele
             </div>
           )}
         </div>
-        <div className="hub-gr-footer-tip">ℹ️&nbsp; Durante a partida você tem <b>&nbsp;2 pauses&nbsp;</b> para mudar de tática.</div>
+        <div className="hub-gr-footer-tip">ℹ️&nbsp; {footerTip}</div>
         <Button variant="orange" size="lg" disabled={!canPlay} onClick={onPlay}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-          Iniciar Partida
+          {playLabel}
         </Button>
       </div>
     </div>

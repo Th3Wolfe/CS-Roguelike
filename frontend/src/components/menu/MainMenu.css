@@ -128,6 +128,17 @@
 .save-item-date { color: var(--text3); font-family: var(--font-mono); font-size: .7rem; }
 
 .menu-right { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; height: 100%; }
+
+.impact-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: impactFly ease-out forwards;
+}
+@keyframes impactFly {
+  from { transform: translate(0, 0); opacity: 1; }
+  to   { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+}
 .menu-hex-art { position: relative; width: 420px; height: 420px; opacity: 0.9; }
 .menu-hex-art img { width: 100%; height: 100%; object-fit: cover; filter: drop-shadow(0 0 40px rgba(246,179,51,.25)); animation: hexPulse 4s ease-in-out infinite; }
 @keyframes hexPulse {

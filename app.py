@@ -335,6 +335,141 @@ def play_series():
     })
 
 
+@app.route("/api/play_map", methods=["POST"])
+def play_map():
+    """
+    Resolve UM mapa da série por vez, em vez da série inteira de uma tacada
+    (como /api/play_series faz). Existe para o Pause Técnico: o front chama
+    isso mapa a mapa, e entre uma chamada e outra o jogador pode pausar e
+    trocar de tática — a próxima chamada já usa a tática nova.
+
+    O estado da campanha (histórico, avanço de fase, moral dos jogadores...)
+    só é gravado de verdade em /api/finish_series, no fim da série. Enquanto
+    isso, o progresso fica só na sessão (state["match_progress"] e o objeto
+    Opponent em state["_match_opponent"], que não precisa ser serializável
+    porque nunca sai do processo Python).
+    """
+    team, campaign = get_game()
+    if not team:     return jsonify({"ok": False, "error": "Sem jogo"}), 404
+    if campaign.state.is_finished():
+        return jsonify({"ok": False, "error": "Campanha finalizada"}), 400
+
+    from systems.match_resolver import _simulate_map
+
+    state = get_session_state()
+    data  = request.get_json(silent=True) or {}
+    map_index   = data.get("map_index", 0)
+    raw_tactics = data.get("tactics") or {}
+
+    progress = state.get("match_progress")
+    if progress is None or map_index == 0:
+        veto_maps = state.pop("veto_maps", None) or []
+        state["veto"] = None
+        opponent, stage_pre, ts, os_ = campaign.prepare_match()
+        progress = {
+            "veto_maps": veto_maps,
+            "stage_pre": stage_pre,
+            "ts": ts, "os": os_,
+            "maps": [],
+        }
+        state["match_progress"]  = progress
+        state["_match_opponent"] = opponent
+
+    veto_maps = progress["veto_maps"]
+    if map_index >= len(veto_maps):
+        return jsonify({"ok": False, "error": "Índice de mapa inválido"}), 400
+
+    tw = sum(1 for m in progress["maps"] if m["winner"] == "team")
+    ow = sum(1 for m in progress["maps"] if m["winner"] == "opponent")
+    if tw == 2 or ow == 2:
+        return jsonify({"ok": False, "error": "Série já decidida"}), 400
+
+    entry  = veto_maps[map_index]
+    result = _simulate_map(
+        progress["ts"], progress["os"],
+        map_name           = entry["map"],
+        team_proficiency   = entry.get("proficiency", "half"),
+        team_start_side     = entry.get("team_side", "ct"),
+        team_tactic_h1      = raw_tactics.get("team_h1"),
+        team_tactic_h2      = raw_tactics.get("team_h2"),
+        enemy_tactic_h1     = raw_tactics.get("enemy_h1"),
+        enemy_tactic_h2     = raw_tactics.get("enemy_h2"),
+    )
+    progress["maps"].append(result.to_dict())
+
+    tw = sum(1 for m in progress["maps"] if m["winner"] == "team")
+    ow = sum(1 for m in progress["maps"] if m["winner"] == "opponent")
+
+    return jsonify({
+        "ok":                True,
+        "map_result":        result.to_dict(),
+        "series_done":       tw == 2 or ow == 2,
+        "team_maps_won":     tw,
+        "opponent_maps_won": ow,
+    })
+
+
+@app.route("/api/finish_series", methods=["POST"])
+def finish_series():
+    """Fecha uma série iniciada via /api/play_map: monta a SeriesDetail a
+    partir dos mapas já resolvidos e só AGORA grava tudo no estado da
+    campanha (mesma lógica de commit do /api/play_series antigo, via
+    CampaignManager._finalize_series)."""
+    team, campaign = get_game()
+    if not team:     return jsonify({"ok": False, "error": "Sem jogo"}), 404
+
+    from systems.match_resolver import (
+        SeriesDetail, MapResult, score_to_win_probability,
+        _simulate_player_stats, _simulate_opponent_stats_real,
+        _simulate_opponent_player_stats,
+    )
+
+    state    = get_session_state()
+    progress = state.pop("match_progress", None)
+    opponent = state.pop("_match_opponent", None)
+    if not progress or opponent is None:
+        return jsonify({"ok": False, "error": "Nenhuma partida em andamento"}), 400
+    if not progress["maps"]:
+        return jsonify({"ok": False, "error": "Nenhum mapa foi jogado ainda"}), 400
+
+    detail = SeriesDetail(
+        team_strength     = progress["ts"],
+        opponent_strength = progress["os"],
+        win_probability   = score_to_win_probability(progress["ts"], progress["os"]),
+    )
+    detail.maps              = [MapResult(**m) for m in progress["maps"]]
+    detail.team_maps_won     = sum(1 for m in detail.maps if m.winner == "team")
+    detail.opponent_maps_won = sum(1 for m in detail.maps if m.winner == "opponent")
+    detail.team_won          = detail.team_maps_won > detail.opponent_maps_won
+    detail.player_stats      = _simulate_player_stats(team.players, detail.maps)
+    if opponent.players:
+        detail.opponent_player_stats = _simulate_opponent_stats_real(opponent.players, detail.maps)
+    else:
+        detail.opponent_player_stats = _simulate_opponent_player_stats(opponent.name, opponent.strength, detail.maps)
+
+    result = campaign._finalize_series(detail, opponent, progress["stage_pre"])
+    return jsonify({
+        "ok": True,
+        "result": {
+            "won":               result["won"],
+            "description":       result["description"],
+            "opponent_name":     result["opponent"].name,
+            "opponent_strength": result["opponent"].strength,
+            "team_score":        result["team_score"],
+            "opp_score":         result["opp_score"],
+            "win_probability":   round(result["win_probability"], 3),
+            "series_detail":     result["series_detail"],
+            "stage_label":       campaign.state.current_stage_label(),
+            "stage_mvp":         result.get("stage_mvp"),
+        },
+        "campaign":   campaign.state.to_dict(),
+        "team":       team.to_dict(),
+        "team_score": round(team.team_score(), 2),
+        "share_code": generate_share_code(team),
+        "bracket":    campaign.get_bracket_state(),
+    })
+
+
 @app.route("/api/tactics_info", methods=["GET"])
 def tactics_info():
     """Return available tactics and AI tactic choices for upcoming series."""

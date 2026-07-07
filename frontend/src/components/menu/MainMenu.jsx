@@ -1,18 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Button from '../ui/Button';
 import MenuParticles from './MenuParticles';
 import LoadSavePanel from './LoadSavePanel';
 import ShareCodePanel from './ShareCodePanel';
+import LightningCanvas from './LightningCanvas';
 import './MainMenu.css';
 
 // Tela de entrada do jogo. Substitui #screen-menu do vanilla.
-// Simplificação consciente: o vanilla tinha um sistema de raio (canvas SVG
-// sincronizado com a música, window.LightningSync) sobre a arte hexagonal —
-// não portado aqui ainda. As partículas flutuantes (MenuParticles) e o pulso
-// de glow no hexágono (CSS puro) foram mantidos.
 export default function MainMenu({ onNewGame, onGameLoaded }) {
   const [showLoads, setShowLoads] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const menuRightRef = useRef(null);
 
   return (
     <div className="menu-screen">
@@ -64,7 +62,8 @@ export default function MainMenu({ onNewGame, onGameLoaded }) {
           </div>
         </div>
 
-        <div className="menu-right">
+        <div className="menu-right" ref={menuRightRef}>
+          <LightningCanvas containerRef={menuRightRef} />
           <div className="menu-hex-art">
             <img src="/ui/static/CS_Manager_Logo_2.png" alt="Major Manager" />
           </div>

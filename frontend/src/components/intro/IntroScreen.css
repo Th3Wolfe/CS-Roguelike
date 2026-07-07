@@ -1,0 +1,83 @@
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity .9s ease;
+}
+.intro-screen.fade-out { opacity: 0; pointer-events: none; }
+.intro-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(246,179,51,.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.intro-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
+  pointer-events: none;
+}
+
+.intro-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  text-align: center;
+  color: var(--color-text-title);
+  line-height: 1.05;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.intro-screen.ready .intro-title { opacity: 1; transform: none; }
+.intro-title span { color: var(--color-primary); text-shadow: 0 0 40px rgba(246,179,51,.35); }
+
+.intro-rule {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(246,179,51,.6), transparent);
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  margin: 1.1rem 0;
+}
+.intro-screen.ready .intro-rule { width: min(340px, 70vw); }
+
+.intro-sub {
+  font-family: var(--font-display);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--text2);
+  opacity: 0;
+  transition: opacity .8s .3s ease;
+}
+.intro-screen.ready .intro-sub { opacity: 1; }
+
+.intro-cta {
+  font-family: var(--font-display);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(246,179,51,.55);
+  margin-top: 3.5rem;
+  opacity: 0;
+  transition: opacity .6s 1.1s ease;
+  animation: introCtaPulse 2s 1.8s ease-in-out infinite;
+}
+.intro-screen.ready .intro-cta { opacity: 1; }
+@keyframes introCtaPulse {
+  0%, 100% { color: rgba(246,179,51,.45); }
+  50%       { color: rgba(246,179,51,.9); }
+}

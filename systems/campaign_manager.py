@@ -681,6 +681,38 @@ class CampaignManager:
         self._apply_difficulty_scaling(opponent, current_stage_pre)
 
         detail: SeriesDetail = resolve_series(self.team, opponent, veto_maps=veto_maps, tactics=tactics)
+        return self._finalize_series(detail, opponent, current_stage_pre)
+
+    def prepare_match(self) -> tuple:
+        """
+        Primeira metade de play_series(): resolve o adversário e aplica o
+        scaling de dificuldade, SEM simular nenhum mapa nem mexer no estado
+        da campanha. Usado pelo fluxo incremental (/api/play_map +
+        /api/finish_series), que precisa resolver mapa a mapa — permitindo
+        pausar entre mapas para trocar tática — em vez de tudo de uma vez.
+        Devolve (opponent, current_stage_pre, ts, os_) prontos para
+        `_simulate_map()` mapa a mapa.
+        """
+        self._init_bracket()
+        current_stage_pre = self.state.stage.value
+        if current_stage_pre in ("stage1", "stage2"):
+            opponent = self._get_paired_opponent(current_stage_pre)
+        else:
+            opponent = self._get_playoff_opponent(current_stage_pre)
+        if opponent.name not in self._used_team_names:
+            self._used_team_names.append(opponent.name)
+        self._apply_difficulty_scaling(opponent, current_stage_pre)
+        ts  = round(self.team.team_score(), 2)
+        os_ = round(opponent.total_score(), 2)
+        return opponent, current_stage_pre, ts, os_
+
+    def _finalize_series(self, detail: "SeriesDetail", opponent: "Opponent", current_stage_pre: str) -> dict:
+        """
+        Segunda metade de play_series(): recebe uma SeriesDetail já pronta
+        (calculada de uma vez por resolve_series(), OU montada mapa a mapa
+        pelo fluxo incremental) e faz todo o trabalho de "commit": estatísticas,
+        moral/forma dos jogadores, histórico, avanço de estágio, bracket.
+        """
         description = describe_result(detail, opponent.name)
 
         current_stage = self.state.stage.value
