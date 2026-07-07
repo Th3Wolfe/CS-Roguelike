@@ -2,7 +2,7 @@
 
 Um simulador roguelike de gestão de equipes de Counter-Strike. Monte um time com jogadores de diferentes eras do competitivo, dispute uma campanha inteira de Major — fase de grupos (formato Swiss), playoffs single-elimination e veto de mapas BO3 — até erguer o troféu ou ser eliminado.
 
-Construído em Python (Flask) no back-end com uma interface web single-page em HTML/JS puro.
+Construído em Python (Flask) no back-end. **O front-end está em migração**: a versão em produção ainda é HTML/JS puro single-page (`ui/index.html`), enquanto uma reescrita em React (Vite) está em andamento em `frontend/`. As duas convivem no repositório até a migração terminar — veja o checklist em [Status da migração](#status-da-migração-html-js--react) pra saber o que já roda na versão nova.
 
 <p align="center">
   <img src="ui/static/demo/menu-principal.gif" alt="Menu principal animado" width="800">
@@ -51,6 +51,29 @@ Construído em Python (Flask) no back-end com uma interface web single-page em H
 - **Save/Load** — salve e carregue o progresso da campanha em qualquer momento.
 - **Códigos de compartilhamento** — gere e decodifique um código compacto que representa o seu time.
 - **Atualização de base de dados via API** — script auxiliar para atualizar a era "2025" com dados ao vivo da CS API.
+
+---
+
+## Status da migração (HTML/JS → React)
+
+O back-end (Flask + API REST) não muda com a migração — só a camada de interface está sendo reescrita, tela por tela, de `ui/index.html` (HTML/CSS/JS puro) para `frontend/` (React + Vite). Enquanto uma tela não é migrada, ela continua funcionando normalmente na versão antiga.
+
+**✅ Já migrado pro React**
+- [x] Menu principal (Novo Jogo, Carregar Save, Ver Time por Código)
+- [x] Draft completo — Era → Elenco → Proficiência de mapas
+- [x] Elenco no draft: sorteio automático por role, clique pra draftar, **e arrastar-e-soltar** pra escolher a posição manualmente ou reorganizar o time já escalado
+- [x] Hub — topbar, abas Hub / Chaveamento / Elenco, histórico, bracket do Swiss e dos playoffs
+- [x] Painel de táticas no Hub (uma tática de CT + uma de T por série)
+- [x] Veto de mapas BO3 completo (ban/ban/pick/pick/ban/ban/decider + coin flip)
+- [x] Resolução da série (dispara `/api/play_series` com as táticas escolhidas)
+- [x] Salvar / carregar partida
+
+**⏳ Ainda só na versão antiga (`ui/index.html`)**
+- [ ] Tela de partida com animação de placar round a round — hoje o resultado aparece só como um card resumido no Hub, sem a encenação visual da série
+- [ ] Sistema de eventos narrativos (drama interno, lesões, boas notícias) — no React, `events_enabled` está fixo em `false` na criação da campanha
+- [ ] Tática por mapa/half individual — a versão antiga permite escolher uma tática diferente pra cada mapa e cada half; a versão React por enquanto aplica uma tática de CT e uma de T pra série toda
+- [ ] Trilha sonora contextual e ilustrações de táticas — o sistema de áudio (`/api/music_tracks`) ainda não tem player nenhum no React
+- [ ] Servir o build do React pelo Flask em produção — o `vite.config.js` já builda pra `../ui_dist`, mas `app.py` ainda serve só `ui/index.html`; falta o Flask aprender a servir `ui_dist` quando ele existir
 
 ---
 
@@ -147,10 +170,20 @@ CS-Roguelike/
 │   ├── events_relations.json  #   Eventos de relacionamento e sinergia
 │   └── events_other.json      #   Demais eventos narrativos
 ├── ui/
-│   ├── index.html              #   Front-end single-page atual (HTML/CSS/JS), com layout desktop e mobile
+│   ├── index.html              #   Front-end single-page ATUAL EM PRODUÇÃO (HTML/CSS/JS), desktop e mobile
 │   ├── index-premobile.html    #   Versão anterior ao rework mobile, mantida como referência
 │   ├── music/                  #   Trilhas por contexto: frontend/, hub/, match/
 │   └── static/                 #   Logo, artes de fundo (bg-menu, bg-draft, bg-hub, bg-match) e ilustrações de táticas (map-ct-*, map-tr-*)
+├── frontend/                   # Reescrita do front-end em React + Vite (EM MIGRAÇÃO — ver checklist acima)
+│   ├── src/
+│   │   ├── App.jsx             #   Navegação entre telas (menu / draft / hub / veto)
+│   │   ├── api/client.js       #   Wrapper de fetch pra API do Flask
+│   │   ├── hooks/useGameState.js #  Busca/mantém o estado da campanha (espelha o `G` global do vanilla)
+│   │   ├── components/menu/    #   Menu principal, carregar save, código de compartilhamento
+│   │   ├── components/draft/   #   Seleção de era, elenco (com drag-and-drop) e proficiência de mapas
+│   │   ├── components/hub/     #   Topbar, bracket, elenco, histórico, painel de táticas
+│   │   └── components/veto/    #   Pick & Ban BO3
+│   └── vite.config.js          #   Builda pra ../ui_dist; em dev, faz proxy de /api e /ui pro Flask (porta 5000)
 ├── saves/                     # Partidas salvas (gerado em runtime)
 ├── update_db_from_csapi.py    # Script para atualizar era 2025 via API externa
 ├── requirements.txt
@@ -183,6 +216,24 @@ O servidor inicia em `http://localhost:5000`. Para produção:
 ```bash
 gunicorn app:app
 ```
+
+Isso já serve o jogo completo pela versão em HTML/JS puro (`ui/index.html`).
+
+### Rodando o front-end React (em migração)
+
+A reescrita em React fica em `frontend/` e roda separada, em modo dev, fazendo proxy das chamadas de API pro Flask:
+
+```bash
+# num terminal: o back-end
+python app.py
+
+# em outro terminal:
+cd frontend
+npm install
+npm run dev
+```
+
+Abre em `http://localhost:5173`. Só as telas já migradas (ver [checklist](#status-da-migração-html-js--react)) estão disponíveis por aqui — o resto do jogo, por enquanto, só existe em `ui/index.html`.
 
 ---
 
@@ -277,7 +328,8 @@ python update_db_from_csapi.py --debug     # inspeciona a estrutura retornada pe
 ## Stack técnica
 
 - **Back-end:** Python 3.10+, Flask 3.x, sessões server-side em memória (dict por UUID de sessão)
-- **Front-end:** HTML/CSS/JS puro (single-page, sem build step), com layout responsivo desktop/mobile e trilha sonora/artes servidas estaticamente pelo Flask
+- **Front-end (produção):** HTML/CSS/JS puro (single-page, sem build step), com layout responsivo desktop/mobile e trilha sonora/artes servidas estaticamente pelo Flask
+- **Front-end (em migração):** React 19 + Vite, em `frontend/` — ver [checklist de migração](#status-da-migração-html-js--react)
 - **Persistência:** JSON em disco (`data/`, `saves/`)
 - **Deploy:** Gunicorn + Procfile (compatível com Heroku e similares)
 
