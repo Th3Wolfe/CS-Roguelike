@@ -5,14 +5,13 @@ import Button from '../ui/Button';
 import PauseModal from './PauseModal';
 import './MatchScreen.css';
 
-// Reescrita pra suportar o Pause Técnico de verdade: em vez de resolver a
-// série inteira numa tacada só (como antes), agora cada mapa é resolvido
-// individualmente via /api/play_map, e só no fim /api/finish_series grava
-// tudo na campanha. Isso permite pausar ENTRE mapas — não no meio de um
-// mapa, já que cada /api/play_map já devolve o mapa inteiro (dois halves +
-// OT) resolvido de uma vez; mudar tática no meio disso não teria efeito
-// real no resultado já calculado, então o pause só é oferecido nos
-// intervalos entre mapas (inclusive antes do primeiro).
+// Mapas jogam em sequência automática (sem clicar "próximo mapa"). O Pause
+// Técnico fica sempre visível nos controles enquanto a partida rola — dá
+// pra clicar a qualquer momento, inclusive no meio da animação de um mapa,
+// e a animação realmente para até você confirmar (usa um "gate" resolvível
+// em vez de só desabilitar o clique). O que muda de verdade com a tática
+// nova é só a partir do PRÓXIMO mapa ainda não pedido ao backend — ver nota
+// mais abaixo, em playMap().
 const SPEED_LEVELS = [
   { label: '🐢 Muito Lento', delay: 1800 },
   { label: '🚶 Lento', delay: 800 },
@@ -20,6 +19,7 @@ const SPEED_LEVELS = [
   { label: '⚡ Rápido', delay: 80 },
   { label: '🚀 Turbo', delay: 12 },
 ];
+const SPEED_STORAGE_KEY = 'csManager.matchSpeedIdx';
 
 function sleep(ms) { return new Promise((res) => setTimeout(res, ms)); }
 
@@ -32,37 +32,69 @@ function buildShuffledSeq(wins, losses) {
   return seq;
 }
 
+function loadStoredSpeed() {
+  const raw = localStorage.getItem(SPEED_STORAGE_KEY);
+  const n = raw !== null ? parseInt(raw, 10) : 2;
+  return Number.isInteger(n) && n >= 0 && n < SPEED_LEVELS.length ? n : 2;
+}
+
 export default function MatchScreen({ team, opponentName, initialTactics, onDone }) {
-  const { setContext, playOnce } = useMusic();
+  const { setContext } = useMusic();
   useEffect(() => { setContext('match'); }, [setContext]);
 
-  const [info, setInfo] = useState(null);       // {veto_maps, enemy_tactics, ...} de /api/tactics_info
+  const [info, setInfo] = useState(null);
   const [error, setError] = useState(null);
   const [tactics, setTactics] = useState({ ct: initialTactics?.ct, t: initialTactics?.t });
   const [pauseUsed, setPauseUsed] = useState(false);
   const [showPause, setShowPause] = useState(false);
 
-  const [mapIndex, setMapIndex] = useState(0);
-  const [phase, setPhase] = useState('loading'); // loading | between | animating | finishing | summary
+  const [phase, setPhase] = useState('loading'); // loading | playing | finishing | summary
   const [mapCards, setMapCards] = useState([]);
   const [seriesDots, setSeriesDots] = useState(['pending', 'pending', 'pending']);
   const [banner, setBanner] = useState({ visible: false, text: '' });
   const [finishResult, setFinishResult] = useState(null);
   const [playerStats, setPlayerStats] = useState(null);
 
-  const [speedIdx, setSpeedIdx] = useState(0);
-  const speedRef = useRef(0);
-  useEffect(() => { speedRef.current = speedIdx; }, [speedIdx]);
+  const [speedIdx, setSpeedIdxState] = useState(loadStoredSpeed);
+  const speedRef = useRef(speedIdx);
+  function setSpeedIdx(updater) {
+    setSpeedIdxState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      speedRef.current = next;
+      localStorage.setItem(SPEED_STORAGE_KEY, String(next));
+      return next;
+    });
+  }
+
+  // "Gate" de pause: enquanto pausedRef.current for true, a animação para
+  // no próximo ponto de checagem e só retoma quando resumeRef.current() for
+  // chamado (isso acontece ao confirmar o modal de pause).
+  const pausedRef = useRef(false);
+  const resumeRef = useRef(null);
+  async function waitIfPaused() {
+    while (pausedRef.current) {
+      await new Promise((res) => { resumeRef.current = res; });
+    }
+  }
+
+  const startedRef = useRef(false);
 
   useEffect(() => {
     get('/api/tactics_info').then((r) => {
       if (!r.ok) { setError(r.error || 'Erro ao preparar a partida'); return; }
       setInfo(r);
-      setPhase('between');
+      setPhase('playing');
     }).catch((err) => setError(err.message));
   }, []);
 
-  const displayOpponentName = opponentName || finishResult?.result?.opponent_name || '...';
+  useEffect(() => {
+    if (phase === 'playing' && info && !startedRef.current) {
+      startedRef.current = true;
+      runSeries();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, info]);
+
   const teamName = team?.name || 'Seu Time';
   const totalMaps = info?.veto_maps?.length || 3;
 
@@ -89,6 +121,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
     let t = startT, o = startO;
     updateCard(idx, (c) => ({ ...c, scoreT: t, scoreO: o }));
     for (let i = 0; i < seq.length; i++) {
+      await waitIfPaused();
       const won = seq[i] === 'win';
       if (won) t++; else o++;
       const dotSide = won ? side : (side === 'ct' ? 't' : 'ct');
@@ -98,19 +131,28 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
     }
   }
 
-  async function playMap() {
-    setPhase('animating');
+  async function runSeries() {
+    for (let mi = 0; mi < info.veto_maps.length; mi++) {
+      await waitIfPaused();
+      const done = await playMap(mi);
+      if (done) { await finishSeries(); return; }
+    }
+    await finishSeries();
+  }
+
+  async function playMap(mi) {
     setError(null);
-    const mi = mapIndex;
     const entry = info.veto_maps[mi];
 
+    // A tática usada aqui é a que estiver em `tactics` NESTE momento — se o
+    // jogador pausou antes deste mapa começar, já é a nova.
     let r;
     try {
       r = await post('/api/play_map', { map_index: mi, tactics: tacticsForMap(mi) });
     } catch (err) {
-      setError(err.message); setPhase('between'); return;
+      setError(err.message); return true;
     }
-    if (!r.ok) { setError(r.error || 'Erro ao jogar o mapa'); setPhase('between'); return; }
+    if (!r.ok) { setError(r.error || 'Erro ao jogar o mapa'); return true; }
 
     const map = r.map_result;
     const teamSide = entry.team_side || 'ct';
@@ -121,6 +163,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
       scoreT: 0, scoreO: 0, h1Dots: [], h2Dots: [], resultBadge: null, visible: false,
     }]);
     await sleep(150);
+    await waitIfPaused();
     updateCard(mi, (c) => ({ ...c, visible: true }));
     await sleep(250);
 
@@ -128,6 +171,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
     await animateHalf(mi, 'h1Dots', map.team_half1, map.opp_half1, teamSide, 0, 0);
 
     setBanner({ visible: true, text: `↔ Troca de lado — ${map.map_name} 2º Half (${oppSide.toUpperCase()})` });
+    await waitIfPaused();
     await sleep(800);
 
     setBanner({ visible: true, text: `${map.map_name} — 2º Half (${oppSide.toUpperCase()})` });
@@ -145,51 +189,45 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
     setSeriesDots((prev) => prev.map((d, i) => (i === mi ? (won ? 'w' : 'l') : d)));
     await sleep(400);
 
-    if (r.series_done) {
-      await finishSeries();
-    } else {
-      setMapIndex(mi + 1);
-      setPhase('between');
-    }
+    return !!r.series_done;
   }
 
   async function finishSeries() {
     setPhase('finishing');
     try {
       const r = await post('/api/finish_series', {});
-      if (!r.ok) { setError(r.error || 'Erro ao fechar a série'); setPhase('between'); return; }
+      if (!r.ok) { setError(r.error || 'Erro ao fechar a série'); setPhase('playing'); return; }
       setFinishResult(r);
       if (r.result.series_detail?.player_stats?.length) {
         setPlayerStats([...r.result.series_detail.player_stats].sort((a, b) => b.kd - a.kd));
       }
-      playOnce(r.result.won ? 'victory' : 'defeat');
       setPhase('summary');
     } catch (err) {
       setError(err.message);
-      setPhase('between');
+      setPhase('playing');
     }
   }
 
+  function handlePauseClick() {
+    pausedRef.current = true;
+    setShowPause(true);
+  }
   function handlePauseConfirm() {
     setPauseUsed(true);
     setShowPause(false);
+    pausedRef.current = false;
+    if (resumeRef.current) { resumeRef.current(); resumeRef.current = null; }
   }
 
-  if (error && phase !== 'between') {
-    return (
-      <div className="match-screen">
-        <div className="match-modal"><div className="match-modal-scroll">
-          <div style={{ color: 'var(--color-danger)', textAlign: 'center', padding: 24 }}>Erro: {error}</div>
-        </div></div>
-      </div>
-    );
-  }
+  const displayOpponentName = opponentName || finishResult?.result?.opponent_name || '...';
 
   if (phase === 'loading' || !info) {
     return (
       <div className="match-screen">
         <div className="match-modal"><div className="match-modal-scroll">
-          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text2)' }}>Preparando a partida…</div>
+          <div style={{ textAlign: 'center', padding: 40, color: 'var(--text2)' }}>
+            {error ? <span style={{ color: 'var(--color-danger)' }}>Erro: {error}</span> : 'Preparando a partida…'}
+          </div>
         </div></div>
       </div>
     );
@@ -207,13 +245,13 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
               <div className="mm-team-name right">{displayOpponentName}</div>
             </div>
             <div className="mm-controls">
-              <div className="speed-ctrl" title="Velocidade da simulação">
+              <div className="speed-ctrl" title="Velocidade da simulação (fica salva para a próxima partida)">
                 <button className="spd-btn" onClick={() => setSpeedIdx((i) => Math.max(0, i - 1))} disabled={speedIdx === 0}>–</button>
                 <span>{SPEED_LEVELS[speedIdx].label}</span>
                 <button className="spd-btn" onClick={() => setSpeedIdx((i) => Math.min(SPEED_LEVELS.length - 1, i + 1))} disabled={speedIdx === SPEED_LEVELS.length - 1}>+</button>
               </div>
-              {phase === 'between' && (
-                <button className="pause-btn" disabled={pauseUsed} onClick={() => setShowPause(true)} title={pauseUsed ? 'Pause já usado nesta partida' : 'Rever/trocar tática (uso único)'}>
+              {phase !== 'summary' && phase !== 'finishing' && (
+                <button className="pause-btn" disabled={pauseUsed || showPause} onClick={handlePauseClick} title={pauseUsed ? 'Pause já usado nesta partida' : 'Rever/trocar tática (uso único)'}>
                   ⏸ Pause {pauseUsed ? '(usado)' : ''}
                 </button>
               )}
@@ -235,13 +273,6 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
             {mapCards.map((c, i) => <MapCard key={i} card={c} teamName={teamName} oppName={displayOpponentName} />)}
           </div>
 
-          {phase === 'between' && (
-            <div style={{ textAlign: 'center', margin: '18px 0' }}>
-              <Button variant="orange" size="lg" onClick={playMap}>
-                ▶ {mapIndex === 0 ? 'Iniciar 1º Mapa' : `Jogar Mapa ${mapIndex + 1}`}
-              </Button>
-            </div>
-          )}
           {phase === 'finishing' && (
             <div style={{ textAlign: 'center', margin: '18px 0', color: 'var(--text2)' }}>Fechando a série…</div>
           )}
@@ -288,7 +319,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
           onSelectCT={(ct) => setTactics((t) => ({ ...t, ct }))}
           onSelectT={(t2) => setTactics((t) => ({ ...t, t: t2 }))}
           onConfirm={handlePauseConfirm}
-          mapsRemaining={totalMaps - mapIndex}
+          mapsRemaining={Math.max(1, totalMaps - mapCards.length)}
         />
       )}
     </div>
