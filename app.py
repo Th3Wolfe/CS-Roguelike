@@ -13,7 +13,7 @@ from systems.save_system import save_game, load_game, list_saves
 from uuid import uuid4
 from flask import session
 from systems.tactics import (
-    CT_TACTICS, T_TACTICS, enemy_choose_tactic, ENEMY_PAUSE_LINES
+    CT_TACTICS, T_TACTICS, enemy_choose_tactic, ENEMY_PAUSE_LINES, CT_MATCHUP_MOD
 )
 import random as _random
 
@@ -339,9 +339,15 @@ def play_series():
 def play_map():
     """
     Resolve UM mapa da série por vez, em vez da série inteira de uma tacada
-    (como /api/play_series faz). Existe para o Pause Técnico: o front chama
-    isso mapa a mapa, e entre uma chamada e outra o jogador pode pausar e
-    trocar de tática — a próxima chamada já usa a tática nova.
+    (como /api/play_series faz). Existe por dois motivos:
+
+    1. Pause Técnico: o front chama isso mapa a mapa, e entre uma chamada e
+       outra o jogador pode pausar e trocar de tática — a próxima chamada já
+       usa a tática nova.
+    2. IA reativa de verdade: a tática do ADVERSÁRIO é decidida AQUI, no
+       momento da chamada, usando o que o jogador acabou de escolher pra
+       esse mapa e o resultado do mapa anterior — não é mais sorteada sem
+       contexto antes da partida começar (ver enemy_choose_tactic).
 
     O estado da campanha (histórico, avanço de fase, moral dos jogadores...)
     só é gravado de verdade em /api/finish_series, no fim da série. Enquanto
@@ -355,6 +361,7 @@ def play_map():
         return jsonify({"ok": False, "error": "Campanha finalizada"}), 400
 
     from systems.match_resolver import _simulate_map
+    from systems.tactics import enemy_choose_tactic
 
     state = get_session_state()
     data  = request.get_json(silent=True) or {}
@@ -384,16 +391,34 @@ def play_map():
     if tw == 2 or ow == 2:
         return jsonify({"ok": False, "error": "Série já decidida"}), 400
 
-    entry  = veto_maps[map_index]
+    entry = veto_maps[map_index]
+    team_side_h1 = entry.get("team_side", "ct")
+    team_side_h2 = "t" if team_side_h1 == "ct" else "ct"
+    team_tactic_h1 = raw_tactics.get("team_h1")
+    team_tactic_h2 = raw_tactics.get("team_h2")
+
+    # A IA reage de verdade agora: usa a tática que você ACABOU de escolher
+    # pra esse mapa (não uma pré-geração cega antes de saber o que você
+    # jogaria) e o resultado do ÚLTIMO mapa da série (se houver) — quanto
+    # mais avançada a fase, maior a chance dela te contra-atacar de propósito
+    # em vez de escolher à toa (ver enemy_choose_tactic em systems/tactics.py).
+    prev_result = None
+    if progress["maps"]:
+        prev_result = "win" if progress["maps"][-1]["winner"] == "opponent" else "loss"
+    enemy_side_h1 = "t" if team_side_h1 == "ct" else "ct"
+    enemy_side_h2 = team_side_h1
+    enemy_tactic_h1 = enemy_choose_tactic(enemy_side_h1, progress["stage_pre"], team_tactic_h1, prev_result)
+    enemy_tactic_h2 = enemy_choose_tactic(enemy_side_h2, progress["stage_pre"], team_tactic_h2, prev_result)
+
     result = _simulate_map(
         progress["ts"], progress["os"],
         map_name           = entry["map"],
         team_proficiency   = entry.get("proficiency", "half"),
-        team_start_side     = entry.get("team_side", "ct"),
-        team_tactic_h1      = raw_tactics.get("team_h1"),
-        team_tactic_h2      = raw_tactics.get("team_h2"),
-        enemy_tactic_h1     = raw_tactics.get("enemy_h1"),
-        enemy_tactic_h2     = raw_tactics.get("enemy_h2"),
+        team_start_side     = team_side_h1,
+        team_tactic_h1      = team_tactic_h1,
+        team_tactic_h2      = team_tactic_h2,
+        enemy_tactic_h1     = enemy_tactic_h1,
+        enemy_tactic_h2     = enemy_tactic_h2,
     )
     progress["maps"].append(result.to_dict())
 
@@ -472,41 +497,39 @@ def finish_series():
 
 @app.route("/api/tactics_info", methods=["GET"])
 def tactics_info():
-    """Return available tactics and AI tactic choices for upcoming series."""
+    """Retorna as táticas disponíveis, os mapas do veto e a matriz de
+    contra-ataque (pra virar informação de jogo real, não só flavor text).
+    A tática do ADVERSÁRIO não é mais pré-gerada/exposta aqui — ela só é
+    decidida no momento de /api/play_map, reagindo de verdade ao que o
+    jogador escolheu e ao resultado do mapa anterior (ver enemy_choose_tactic
+    em systems/tactics.py, que existia mas nunca era chamada com contexto
+    real antes desta correção)."""
     _, campaign = get_game()
     stage = campaign.state.stage.value if campaign else "stage1"
-
-    # Pre-generate enemy tactics for all potential maps (up to 3)
-    # Enemy tactics are revealed after the series is over in the result
-    # But we need to pre-generate them so the simulation uses them consistently
     state = get_session_state()
-
-    # Generate enemy tactics for this series (3 maps max, 2 halves each)
     veto_maps = state.get("veto_maps") or []
-    num_maps = max(3, len(veto_maps))
 
-    enemy_tactics = {}
-    for mi in range(num_maps):
-        if veto_maps and mi < len(veto_maps):
-            team_start = veto_maps[mi].get("team_side", "ct")
-        else:
-            team_start = "ct"
-        enemy_side_h1 = "t" if team_start == "ct" else "ct"
-        enemy_side_h2 = team_start
+    STAGE_AI_HINT = {
+        "stage1":        "Fase inicial — o adversário ainda não tem padrão, as escolhas dele parecem soltas.",
+        "stage2":        "A essa altura, o adversário já reage ao que deu errado pra ele — se perder, tende a tentar te contra-atacar.",
+        "playoffs_qf":   "Playoffs: adversário estuda suas rodadas anteriores e contra-ataca com frequência.",
+        "playoffs_sf":   "Semifinal: um dos times mais preparados do torneio — espera contra-ataques constantes.",
+        "playoffs_final": "Grande Final: o adversário vai tentar te ler o tempo todo. Cuidado com previsibilidade.",
+    }
 
-        h1 = enemy_choose_tactic(enemy_side_h1, stage)
-        h2 = enemy_choose_tactic(enemy_side_h2, stage)
-        enemy_tactics[mi] = {"h1": h1, "h2": h2}
-
-    state["pending_enemy_tactics"] = enemy_tactics
+    matchups = [
+        {"ct": ct, "t": t, "mod": mod}
+        for (ct, t), mod in CT_MATCHUP_MOD.items()
+    ]
 
     return jsonify({
-        "ok": True,
-        "ct_tactics": CT_TACTICS,
-        "t_tactics":  T_TACTICS,
-        "stage":      stage,
-        "veto_maps":  [{"map": v["map"], "team_side": v.get("team_side","ct")} for v in veto_maps],
-        "enemy_tactics": enemy_tactics,  # pre-generated, sent to client to use in simulation
+        "ok":               True,
+        "ct_tactics":       CT_TACTICS,
+        "t_tactics":        T_TACTICS,
+        "stage":            stage,
+        "ai_hint":          STAGE_AI_HINT.get(stage, ""),
+        "veto_maps":        [{"map": v["map"], "team_side": v.get("team_side", "ct")} for v in veto_maps],
+        "matchups":         matchups,
         "enemy_pause_lines": ENEMY_PAUSE_LINES,
     })
 

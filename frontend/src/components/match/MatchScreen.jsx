@@ -3,6 +3,7 @@ import { get, post } from '../../api/client';
 import { useMusic } from '../../music/MusicContext';
 import Button from '../ui/Button';
 import PauseModal from './PauseModal';
+import { edgeFor, cleanTacticLabel, tacticEmoji } from '../../utils/tacticEdge';
 import './MatchScreen.css';
 
 // Mapas jogam em sequência automática (sem clicar "próximo mapa"). O Pause
@@ -161,6 +162,8 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
     setMapCards((prev) => [...prev, {
       mapName: map.map_name, wentOT: map.went_ot, teamSide, oppSide,
       scoreT: 0, scoreO: 0, h1Dots: [], h2Dots: [], resultBadge: null, visible: false,
+      teamTacticH1: map.team_tactic_h1, teamTacticH2: map.team_tactic_h2,
+      enemyTacticH1: map.enemy_tactic_h1, enemyTacticH2: map.enemy_tactic_h2,
     }]);
     await sleep(150);
     await waitIfPaused();
@@ -270,7 +273,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
           </div>
 
           <div>
-            {mapCards.map((c, i) => <MapCard key={i} card={c} teamName={teamName} oppName={displayOpponentName} />)}
+            {mapCards.map((c, i) => <MapCard key={i} card={c} teamName={teamName} oppName={displayOpponentName} info={info} />)}
           </div>
 
           {phase === 'finishing' && (
@@ -326,7 +329,7 @@ export default function MatchScreen({ team, opponentName, initialTactics, onDone
   );
 }
 
-function MapCard({ card, teamName, oppName }) {
+function MapCard({ card, teamName, oppName, info }) {
   return (
     <div className={`map-score-card ${card.visible ? 'vis' : ''}`}>
       <div className="msc-head">
@@ -362,6 +365,46 @@ function MapCard({ card, teamName, oppName }) {
           </div>
         </div>
       </div>
+
+      {card.resultBadge && info && (
+        <TacticalClash card={card} info={info} />
+      )}
+    </div>
+  );
+}
+
+// Revela o que o adversário jogou de verdade (só depois do mapa acabar —
+// nunca antes, senão vira leitura de mão) e mostra quem levou vantagem em
+// cada half, usando a mesma matriz de matchup do painel de táticas.
+function TacticalClash({ card, info }) {
+  const halves = [
+    { label: '1º Half', side: card.teamSide, teamKey: card.teamTacticH1, enemyKey: card.enemyTacticH1 },
+    { label: '2º Half', side: card.oppSide, teamKey: card.teamTacticH2, enemyKey: card.enemyTacticH2 },
+  ];
+
+  return (
+    <div className="tac-clash">
+      <div className="tac-clash-title">Confronto Tático</div>
+      {halves.map((h, i) => {
+        const teamTactics = h.side === 'ct' ? info.ct_tactics : info.t_tactics;
+        const enemyTactics = h.side === 'ct' ? info.t_tactics : info.ct_tactics;
+        const teamV = teamTactics?.[h.teamKey];
+        const enemyV = enemyTactics?.[h.enemyKey];
+        if (!teamV || !enemyV) return null;
+        const edge = edgeFor(info.matchups, h.side, h.teamKey, h.enemyKey);
+        const cls = edge > 0.02 ? 'good' : edge < -0.02 ? 'bad' : 'neutral';
+        return (
+          <div className="tac-clash-row" key={i}>
+            <span className="tac-clash-half">{h.label}</span>
+            <span className="tac-clash-you">{tacticEmoji(teamV)} {cleanTacticLabel(teamV.label)}</span>
+            <span className="tac-clash-vs">vs</span>
+            <span className="tac-clash-them">{tacticEmoji(enemyV)} {cleanTacticLabel(enemyV.label)}</span>
+            <span className={`tac-clash-edge ${cls}`}>
+              {cls === 'good' ? '▲ vantagem' : cls === 'bad' ? '▼ desvantagem' : '● parelho'}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { get } from '../../api/client';
 import Button from '../ui/Button';
+import { edgeFor, cleanTacticLabel as cleanLabel, tacticEmoji as emojiOf } from '../../utils/tacticEdge';
 import './TacticsPanel.css';
 
-// Port do hub-get-ready. Nota: no backend, CT_TACTICS/T_TACTICS só têm
-// `label` e `desc` — os campos `flavor`, `counters`, `weak` e `emoji` que o
-// vanilla tentava ler nunca existiram, então a seção "Bom contra / Fraco
-// contra" do preview nunca renderizava nada (sempre ficava vazia). Replico
-// esse mesmo comportamento aqui (sem inventar dados que o backend não tem):
-// o emoji vem da primeira palavra do label, e o "flavor" cai pro desc.
+// Port do hub-get-ready. A seção "Bom contra / Fraco contra" do preview
+// ERA morta no vanilla (os campos que ela lia — `flavor`, `counters`,
+// `weak` — nunca existiram no backend). Agora ela mostra dado real: puxamos
+// a matriz de contra-ataque de /api/tactics_info (systems/tactics.py,
+// CT_MATCHUP_MOD) e calculamos, pra cada tática, como ela se sai contra
+// as 3 respostas possíveis do adversário do outro lado — informação de
+// verdade pro jogador decidir, não só flavor text.
 const TAC_MAP_IMG = {
   aggressive: '/ui/static/map-ct-agressivo.png',
   passive: '/ui/static/map-ct-passivo-hold.png',
@@ -17,13 +19,6 @@ const TAC_MAP_IMG = {
   slow_default: '/ui/static/map-tr-slowdefault.png',
   anti_eco: '/ui/static/map-tr-antieco-push.png',
 };
-
-function cleanLabel(label) {
-  return (label || '').replace(/^\S+\s/, '');
-}
-function emojiOf(v) {
-  return v.emoji || (v.label || '').split(' ')[0] || '';
-}
 
 export default function TacticsPanel({
   selectedCT, selectedT, onSelectCT, onSelectT, onPlay, disabled,
@@ -35,6 +30,8 @@ export default function TacticsPanel({
 }) {
   const [ctTactics, setCtTactics] = useState(null);
   const [tTactics, setTTactics] = useState(null);
+  const [matchups, setMatchups] = useState(null);
+  const [aiHint, setAiHint] = useState('');
   const [preview, setPreview] = useState(null); // { side, key }
 
   useEffect(() => {
@@ -42,6 +39,8 @@ export default function TacticsPanel({
       if (!r.ok) return;
       setCtTactics(r.ct_tactics);
       setTTactics(r.t_tactics);
+      setMatchups(r.matchups);
+      setAiHint(r.ai_hint || '');
     });
   }, []);
 
@@ -60,6 +59,12 @@ export default function TacticsPanel({
         <div className="hub-gr-eyebrow">{eyebrow}</div>
         <div className="hub-gr-title">{title}</div>
         <div className="hub-gr-subtitle">{subtitle}</div>
+        {aiHint && (
+          <div className="hub-gr-scouting">
+            <span className="hub-gr-scouting-icon">🔍</span>
+            <span><b>Scouting:</b> {aiHint}</span>
+          </div>
+        )}
       </div>
 
       <div className="hub-gr-body">
@@ -90,7 +95,12 @@ export default function TacticsPanel({
               <div>Clique em uma tática<br />para ver os detalhes</div>
             </div>
           ) : (
-            <PreviewContent side={preview.side} tacKey={preview.key} tactics={preview.side === 'ct' ? ctTactics : tTactics} />
+            <PreviewContent
+              side={preview.side} tacKey={preview.key}
+              tactics={preview.side === 'ct' ? ctTactics : tTactics}
+              oppTactics={preview.side === 'ct' ? tTactics : ctTactics}
+              matchups={matchups}
+            />
           )}
         </div>
 
@@ -164,11 +174,20 @@ function TacticOption({ side, tacKey, v, selected, onSelect, onHover }) {
   );
 }
 
-function PreviewContent({ side, tacKey, tactics }) {
+function PreviewContent({ side, tacKey, tactics, oppTactics, matchups }) {
   const v = tactics?.[tacKey];
   if (!v) return null;
   const label = cleanLabel(v.label);
   const emoji = emojiOf(v);
+  const oppSide = side === 'ct' ? 't' : 'ct';
+
+  const breakdown = oppTactics ? Object.entries(oppTactics).map(([oppKey, oppV]) => ({
+    key: oppKey,
+    label: cleanLabel(oppV.label),
+    emoji: emojiOf(oppV),
+    edge: edgeFor(matchups, side, tacKey, oppKey),
+  })) : [];
+
   return (
     <div>
       <div className="hub-preview-img">
@@ -178,11 +197,20 @@ function PreviewContent({ side, tacKey, tactics }) {
         {side === 'ct' ? 'CT — DEFESA' : 'TR — ATAQUE'}
       </div>
       <div className="hub-preview-name">{emoji} {label}</div>
-      <div className="hub-preview-flavor">{v.flavor || v.desc || ''}</div>
-      {(v.counters || v.weak) && (
+      <div className="hub-preview-flavor">{v.desc || ''}</div>
+
+      {breakdown.length > 0 && (
         <div className="hub-preview-matchup">
-          {v.counters && <div className="hub-pm-row hub-pm-good">✔ <b>Bom contra:</b>&nbsp;{v.counters}</div>}
-          {v.weak && <div className="hub-pm-row hub-pm-bad">⚠ <b>Fraco contra:</b>&nbsp;{v.weak}</div>}
+          <div className="hub-pm-title">Contra a resposta {oppSide === 'ct' ? 'CT' : 'TR'} do adversário:</div>
+          {breakdown.map((b) => (
+            <div className={`hub-pm-row ${b.edge > 0.02 ? 'hub-pm-good' : b.edge < -0.02 ? 'hub-pm-bad' : 'hub-pm-neutral'}`} key={b.key}>
+              <span className="hub-pm-opp">{b.emoji} {b.label}</span>
+              <span className="hub-pm-bar-track">
+                <span className="hub-pm-bar-fill" style={{ width: `${Math.min(100, Math.abs(b.edge) * 700)}%` }} />
+              </span>
+              <span className="hub-pm-edge">{b.edge > 0 ? '+' : ''}{Math.round(b.edge * 100)}%</span>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -191,3 +191,35 @@
   background: rgba(224,48,48,.08);
   border-bottom: 1px solid rgba(224,48,48,.25);
 }
+
+/* ── Confronto Tático (revelado após cada mapa) ── */
+.tac-clash {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.tac-clash-title {
+  font-family: var(--font-display);
+  font-size: .6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+.tac-clash-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .72rem;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+.tac-clash-half { font-family: var(--font-display); font-weight: 700; color: var(--text3); flex: 0 0 52px; font-size: .64rem; text-transform: uppercase; }
+.tac-clash-you { color: var(--color-primary); }
+.tac-clash-them { color: var(--text2); }
+.tac-clash-vs { color: var(--text3); font-size: .64rem; }
+.tac-clash-edge { margin-left: auto; font-family: var(--font-display); font-size: .64rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.tac-clash-edge.good    { color: var(--color-success); }
+.tac-clash-edge.bad     { color: var(--color-danger); }
+.tac-clash-edge.neutral { color: var(--text3); }

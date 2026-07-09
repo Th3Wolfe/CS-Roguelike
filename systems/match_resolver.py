@@ -67,6 +67,10 @@ class MapResult:
     opp_half2:       int    = 0
     team_ot:         int    = 0
     opp_ot:          int    = 0
+    team_tactic_h1:  str | None = None
+    team_tactic_h2:  str | None = None
+    enemy_tactic_h1: str | None = None
+    enemy_tactic_h2: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -82,6 +86,10 @@ class MapResult:
             "opp_half2":       self.opp_half2,
             "team_ot":         self.team_ot,
             "opp_ot":          self.opp_ot,
+            "team_tactic_h1":  self.team_tactic_h1,
+            "team_tactic_h2":  self.team_tactic_h2,
+            "enemy_tactic_h1": self.enemy_tactic_h1,
+            "enemy_tactic_h2": self.enemy_tactic_h2,
         }
 
 
@@ -264,6 +272,8 @@ def _simulate_map(ts: float, os_: float,
         team_half1=h1_t, opp_half1=h1_o,
         team_half2=h2_t, opp_half2=h2_o,
         team_ot=team_ot, opp_ot=opp_ot,
+        team_tactic_h1=team_tactic_h1, team_tactic_h2=team_tactic_h2,
+        enemy_tactic_h1=enemy_tactic_h1, enemy_tactic_h2=enemy_tactic_h2,
     )
 
 
